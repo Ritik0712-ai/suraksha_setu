@@ -1,0 +1,60 @@
+import { http, HttpResponse } from "msw";
+import { setupServer } from "msw/node";
+
+export const VILLAGE = {
+  id: "6ab80d7c71b27ffe37aa43c9",
+  name: { en: "Mahodiya", hi: "महोदिया" },
+  type: "village",
+  parentId: null,
+};
+
+export const citizen = (over = {}) => ({
+  id: "u1",
+  name: "Sunita Devi",
+  phone: "+919876543210",
+  email: null,
+  role: "citizen",
+  status: "active",
+  language: "hi",
+  textSize: "md",
+  gender: null,
+  jurisdictionId: VILLAGE.id,
+  villageOther: null,
+  emergencyContactCount: 0,
+  authority: null,
+  mustChangePassword: false,
+  ...over,
+});
+
+export const officer = (over = {}) =>
+  citizen({
+    id: "a1",
+    name: "Mr Verma",
+    role: "authority",
+    authority: { jurisdictionIds: [VILLAGE.id], departmentId: null, title: null },
+    ...over,
+  });
+
+export const tokens = (user) => ({
+  data: { accessToken: `token-${user.id}`, expiresIn: 900, user },
+});
+export const apiErr = (status, code, message, details) =>
+  HttpResponse.json({ error: { code, message, ...(details ? { details } : {}) } }, { status });
+
+// Default: logged out, healthy API.
+export const handlers = [
+  http.post("*/api/v1/auth/refresh", () => apiErr(401, "UNAUTHENTICATED", "Please log in again.")),
+  http.get("*/api/v1/health", () => HttpResponse.json({ status: "ok", db: "up", ai: "up" })),
+  http.get("*/api/v1/jurisdictions", () => HttpResponse.json({ data: [VILLAGE] })),
+  http.patch("*/api/v1/users/me", async ({ request }) =>
+    HttpResponse.json({ data: citizen(await request.json()) }),
+  ),
+];
+
+export const server = setupServer(...handlers);
+
+/** Makes the initial refresh succeed as `user`. */
+export const loggedInAs = (user) =>
+  server.use(http.post("*/api/v1/auth/refresh", () => HttpResponse.json(tokens(user))));
+
+export { http, HttpResponse };

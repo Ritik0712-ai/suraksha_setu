@@ -5,7 +5,11 @@ import { invalidateUser, requireAuth } from "../../middleware/auth.js";
 import { validate } from "../../middleware/validate.js";
 import { User } from "../../models/User.js";
 import { setRefreshCookie } from "../auth/cookies.js";
-import { changePasswordBody, updateMeBody } from "../auth/schemas.js";
+import { verifyPassword } from "../../lib/password.js";
+import { clearRefreshCookie } from "../auth/cookies.js";
+import { changePasswordBody, deleteAccountBody, updateMeBody } from "../auth/schemas.js";
+import { contactsRouter } from "./contacts.js";
+import { deleteAccount } from "./deleteAccount.js";
 
 const wrap = (fn) => (req, res, next) => fn(req, res, next).catch(next);
 
@@ -55,6 +59,24 @@ export function usersRouter({ env, auth }) {
           user: tokens.user.toSelfJSON(),
         },
       });
+    }),
+  );
+
+  router.use("/me/contacts", contactsRouter());
+
+  // Delete my account — asks for the password again (docs/03 S-27).
+  router.delete(
+    "/me",
+    validate({ body: deleteAccountBody }),
+    wrap(async (req, res) => {
+      const user = await User.findById(req.user._id).select("+passwordHash");
+      if (!(await verifyPassword(req.body.password, user.passwordHash)))
+        throw new AppError("VALIDATION_ERROR", "wrong_current_password", [
+          { field: "password", issue: "incorrect" },
+        ]);
+      await deleteAccount(user, req, { bcryptCost: env.BCRYPT_COST });
+      clearRefreshCookie(res, env);
+      res.json({ data: { ok: true } });
     }),
   );
 

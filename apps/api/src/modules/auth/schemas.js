@@ -87,3 +87,17 @@ export const updateMeBody = z
   })
   .strict()
   .refine((v) => Object.keys(v).length > 0, { message: "empty_update" });
+
+export const contactBody = z.object({
+  name: z.string().trim().min(1).max(60),
+  relation: z.enum(C.contactRelations),
+  phone,
+  email: email.nullable().optional(),
+});
+
+export const contactPatchBody = contactBody
+  .partial()
+  .strict()
+  .refine((v) => Object.keys(v).length > 0, { message: "empty_update" });
+
+export const deleteAccountBody = z.object({ password: z.string().min(1).max(200) });

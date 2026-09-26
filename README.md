@@ -139,6 +139,11 @@ All routes are under `/api/v1`. Responses use `{ data }` on success and `{ error
 | GET    | `/auth/me`                                      | Auth                  |
 | PATCH  | `/users/me`                                     | Auth                  |
 | PUT    | `/users/me/password`                            | Auth                  |
+| DELETE | `/users/me` (password required, doc 05 §10)     | Auth                  |
+| GET    | `/users/me/contacts`                            | Citizen               |
+| POST   | `/users/me/contacts` (max 5)                    | Citizen               |
+| PATCH  | `/users/me/contacts/:contactId`                 | Citizen               |
+| DELETE | `/users/me/contacts/:contactId`                 | Citizen               |
 | POST   | `/admin/users/:id/reset-code`                   | Admin (audited)       |
 | GET    | `/jurisdictions?type=&q=`                       | Public                |
 
@@ -162,4 +167,13 @@ Test a restore into a scratch database once before the pilot (doc 06 task 7.7).
 - ✅ Phase 0 — setup
 - ✅ Phase 1 — authentication (tasks 1.1–1.10)
 - ✅ Phase 2 — database: all 19 models, migrations setup, seeds, jurisdiction resolver, department routing, complaint numbers, nightly backups (tasks 2.1–2.7)
-- ⏭ Phase 3 — core UI (design system, app shell, auth screens) — see doc 06 §4
+- ✅ Phase 3 — core UI: design system, citizen + portal shells, auth/profile/contacts screens, system screens, route guards, PWA (tasks 3.1–3.10)
+- ⏭ Phase 4A — Women's SOS — see doc 06 §4
+
+## Frontend notes
+
+- `npm run dev:web` → http://localhost:5173. In development, **/dev/components** shows every shared component; switch the language from the header to check both.
+- Routes for modules that later phases build (SOS, complaints, schemes, …) already exist and show a "coming soon" page with the emergency helplines, so no link dead-ends.
+- The access token lives only in memory (Zustand); language and text size are saved on the device. Server data goes through TanStack Query, and the API client refreshes once on `TOKEN_EXPIRED` and retries.
+- Every visible string is in `apps/web/src/i18n/locales/{hi,en}/<namespace>.json`. Hindi is the default.
+- React Router is on **v7** (doc 02 §3 says v6): v6 has an unpatched open-redirect advisory (GHSA-wrjc-x8rr-h8h6), fixed only in v7.

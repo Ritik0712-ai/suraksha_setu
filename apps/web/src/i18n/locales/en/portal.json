@@ -1,0 +1,25 @@
+{
+  "title": "Authority portal",
+  "openMenu": "Open menu",
+  "nav": {
+    "overview": "Overview",
+    "complaints": "Complaints",
+    "liveSos": "Live SOS",
+    "analytics": "Analytics",
+    "admin": "Admin",
+    "users": "Users",
+    "schemes": "Schemes",
+    "emergencyDirectory": "Emergency directory",
+    "departments": "Departments",
+    "jurisdictions": "Areas",
+    "audit": "Audit log",
+    "profile": "My profile"
+  },
+  "roles": {
+    "authority": "Authority",
+    "admin": "Admin",
+    "citizen": "Citizen"
+  },
+  "comingSoon": "This part of the portal is being built.",
+  "welcome": "Welcome, {{name}}"
+}

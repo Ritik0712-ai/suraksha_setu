@@ -32,7 +32,13 @@ export const theme = createTheme({
       defaultProps: { disableElevation: true },
       styleOverrides: { root: { minHeight: 56, paddingInline: 24 }, sizeSmall: { minHeight: 48 } },
     },
+    // Labels always sit above the field, never inside it like a placeholder (docs/04 §5.4).
+    MuiInputLabel: {
+      defaultProps: { shrink: true },
+      styleOverrides: { root: { color: "#1A1A1A", fontWeight: 500 } },
+    },
     MuiOutlinedInput: {
+      defaultProps: { notched: true },
       styleOverrides: {
         root: { minHeight: 56 },
         notchedOutline: { borderColor: "#7A8699" },

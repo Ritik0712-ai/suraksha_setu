@@ -1,0 +1,13 @@
+{
+  "notFound": "Page not found",
+  "forbidden": "You don't have access to this page",
+  "goPortal": "Go to portal",
+  "sessionExpired": "Please log in again",
+  "sessionExpiredBody": "Your session ended. Log in to continue where you left off.",
+  "crash": "Something went wrong.",
+  "reload": "Reload",
+  "maintenance": "We're fixing something. Emergency numbers still work below.",
+  "citizensOnly": "This page is for citizens.",
+  "chooseLanguage": "Choose your language",
+  "lookAround": "No account needed to look around."
+}

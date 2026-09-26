@@ -1,10 +1,135 @@
 {
   "appName": "सुरक्षा सेतु",
   "tagline": "सुरक्षा, शिकायत, योजनाएं — सब एक जगह",
-  "emergencyBar": "आपातकाल? 112 पर कॉल करें",
   "languageToggleLabel": "Language / भाषा",
-  "setupNotice": "ऐप बन रहा है। जल्द ही यहाँ सभी सेवाएँ मिलेंगी।",
+  "emergencyBar": "आपातकाल? 112 पर कॉल करें",
   "footer": {
-    "disclaimer": "सुरक्षा सेतु VIT भोपाल का एक स्वतंत्र छात्र प्रोजेक्ट है। यह सरकारी सेवा नहीं है।"
+    "disclaimer": "सुरक्षा सेतु VIT भोपाल का एक स्वतंत्र छात्र प्रोजेक्ट है। यह सरकारी सेवा नहीं है।",
+    "about": "हमारे बारे में",
+    "privacy": "गोपनीयता"
+  },
+  "nav": {
+    "main": "मुख्य मेन्यू",
+    "home": "होम",
+    "schemes": "योजनाएं",
+    "sos": "SOS",
+    "sahayak": "सहायक",
+    "profile": "प्रोफ़ाइल",
+    "complaints": "शिकायतें",
+    "blood": "रक्तदान",
+    "emergency": "आपातकाल"
+  },
+  "header": {
+    "home": "सुरक्षा सेतु होम",
+    "textSize": "अक्षर का आकार",
+    "sizeSm": "छोटे अक्षर",
+    "sizeMd": "सामान्य अक्षर",
+    "sizeLg": "बड़े अक्षर",
+    "notifications": "सूचनाएं"
+  },
+  "actions": {
+    "retry": "फिर से कोशिश करें",
+    "cancel": "रद्द करें",
+    "save": "सेव करें",
+    "back": "वापस",
+    "next": "आगे",
+    "close": "बंद करें",
+    "edit": "बदलें",
+    "delete": "हटाएं",
+    "continue": "आगे बढ़ें",
+    "goHome": "होम पर जाएं",
+    "logIn": "लॉग इन",
+    "register": "रजिस्टर करें",
+    "showPassword": "पासवर्ड दिखाएं",
+    "hidePassword": "पासवर्ड छिपाएं",
+    "call": "{{number}} पर कॉल करें",
+    "skipToContent": "मुख्य सामग्री पर जाएं"
+  },
+  "states": {
+    "slow": "सामान्य से ज़्यादा समय लग रहा है…",
+    "networkError": "लोड नहीं हो सका। इंटरनेट जाँचें।",
+    "serverError": "हमारी तरफ़ से गड़बड़ हुई। फिर से कोशिश करें।",
+    "needsInternet": "इंटरनेट चाहिए"
+  },
+  "offline": {
+    "banner": "आप ऑफ़लाइन हैं। कुछ सुविधाएँ काम नहीं करेंगी।",
+    "backOnline": "फिर से ऑनलाइन"
+  },
+  "toast": {
+    "saved": "सेव हो गया",
+    "deleted": "हटा दिया गया",
+    "loggedOut": "लॉग आउट हो गए"
+  },
+  "errors": {
+    "required": "यह भरना ज़रूरी है।",
+    "invalid_phone": "10 अंकों का मोबाइल नंबर डालें।",
+    "too_short": "यह बहुत छोटा है।",
+    "too_long": "यह बहुत लंबा है।",
+    "only_digits": "सिर्फ़ नंबर नहीं, अक्षर भी डालें।",
+    "password_too_short": "कम से कम 8 अक्षर।",
+    "invalid_name": "सिर्फ़ अक्षर और खाली जगह इस्तेमाल करें।",
+    "invalid_email": "सही ईमेल पता डालें।",
+    "consent_required": "आगे बढ़ने के लिए स्वीकार करें।",
+    "taken": "यह नंबर पहले से रजिस्टर है।",
+    "own_number": "यह आपका अपना नंबर है।",
+    "duplicate": "यह नंबर पहले से जुड़ा है।",
+    "incorrect": "यह पासवर्ड गलत है।",
+    "invalid": "कृपया इसे जाँचें।",
+    "mismatch": "पासवर्ड मेल नहीं खाते।",
+    "invalid_code": "6 अंकों का कोड डालें।",
+    "village_required": "अपना गाँव चुनें या “मेरा गाँव सूची में नहीं है” चुनें।"
+  },
+  "status": {
+    "SUBMITTED": "दर्ज हुई",
+    "VERIFIED": "जाँची गई",
+    "ASSIGNED": "सौंपी गई",
+    "IN_PROGRESS": "काम चल रहा है",
+    "RESOLVED": "हल हो गई",
+    "REJECTED": "अस्वीकार",
+    "SOS_ACTIVE": "SOS चालू",
+    "SOS_ACKNOWLEDGED": "देख लिया गया",
+    "SOS_RESOLVED": "सुरक्षित"
+  },
+  "modules": {
+    "report": "शिकायत करें",
+    "myComplaints": "मेरी शिकायतें",
+    "schemes": "सरकारी योजनाएं",
+    "check": "पात्रता जाँचें",
+    "emergency": "आपातकालीन नंबर",
+    "blood": "रक्तदाता",
+    "sahayak": "सहायक",
+    "fakeCall": "नकली कॉल",
+    "sos": "SOS",
+    "notifications": "सूचनाएं",
+    "track": "लाइव लोकेशन"
+  },
+  "relations": {
+    "mother": "माँ",
+    "father": "पिता",
+    "husband": "पति",
+    "wife": "पत्नी",
+    "brother": "भाई",
+    "sister": "बहन",
+    "son": "बेटा",
+    "daughter": "बेटी",
+    "friend": "दोस्त",
+    "other": "अन्य"
+  },
+  "comingSoon": {
+    "title": "जल्द आ रहा है",
+    "body": "यह सेवा बन रही है। आपातकालीन नंबर अभी से काम करते हैं — कॉल करने के लिए दबाएं।"
+  },
+  "wizard": {
+    "step": "चरण {{current}} / {{total}}"
+  },
+  "helplines": {
+    "title": "आपातकालीन नंबर"
+  },
+  "dialog": {
+    "confirmTitle": "क्या आप पक्का हैं?"
+  },
+  "languages": {
+    "hi": "हिन्दी",
+    "en": "English"
   }
 }

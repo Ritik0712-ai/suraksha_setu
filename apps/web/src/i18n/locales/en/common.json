@@ -1,10 +1,135 @@
 {
   "appName": "Suraksha Setu",
   "tagline": "Safety, complaints, schemes — all in one place",
-  "emergencyBar": "Emergency? Call 112",
   "languageToggleLabel": "Language / भाषा",
-  "setupNotice": "The app is being built. All services will be available here soon.",
+  "emergencyBar": "Emergency? Call 112",
   "footer": {
-    "disclaimer": "Suraksha Setu is an independent student project of VIT Bhopal. Not a government service."
+    "disclaimer": "Suraksha Setu is an independent student project of VIT Bhopal. Not a government service.",
+    "about": "About",
+    "privacy": "Privacy"
+  },
+  "nav": {
+    "main": "Main menu",
+    "home": "Home",
+    "schemes": "Schemes",
+    "sos": "SOS",
+    "sahayak": "Sahayak",
+    "profile": "Profile",
+    "complaints": "Complaints",
+    "blood": "Blood",
+    "emergency": "Emergency"
+  },
+  "header": {
+    "home": "Suraksha Setu home",
+    "textSize": "Text size",
+    "sizeSm": "Smaller text",
+    "sizeMd": "Normal text",
+    "sizeLg": "Larger text",
+    "notifications": "Notifications"
+  },
+  "actions": {
+    "retry": "Try again",
+    "cancel": "Cancel",
+    "save": "Save",
+    "back": "Back",
+    "next": "Next",
+    "close": "Close",
+    "edit": "Edit",
+    "delete": "Delete",
+    "continue": "Continue",
+    "goHome": "Go home",
+    "logIn": "Log in",
+    "register": "Register",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "call": "Call {{number}}",
+    "skipToContent": "Skip to content"
+  },
+  "states": {
+    "slow": "Taking longer than usual…",
+    "networkError": "Couldn't load. Check your internet.",
+    "serverError": "Something went wrong on our side. Please try again.",
+    "needsInternet": "Needs internet"
+  },
+  "offline": {
+    "banner": "You're offline. Some features won't work.",
+    "backOnline": "Back online"
+  },
+  "toast": {
+    "saved": "Saved",
+    "deleted": "Deleted",
+    "loggedOut": "Logged out"
+  },
+  "errors": {
+    "required": "This is required.",
+    "invalid_phone": "Enter a 10-digit mobile number.",
+    "too_short": "This is too short.",
+    "too_long": "This is too long.",
+    "only_digits": "Use letters too, not only numbers.",
+    "password_too_short": "At least 8 characters.",
+    "invalid_name": "Use letters and spaces only.",
+    "invalid_email": "Enter a valid email address.",
+    "consent_required": "Please accept to continue.",
+    "taken": "This number is already registered.",
+    "own_number": "This is your own number.",
+    "duplicate": "Already added.",
+    "incorrect": "This password is incorrect.",
+    "invalid": "Please check this.",
+    "mismatch": "Passwords don't match.",
+    "invalid_code": "Enter the 6-digit code.",
+    "village_required": "Choose your village or tick “My village is not listed”."
+  },
+  "status": {
+    "SUBMITTED": "Submitted",
+    "VERIFIED": "Verified",
+    "ASSIGNED": "Assigned",
+    "IN_PROGRESS": "In progress",
+    "RESOLVED": "Resolved",
+    "REJECTED": "Rejected",
+    "SOS_ACTIVE": "SOS active",
+    "SOS_ACKNOWLEDGED": "Acknowledged",
+    "SOS_RESOLVED": "Safe"
+  },
+  "modules": {
+    "report": "Report a problem",
+    "myComplaints": "My complaints",
+    "schemes": "Government schemes",
+    "check": "Check eligibility",
+    "emergency": "Emergency numbers",
+    "blood": "Blood donors",
+    "sahayak": "Sahayak",
+    "fakeCall": "Fake call",
+    "sos": "SOS",
+    "notifications": "Notifications",
+    "track": "Live location"
+  },
+  "relations": {
+    "mother": "Mother",
+    "father": "Father",
+    "husband": "Husband",
+    "wife": "Wife",
+    "brother": "Brother",
+    "sister": "Sister",
+    "son": "Son",
+    "daughter": "Daughter",
+    "friend": "Friend",
+    "other": "Other"
+  },
+  "comingSoon": {
+    "title": "Coming soon",
+    "body": "This service is being built. Emergency numbers already work — tap one to call."
+  },
+  "wizard": {
+    "step": "Step {{current}} of {{total}}"
+  },
+  "helplines": {
+    "title": "Emergency numbers"
+  },
+  "dialog": {
+    "confirmTitle": "Are you sure?"
+  },
+  "languages": {
+    "hi": "हिन्दी",
+    "en": "English"
   }
 }

@@ -65,6 +65,22 @@ export const MESSAGES = {
     en: "Your current password is incorrect.",
     hi: "आपका मौजूदा पासवर्ड गलत है।",
   },
+  own_number: {
+    en: "This is your own number.",
+    hi: "यह आपका अपना नंबर है।",
+  },
+  contact_duplicate: {
+    en: "Already added.",
+    hi: "यह नंबर पहले से जुड़ा है।",
+  },
+  too_many_contacts: {
+    en: "Maximum 5 contacts.",
+    hi: "अधिकतम 5 संपर्क।",
+  },
+  contact_not_found: {
+    en: "Contact not found.",
+    hi: "संपर्क नहीं मिला।",
+  },
   user_not_found: {
     en: "User not found.",
     hi: "उपयोगकर्ता नहीं मिला।",

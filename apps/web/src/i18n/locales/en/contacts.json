@@ -1,0 +1,23 @@
+{
+  "title": "Emergency contacts",
+  "intro": "These people get your SOS alert (max 5)",
+  "add": "Add contact",
+  "max": "Maximum 5 contacts",
+  "emptyTitle": "No contacts yet",
+  "emptyBody": "Add at least one person you trust.",
+  "formAdd": "Add contact",
+  "formEdit": "Edit contact",
+  "name": "Name",
+  "relation": "Relation",
+  "mobile": "Mobile number",
+  "email": "Email (optional)",
+  "emailHelp": "Adds an email alert during SOS.",
+  "pick": "Pick from phone contacts",
+  "test": "Test alert",
+  "testMessage": "This is a test from Suraksha Setu. {{name}} added you as an emergency contact.",
+  "actionsFor": "Actions for {{name}}",
+  "deleteTitle": "Remove {{name}}?",
+  "deleteBody": "They won't get your SOS alerts any more.",
+  "onboardingTitle": "One last step: add people to alert in an emergency",
+  "skip": "Skip for now"
+}

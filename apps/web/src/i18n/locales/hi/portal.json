@@ -1,0 +1,25 @@
+{
+  "title": "प्रशासन पोर्टल",
+  "openMenu": "मेन्यू खोलें",
+  "nav": {
+    "overview": "सारांश",
+    "complaints": "शिकायतें",
+    "liveSos": "लाइव SOS",
+    "analytics": "विश्लेषण",
+    "admin": "एडमिन",
+    "users": "उपयोगकर्ता",
+    "schemes": "योजनाएं",
+    "emergencyDirectory": "आपातकालीन सूची",
+    "departments": "विभाग",
+    "jurisdictions": "क्षेत्र",
+    "audit": "ऑडिट लॉग",
+    "profile": "मेरी प्रोफ़ाइल"
+  },
+  "roles": {
+    "authority": "अधिकारी",
+    "admin": "एडमिन",
+    "citizen": "नागरिक"
+  },
+  "comingSoon": "पोर्टल का यह हिस्सा बन रहा है।",
+  "welcome": "स्वागत है, {{name}}"
+}

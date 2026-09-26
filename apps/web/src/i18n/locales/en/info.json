@@ -1,0 +1,32 @@
+{
+  "about": {
+    "title": "About Suraksha Setu",
+    "what": "Suraksha Setu (“safety bridge”) brings emergency help, civic complaints, government-scheme guidance, blood-donor search and a Hindi writing assistant together in one simple app.",
+    "pilot": "We are starting with Mahodiya village, Sehore district, Madhya Pradesh.",
+    "project": "This is a student project for DSN3099 (Engineering Projects in Community Service) at VIT Bhopal.",
+    "notGov": "Suraksha Setu is independent. It is not a government service and is not connected to any government office. Scheme information comes from official sources, which we show on every scheme.",
+    "helplines": "In an emergency, always call 112. Suraksha Setu helps you reach help faster but does not replace official helplines.",
+    "team": "Team",
+    "teamBody": "Ritik Agarwal (tech lead) and the Suraksha Setu team, VIT Bhopal."
+  },
+  "privacy": {
+    "title": "Privacy & your data",
+    "intro": "We collect only what we need to help you, and we tell you why.",
+    "collectTitle": "What we collect and why",
+    "collect1": "Your name, mobile number and village — to create your account and route your complaints.",
+    "collect2": "Your location, only when you send an SOS or file a complaint.",
+    "collect3": "Photos you upload with complaints.",
+    "collect4": "Your emergency contacts — used only to alert them during an SOS.",
+    "seeTitle": "Who can see it",
+    "see1": "Your SOS location: you, the people you send the link to (until it expires), and the officer for your area.",
+    "see2": "Your complaints: you and the officers handling them.",
+    "see3": "Blood donors' phone numbers are hidden until someone asks, and every request is recorded.",
+    "keepTitle": "How long we keep it",
+    "keep1": "SOS location trail: 90 days after the SOS ends.",
+    "keep2": "Complaints: 3 years.",
+    "keep3": "Sahayak chats: 90 days after your last message.",
+    "keep4": "Notifications: 180 days.",
+    "deleteTitle": "Deleting your account",
+    "deleteBody": "Go to Profile → Delete my account. We remove your profile, contacts, donor profile and chats. Complaints stay without your name so the work can be finished."
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "greeting": "Namaste 🙏",
+  "greetingName": "Namaste, {{name}}",
+  "sosCard": {
+    "title": "SOS — need help?",
+    "button": "Press SOS",
+    "hint": "Alerts your family with your location"
+  },
+  "setup": {
+    "title": "No emergency contacts yet",
+    "button": "Add contacts"
+  },
+  "account": {
+    "text": "Create an account to save your complaints and contacts"
+  },
+  "services": "Services"
+}
