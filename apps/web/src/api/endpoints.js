@@ -43,3 +43,19 @@ export const sosApi = {
 export const trackApi = {
   get: (token) => data(api.get(`/track/${encodeURIComponent(token)}`)),
 };
+
+// Complaints (docs/02 §7.2 "Complaints (M2)").
+export const complaintsApi = {
+  // Upload + AI can take a while on 2G; the server caps the AI call at 8 s.
+  classify: (file) => {
+    const form = new FormData();
+    form.append("image", file, file.name || "photo.jpg");
+    return data(api.post("/complaints/classify", form, { timeout: 45000 }));
+  },
+  warmup: () => data(api.get("/complaints/classify/warmup")),
+  routePreview: (params) => data(api.get("/complaints/route-preview", { params })),
+  create: (body) => data(api.post("/complaints", body)),
+  mine: (params) => data(api.get("/complaints/mine", { params })),
+  get: (id) => data(api.get(`/complaints/${id}`)),
+  reopen: (id, body) => data(api.post(`/complaints/${id}/reopen`, body)),
+};

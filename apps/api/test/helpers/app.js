@@ -1,5 +1,6 @@
 import request from "supertest";
 import { createRealtimeRecorder } from "../../src/lib/realtime.js";
+import { createMemoryStorage } from "../../src/lib/storage.js";
 import { createApp } from "../../src/app.js";
 import { loadEnv } from "../../src/config/env.js";
 import { Jurisdiction } from "../../src/models/Jurisdiction.js";
@@ -35,11 +36,34 @@ export function fakeMailer() {
   };
 }
 
-export function makeApp({ rateLimits = false, env = testEnv() } = {}) {
+/** Stand-in for the AI client: set `next` to the suggestion the next classify returns. */
+export function fakeAi() {
+  const ai = {
+    configured: true,
+    calls: [],
+    next: null,
+    up: true,
+    async classify(imageUrl) {
+      ai.calls.push(imageUrl);
+      return ai.next;
+    },
+    async health() {
+      return { ok: ai.up, modelVersion: ai.up ? "civic_cnn_test" : null };
+    },
+  };
+  return ai;
+}
+
+export function makeApp({
+  rateLimits = false,
+  env = testEnv(),
+  storage = createMemoryStorage(),
+  ai = fakeAi(),
+} = {}) {
   const mailer = fakeMailer();
   const realtime = createRealtimeRecorder();
-  const app = createApp({ env, mailer, realtime, rateLimits });
-  return { app, mailer, realtime, env, api: () => request(app) };
+  const app = createApp({ env, mailer, realtime, rateLimits, storage, ai });
+  return { app, mailer, realtime, env, storage, ai, api: () => request(app) };
 }
 
 /** Logs in and returns an authenticated request builder: as("post", "/sos").send(...) */

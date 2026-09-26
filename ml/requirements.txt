@@ -1,0 +1,6 @@
+# Training pipeline (run on Google Colab, docs/02 §4.2). Not needed by the web apps.
+tensorflow>=2.16
+ai-edge-litert>=1.0
+pillow>=10
+numpy>=1.26
+scikit-learn>=1.4

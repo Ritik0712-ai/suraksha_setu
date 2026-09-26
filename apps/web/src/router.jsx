@@ -80,10 +80,23 @@ export const routes = [
                 lazy: page(() => import("./features/profile/ContactsPage.jsx")),
               },
               { path: "sos/:id/done", lazy: page(() => import("./features/sos/SosDonePage.jsx")) },
-              { path: "complaints", ...soon("modules.myComplaints") },
-              { path: "complaints/new", handle: { focus: true }, ...soon("modules.report") },
-              { path: "complaints/new/success", ...soon("modules.report") },
-              { path: "complaints/:id", ...soon("modules.myComplaints") },
+              {
+                path: "complaints",
+                lazy: page(() => import("./features/complaints/MyComplaintsPage.jsx")),
+              },
+              {
+                path: "complaints/new",
+                handle: { focus: true },
+                lazy: page(() => import("./features/complaints/NewComplaintPage.jsx")),
+              },
+              {
+                path: "complaints/new/success",
+                lazy: page(() => import("./features/complaints/ComplaintSuccessPage.jsx")),
+              },
+              {
+                path: "complaints/:id",
+                lazy: page(() => import("./features/complaints/ComplaintDetailPage.jsx")),
+              },
               { path: "my-schemes", ...soon("modules.schemes") },
               { path: "blood", ...soon("modules.blood") },
               { path: "blood/donor", ...soon("modules.blood") },

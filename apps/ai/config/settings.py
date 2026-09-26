@@ -26,6 +26,9 @@ ALLOWED_HOSTS = [h.strip() for h in _hosts.split(",") if h.strip()]
 AI_INTERNAL_KEY = os.environ.get("AI_INTERNAL_KEY", "")
 LLM_PROVIDER = os.environ.get("LLM_PROVIDER", "gemini")
 MODEL_PATH = os.environ.get("MODEL_PATH", str(BASE_DIR / "models" / "civic_cnn_v1.tflite"))
+# Hosts the classifier may download photos from (SSRF guard). Production: Cloudinary only.
+_image_hosts = os.environ.get("AI_ALLOWED_IMAGE_HOSTS", "res.cloudinary.com")
+AI_ALLOWED_IMAGE_HOSTS = {h.strip().lower() for h in _image_hosts.split(",") if h.strip()}
 SHARED_CONSTANTS_PATH = Path(
     os.environ.get("SHARED_CONSTANTS_PATH", REPO_ROOT / "shared" / "constants.json")
 )

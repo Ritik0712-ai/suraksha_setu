@@ -85,6 +85,58 @@ export const MESSAGES = {
     en: "User not found.",
     hi: "उपयोगकर्ता नहीं मिला।",
   },
+  complaint_not_found: {
+    en: "Complaint not found.",
+    hi: "शिकायत नहीं मिली।",
+  },
+  complaint_daily_limit: {
+    en: "You've reached today's limit of 10 complaints. Try tomorrow.",
+    hi: "आज की 10 शिकायतों की सीमा पूरी हो गई। कल फिर कोशिश करें।",
+  },
+  upload_daily_limit: {
+    en: "Too many photos today. Try tomorrow, or continue without a photo.",
+    hi: "आज बहुत सारी फ़ोटो भेजी जा चुकी हैं। कल कोशिश करें या बिना फ़ोटो के आगे बढ़ें।",
+  },
+  upload_failed: {
+    en: "Couldn't upload the photo.",
+    hi: "फ़ोटो अपलोड नहीं हो सकी।",
+  },
+  upload_invalid: {
+    en: "This photo has expired or was already used. Please add it again.",
+    hi: "यह फ़ोटो पुरानी हो गई है या पहले इस्तेमाल हो चुकी है। कृपया फिर से जोड़ें।",
+  },
+  image_required: {
+    en: "Please choose a photo.",
+    hi: "कृपया एक फ़ोटो चुनें।",
+  },
+  image_type: {
+    en: "Please choose a photo (JPG, PNG or WebP).",
+    hi: "कृपया फ़ोटो चुनें (JPG, PNG या WebP)।",
+  },
+  image_too_large: {
+    en: "The photo is larger than 5 MB.",
+    hi: "फ़ोटो 5 MB से बड़ी है।",
+  },
+  no_department: {
+    en: "Complaints from this area can't be routed yet. Please call the Gram Panchayat.",
+    hi: "इस क्षेत्र की शिकायतें अभी भेजी नहीं जा सकतीं। कृपया ग्राम पंचायत को फ़ोन करें।",
+  },
+  reopen_not_resolved: {
+    en: "Only a resolved complaint can be reopened.",
+    hi: "सिर्फ़ हल हुई शिकायत दोबारा खोली जा सकती है।",
+  },
+  reopen_expired: {
+    en: "More than 7 days have passed. To report it again, create a new complaint.",
+    hi: "7 दिन से ज़्यादा हो गए। दोबारा बताने के लिए नई शिकायत दर्ज करें।",
+  },
+  reopen_limit: {
+    en: "This complaint has already been reopened twice. Please create a new complaint.",
+    hi: "यह शिकायत दो बार दोबारा खोली जा चुकी है। कृपया नई शिकायत दर्ज करें।",
+  },
+  complaint_changed: {
+    en: "This complaint was just updated. Please reload.",
+    hi: "यह शिकायत अभी-अभी बदली गई है। कृपया दोबारा लोड करें।",
+  },
 };
 
 /** Picks "hi" or "en" from Accept-Language. Hindi is the default (docs/01 FR-GEN-01). */

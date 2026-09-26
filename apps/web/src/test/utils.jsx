@@ -9,6 +9,7 @@ import { useNetwork } from "../stores/network.js";
 import { usePrefs } from "../stores/prefs.js";
 import { useSession } from "../stores/session.js";
 import { useToast } from "../stores/toast.js";
+import { useComplaintDraft } from "../stores/complaintDraft.js";
 
 export function resetStores() {
   try {
@@ -21,6 +22,7 @@ export function resetStores() {
   useSession.setState({ status: "loading", accessToken: null, user: null, endedByUser: false });
   usePrefs.setState({ language: "hi", languageChosen: true, textSize: "md" });
   useToast.setState({ toast: null });
+  useComplaintDraft.getState().reset();
   useNetwork.setState({ browserOnline: true, failures: 0 });
   document.documentElement.setAttribute("data-text-size", "md");
   i18n.changeLanguage("hi");

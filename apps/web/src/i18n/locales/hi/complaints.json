@@ -1,0 +1,143 @@
+{
+  "title": "शिकायत दर्ज करें",
+  "categories": {
+    "road_damage": "सड़क / गड्ढा",
+    "garbage": "कचरा",
+    "streetlight": "स्ट्रीट लाइट",
+    "waterlogging": "जलभराव",
+    "water_supply": "पानी / हैंडपंप",
+    "encroachment": "अतिक्रमण",
+    "other": "अन्य"
+  },
+  "photo": {
+    "heading": "समस्या की फ़ोटो जोड़ें",
+    "takePhoto": "फ़ोटो खींचें",
+    "fromGallery": "गैलरी से चुनें",
+    "tip": "फ़ोटो दिन की रोशनी में, पास से खींचें ताकि समस्या साफ़ दिखे।",
+    "retake": "दोबारा खींचें",
+    "skip": "बिना फ़ोटो के शिकायत करें",
+    "notImage": "कृपया एक फ़ोटो चुनें।",
+    "uploadFailed": "फ़ोटो अपलोड नहीं हो सकी।",
+    "continueWithout": "बिना फ़ोटो के आगे बढ़ें",
+    "checking": "AI फ़ोटो देख रहा है…",
+    "previewAlt": "आपकी फ़ोटो"
+  },
+  "category": {
+    "heading": "समस्या क्या है?",
+    "aiThinks": "AI के अनुसार: {{category}}",
+    "verySure": "पक्का",
+    "fairlySure": "शायद",
+    "yes": "हाँ, सही है",
+    "chooseAnother": "दूसरा चुनें",
+    "aiBadge": "AI",
+    "pick": "श्रेणी चुनें"
+  },
+  "details": {
+    "heading": "समस्या कहाँ है?",
+    "mapCaption": "पिन को सही जगह पर खिसकाएँ",
+    "mapCaptionDenied": "पिन को समस्या की जगह पर खिसकाएँ।",
+    "useMyLocation": "मेरी अभी की लोकेशन लें",
+    "locating": "आपकी लोकेशन ढूँढ रहे हैं…",
+    "located": "लोकेशन मिल गई (±{{m}} मी.)",
+    "villageFallback": "आपकी लोकेशन नहीं मिली, इसलिए आपका गाँव इस्तेमाल होगा। पास की कोई पहचान (लैंडमार्क) लिखें ताकि टीम जगह ढूँढ सके।",
+    "landmark": "पास की पहचान (वैकल्पिक)",
+    "landmarkPlaceholder": "जैसे: प्राथमिक स्कूल के पास",
+    "description": "समस्या के बारे में लिखें (वैकल्पिक)",
+    "descriptionHint": "सुझाव: बोलकर लिखने के लिए कीबोर्ड का माइक दबाएँ।",
+    "onBehalf": "किसी और के लिए शिकायत कर रहे हैं?",
+    "onBehalfName": "उनका नाम",
+    "onBehalfPhone": "उनका मोबाइल (वैकल्पिक)"
+  },
+  "review": {
+    "heading": "जाँचें और भेजें",
+    "photo": "फ़ोटो",
+    "noPhoto": "कोई फ़ोटो नहीं",
+    "category": "समस्या",
+    "location": "जगह",
+    "villageLocation": "आपका गाँव (लोकेशन नहीं दी गई)",
+    "description": "विवरण",
+    "noDescription": "कोई विवरण नहीं",
+    "onBehalf": "किसकी ओर से",
+    "edit": "बदलें",
+    "goesTo": "आपकी शिकायत यहाँ जाएगी:",
+    "defaultDept": "ग्राम पंचायत",
+    "submit": "शिकायत भेजें"
+  },
+  "discard": {
+    "title": "यह शिकायत छोड़ दें?",
+    "body": "आपने जो भरा है वह मिट जाएगा।",
+    "confirm": "छोड़ दें",
+    "cancel": "भरना जारी रखें"
+  },
+  "success": {
+    "title": "शिकायत दर्ज हो गई!",
+    "numberLabel": "शिकायत नंबर",
+    "copy": "शिकायत नंबर कॉपी करें",
+    "copied": "कॉपी हो गया",
+    "notify": "स्थिति बदलने पर हम आपको बताएँगे।",
+    "view": "शिकायत देखें",
+    "another": "एक और शिकायत करें"
+  },
+  "list": {
+    "title": "मेरी शिकायतें",
+    "filterLabel": "स्थिति से छाँटें",
+    "filters": {
+      "all": "सभी",
+      "open": "खुली",
+      "resolved": "हल हुईं",
+      "rejected": "अस्वीकार"
+    },
+    "emptyTitle": "अभी तक कोई शिकायत नहीं",
+    "emptyBody": "कोई ख़राब हैंडपंप या सड़क दिखी? 1 मिनट में शिकायत करें।",
+    "emptyFilter": "इस स्थिति की कोई शिकायत नहीं है।",
+    "new": "नई शिकायत",
+    "updated": "{{ago}} बदली गई",
+    "loadingMore": "और लोड हो रही हैं…"
+  },
+  "detail": {
+    "notFound": "शिकायत नहीं मिली",
+    "backToList": "मेरी शिकायतें",
+    "copyNo": "शिकायत नंबर कॉपी करें",
+    "timeline": "प्रगति",
+    "department": "विभाग",
+    "location": "जगह",
+    "landmark": "पास की पहचान",
+    "description": "विवरण",
+    "onBehalf": "किसकी ओर से दर्ज",
+    "openMaps": "मैप में खोलें",
+    "resolutionPhoto": "काम के बाद की फ़ोटो",
+    "before": "पहले",
+    "after": "बाद में",
+    "photoAlt": "{{date}} को दर्ज {{category}} की फ़ोटो",
+    "viewPhoto": "फ़ोटो पूरी स्क्रीन पर खोलें",
+    "reopen": "समस्या अभी भी है? दोबारा खोलें",
+    "reopenTitle": "शिकायत दोबारा खोलें",
+    "reopenReason": "अब भी क्या ख़राब है?",
+    "reopenHint": "कम से कम 10 अक्षर।",
+    "reopenSubmit": "दोबारा खोलें",
+    "reopened": "शिकायत दोबारा खोली गई",
+    "reopenExpired": "दोबारा बताने के लिए नई शिकायत दर्ज करें।",
+    "newComplaint": "नई शिकायत",
+    "share": "शेयर करें",
+    "shareText": "शिकायत {{no}}: {{category}} — स्थिति {{status}}",
+    "shareCopied": "शेयर करने के लिए कॉपी हो गया",
+    "statusUpdated": "स्थिति बदली",
+    "rejectedBecause": "कारण: {{reason}}",
+    "events": {
+      "created": "दर्ज हुई",
+      "reopened": "दोबारा खोली गई",
+      "public_note": "कार्यालय से जानकारी",
+      "assigned": "विभाग को भेजी गई",
+      "status_change": "स्थिति बदली",
+      "category_changed": "श्रेणी सुधारी गई",
+      "resolution_photo": "फ़ोटो जोड़ी गई"
+    }
+  },
+  "rejection": {
+    "duplicate": "पहले ही दर्ज है",
+    "not_civic_issue": "नागरिक समस्या नहीं",
+    "outside_area": "इस क्षेत्र से बाहर",
+    "inappropriate": "अनुचित सामग्री",
+    "other": "अन्य"
+  }
+}

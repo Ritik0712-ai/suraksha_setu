@@ -5,6 +5,7 @@ import { connectDb } from "./db/connect.js";
 import { startJobs } from "./jobs/scheduler.js";
 import { logger } from "./lib/logger.js";
 import { createRealtime } from "./lib/realtime.js";
+import { createStorage } from "./lib/storage.js";
 
 const env = loadEnv();
 
@@ -15,12 +16,13 @@ const realtime = {
   toScope: (...args) => io?.toScope(...args),
   toUser: (...args) => io?.toUser(...args),
 };
-const server = createServer(createApp({ env, realtime }));
+const storage = createStorage(env);
+const server = createServer(createApp({ env, realtime, storage }));
 io = createRealtime(server, env);
 
 if (env.MONGODB_URI) {
   connectDb(env.MONGODB_URI, { production: env.NODE_ENV === "production" })
-    .then(() => startJobs({ realtime }))
+    .then(() => startJobs({ realtime, storage }))
     .catch((err) => {
       logger.error({ err }, "MongoDB connection failed");
       if (env.NODE_ENV === "production") process.exit(1);

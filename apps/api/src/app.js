@@ -15,7 +15,11 @@ import { adminRouter } from "./modules/admin/routes.js";
 import { jurisdictionsRouter } from "./modules/jurisdictions/routes.js";
 import { createSosService } from "./modules/sos/service.js";
 import { sosRouter, trackRouter } from "./modules/sos/routes.js";
+import { createComplaintService } from "./modules/complaints/service.js";
+import { complaintsRouter, filesRouter } from "./modules/complaints/routes.js";
+import { createAiClient } from "./lib/aiClient.js";
 import { noopRealtime } from "./lib/realtime.js";
+import { createStorage } from "./lib/storage.js";
 import { healthRouter } from "./routes/health.js";
 
 /**
@@ -24,6 +28,8 @@ import { healthRouter } from "./routes/health.js";
  * @param deps.mailer      injectable mailer ({ send(to, subject, text) })
  * @param deps.realtime    Socket.IO emitter (lib/realtime.js); a no-op when omitted
  * @param deps.rateLimits  false disables auth rate limits (tests of other behaviour)
+ * @param deps.storage     photo storage (lib/storage.js); from env when omitted
+ * @param deps.ai          AI service client (lib/aiClient.js); from env when omitted
  */
 export function createApp({
   env,
@@ -31,11 +37,14 @@ export function createApp({
   mailer,
   realtime = noopRealtime,
   rateLimits = true,
+  storage = createStorage(env, { fetchImpl }),
+  ai = createAiClient({ env, fetchImpl }),
 } = {}) {
   const app = express();
   const mail = mailer ?? createMailer(env);
   const auth = createAuthService({ env, mailer: mail });
   const sos = createSosService({ env, mailer: mail, realtime });
+  const complaints = createComplaintService({ realtime, storage, ai });
   const limiters = createAuthLimiters(rateLimits);
 
   app.disable("x-powered-by");
@@ -60,6 +69,8 @@ export function createApp({
   v1.use("/jurisdictions", jurisdictionsRouter());
   v1.use("/sos", sosRouter({ env, sos }));
   v1.use("/track", trackRouter({ sos, limiter: limiters.track }));
+  v1.use("/complaints", complaintsRouter({ env, complaints, ai }));
+  v1.use("/files", filesRouter({ storage }));
   app.use("/api/v1", v1);
 
   app.use(notFound);

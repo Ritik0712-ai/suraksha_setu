@@ -1,0 +1,16 @@
+{
+  "modelVersion": "civic_cnn_test",
+  "classes": [
+    "road_damage",
+    "garbage",
+    "streetlight",
+    "waterlogging",
+    "water_supply",
+    "encroachment",
+    "other"
+  ],
+  "input": {
+    "size": 224,
+    "format": "rgb_0_255"
+  }
+}

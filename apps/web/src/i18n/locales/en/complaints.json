@@ -1,0 +1,143 @@
+{
+  "title": "Report a problem",
+  "categories": {
+    "road_damage": "Road / pothole",
+    "garbage": "Garbage",
+    "streetlight": "Streetlight",
+    "waterlogging": "Waterlogging",
+    "water_supply": "Water supply / handpump",
+    "encroachment": "Encroachment",
+    "other": "Other"
+  },
+  "photo": {
+    "heading": "Add a photo of the problem",
+    "takePhoto": "Take photo",
+    "fromGallery": "Choose from gallery",
+    "tip": "Take the photo in daylight, close enough to see the problem.",
+    "retake": "Retake",
+    "skip": "Report without photo",
+    "notImage": "Please choose a photo.",
+    "uploadFailed": "Couldn't upload the photo.",
+    "continueWithout": "Continue without photo",
+    "checking": "AI is checking the photo…",
+    "previewAlt": "Your photo"
+  },
+  "category": {
+    "heading": "What is the problem?",
+    "aiThinks": "AI thinks: {{category}}",
+    "verySure": "Very sure",
+    "fairlySure": "Fairly sure",
+    "yes": "Yes, correct",
+    "chooseAnother": "Choose another",
+    "aiBadge": "AI",
+    "pick": "Choose a category"
+  },
+  "details": {
+    "heading": "Where is it?",
+    "mapCaption": "Drag the pin to the exact spot",
+    "mapCaptionDenied": "Drag the pin to the problem location.",
+    "useMyLocation": "Use my current location",
+    "locating": "Finding your location…",
+    "located": "Location found (±{{m}} m)",
+    "villageFallback": "We couldn't get your location, so your village will be used. Add a landmark so the team can find the spot.",
+    "landmark": "Landmark (optional)",
+    "landmarkPlaceholder": "e.g. near primary school",
+    "description": "Describe the problem (optional)",
+    "descriptionHint": "Tip: tap the microphone on your keyboard to speak.",
+    "onBehalf": "Filing for someone else?",
+    "onBehalfName": "Their name",
+    "onBehalfPhone": "Their mobile (optional)"
+  },
+  "review": {
+    "heading": "Check and submit",
+    "photo": "Photo",
+    "noPhoto": "No photo",
+    "category": "Problem",
+    "location": "Location",
+    "villageLocation": "Your village (location not shared)",
+    "description": "Description",
+    "noDescription": "No description",
+    "onBehalf": "On behalf of",
+    "edit": "Edit",
+    "goesTo": "Your complaint will go to:",
+    "defaultDept": "Gram Panchayat",
+    "submit": "Submit complaint"
+  },
+  "discard": {
+    "title": "Discard this complaint?",
+    "body": "What you entered will be lost.",
+    "confirm": "Discard",
+    "cancel": "Keep editing"
+  },
+  "success": {
+    "title": "Complaint submitted!",
+    "numberLabel": "Complaint number",
+    "copy": "Copy complaint number",
+    "copied": "Copied",
+    "notify": "We'll notify you when the status changes.",
+    "view": "View complaint",
+    "another": "Report another"
+  },
+  "list": {
+    "title": "My complaints",
+    "filterLabel": "Filter by status",
+    "filters": {
+      "all": "All",
+      "open": "Open",
+      "resolved": "Resolved",
+      "rejected": "Rejected"
+    },
+    "emptyTitle": "No complaints yet",
+    "emptyBody": "Seen a broken handpump or road? Report it in 1 minute.",
+    "emptyFilter": "No complaints with this status.",
+    "new": "New complaint",
+    "updated": "Updated {{ago}}",
+    "loadingMore": "Loading more…"
+  },
+  "detail": {
+    "notFound": "Complaint not found",
+    "backToList": "My complaints",
+    "copyNo": "Copy complaint number",
+    "timeline": "Progress",
+    "department": "Department",
+    "location": "Location",
+    "landmark": "Landmark",
+    "description": "Description",
+    "onBehalf": "Filed on behalf of",
+    "openMaps": "Open in Maps",
+    "resolutionPhoto": "Photo after the work",
+    "before": "Before",
+    "after": "After",
+    "photoAlt": "Photo of {{category}} reported on {{date}}",
+    "viewPhoto": "Open photo full screen",
+    "reopen": "Problem still there? Reopen",
+    "reopenTitle": "Reopen this complaint",
+    "reopenReason": "What is still wrong?",
+    "reopenHint": "At least 10 characters.",
+    "reopenSubmit": "Reopen",
+    "reopened": "Complaint reopened",
+    "reopenExpired": "To report it again, create a new complaint.",
+    "newComplaint": "New complaint",
+    "share": "Share",
+    "shareText": "Complaint {{no}}: {{category}} — status {{status}}",
+    "shareCopied": "Copied to share",
+    "statusUpdated": "Status updated",
+    "rejectedBecause": "Reason: {{reason}}",
+    "events": {
+      "created": "Submitted",
+      "reopened": "Reopened",
+      "public_note": "Update from the office",
+      "assigned": "Assigned",
+      "status_change": "Status changed",
+      "category_changed": "Category corrected",
+      "resolution_photo": "Photo added"
+    }
+  },
+  "rejection": {
+    "duplicate": "Already reported",
+    "not_civic_issue": "Not a civic problem",
+    "outside_area": "Outside this area",
+    "inappropriate": "Inappropriate content",
+    "other": "Other"
+  }
+}

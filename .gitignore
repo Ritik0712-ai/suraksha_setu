@@ -21,6 +21,7 @@ coverage/
 
 # ML artefacts are downloaded at build time, never committed (docs/02 §9.2)
 *.tflite
+!apps/ai/core/tests/fixtures/test_model.tflite
 *.h5
 *.keras
 
@@ -33,3 +34,6 @@ coverage/
 
 # Team admin seed list (phones) — never commit
 apps/api/seed/admins.local.json
+
+# Local-dev complaint photos (production uses Cloudinary)
+apps/api/.uploads/

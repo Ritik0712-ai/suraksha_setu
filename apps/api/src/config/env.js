@@ -22,6 +22,8 @@ const schema = z.object({
         .filter(Boolean),
     ),
   PUBLIC_APP_URL: z.string().default("http://localhost:5173"),
+  // Public URL of this API. Only used for photo URLs when photos are stored on local disk.
+  API_PUBLIC_URL: optional,
   CLOUDINARY_URL: optional,
   SMTP_HOST: optional,
   SMTP_PORT: z.coerce.number().int().positive().default(587),
