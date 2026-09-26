@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
+import { Types } from "mongoose";
 import { useTestDb } from "../helpers/db.js";
 import {
   PASSWORD,
@@ -232,9 +233,7 @@ describe("admin-issued reset code (docs/03 A-07, S-05b code mode)", () => {
     const { access } = await loginAs("9000000001");
     const res = await ctx
       .api()
-      .post(
-        `/api/v1/admin/users/${citizen._id.toString().replace(/.$/, (c) => (c === "0" ? "1" : "0"))}/reset-code`,
-      )
+      .post(`/api/v1/admin/users/${new Types.ObjectId()}/reset-code`)
       .set("Authorization", `Bearer ${access}`);
     expect(res.status).toBe(404);
   });
