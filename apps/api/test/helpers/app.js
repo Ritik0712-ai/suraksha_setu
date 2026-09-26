@@ -1,0 +1,94 @@
+import request from "supertest";
+import { createApp } from "../../src/app.js";
+import { loadEnv } from "../../src/config/env.js";
+import { Jurisdiction } from "../../src/models/Jurisdiction.js";
+import { User } from "../../src/models/User.js";
+import { hashPassword } from "../../src/lib/password.js";
+import C from "../../src/config/constants.js";
+import "../../src/models/Session.js";
+import "../../src/models/PasswordReset.js";
+import "../../src/models/AuditLog.js";
+
+export const PASSWORD = "safe-pass-123";
+
+export function testEnv(overrides = {}) {
+  return loadEnv({
+    NODE_ENV: "test",
+    JWT_ACCESS_SECRET: "test-access-secret",
+    REFRESH_TOKEN_PEPPER: "test-pepper",
+    BCRYPT_COST: "4",
+    PUBLIC_APP_URL: "https://app.test",
+    ...overrides,
+  });
+}
+
+/** Fake mailer that records every message. */
+export function fakeMailer() {
+  const sent = [];
+  return {
+    sent,
+    async send(to, subject, text) {
+      sent.push({ to, subject, text });
+      return true;
+    },
+  };
+}
+
+export function makeApp({ rateLimits = false, env = testEnv() } = {}) {
+  const mailer = fakeMailer();
+  const app = createApp({ env, mailer, rateLimits });
+  return { app, mailer, env, api: () => request(app) };
+}
+
+/** Minimal pilot tree: MP → Sehore district → Sehore block → Mahodiya GP → Mahodiya village. */
+export async function seedJurisdictions() {
+  const at = { type: "Point", coordinates: [77.08, 23.2] };
+  const make = (en, hi, type, parent) =>
+    Jurisdiction.create({ name: { en, hi }, type, parentId: parent?._id ?? null, centroid: at });
+  const state = await make("Madhya Pradesh", "मध्य प्रदेश", "state");
+  const district = await make("Sehore", "सीहोर", "district", state);
+  const block = await make("Sehore", "सीहोर", "block", district);
+  const gp = await make("Mahodiya", "महोदिया", "gram_panchayat", block);
+  const village = await make("Mahodiya", "महोदिया", "village", gp);
+  return { state, district, block, gp, village };
+}
+
+export function registerBody(village, overrides = {}) {
+  return {
+    name: "Sunita Devi",
+    phone: "98765 43210",
+    password: PASSWORD,
+    jurisdictionId: String(village._id),
+    consent: true,
+    ...overrides,
+  };
+}
+
+/** Creates a user directly in the DB (for authority/admin accounts). */
+export async function createUser({
+  role = "citizen",
+  phone = "+919812345678",
+  password = PASSWORD,
+  jurisdictionId,
+  ...rest
+}) {
+  return User.create({
+    name: rest.name ?? `${role} user`,
+    phone,
+    passwordHash: await hashPassword(password, 4),
+    role,
+    jurisdictionId,
+    consent: { version: C.consentVersion, acceptedAt: new Date() },
+    ...rest,
+  });
+}
+
+/** Extracts the ss_rt cookie value and its attributes from a response. */
+export function refreshCookie(res) {
+  const raw = (res.headers["set-cookie"] || []).find((c) => c.startsWith("ss_rt="));
+  if (!raw) return null;
+  const [pair, ...attrs] = raw.split(";").map((s) => s.trim());
+  return { value: decodeURIComponent(pair.slice("ss_rt=".length)), attrs, raw };
+}
+
+export const cookieHeader = (value) => `ss_rt=${encodeURIComponent(value)}`;

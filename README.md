@@ -87,17 +87,31 @@ set -a && source .env && set +a
 python manage.py runserver 8000                  # internal only; needs X-Internal-Key
 ```
 
+### 4. Seed a local database (first time)
+
+```bash
+cd apps/api
+npm run db:indexes              # create every index (production runs with autoIndex off)
+npm run db:seed:jurisdictions   # pilot tree: MP → Sehore → Sehore block → Mahodiya (placeholders until field visit 1)
+cp seed/admins.example.json seed/admins.local.json   # add each team member's name + phone
+npm run db:seed:admins          # prints each admin's temporary password ONCE
+```
+
+`seed/admins.local.json` is git-ignored because it holds phone numbers. Admins must change the temporary password at first login.
+
 ## Checks (same as CI)
 
 ```bash
 npm run lint            # ESLint (web + api)
 npm run format:check    # Prettier
 npm run i18n:check      # every key exists in both hi and en
-npm test                # Vitest (web + api)
+npm test                # Vitest (web + api; API integration tests start an in-memory MongoDB)
 npm run build -w apps/web
 
 cd apps/ai && ruff check . && black --check . && pytest -q
 ```
+
+The API integration tests download a `mongod` binary from `fastdl.mongodb.org` on first run. If that host is blocked on your network, point `MONGOMS_SYSTEM_BINARY` at any local `mongod` 7+ binary. `npm run test:unit -w apps/api` runs only the tests that don't need a database.
 
 A pre-commit hook (husky + lint-staged) runs ESLint and Prettier on staged JS/JSON/MD/CSS files. Python files are checked in CI.
 
@@ -109,6 +123,27 @@ A pre-commit hook (husky + lint-staged) runs ESLint and Prettier on staged JS/JS
 4. Add every user-visible string to **both** `apps/web/src/i18n/locales/hi` and `.../en`.
 5. Add tests. Open a PR, get at least 1 review, and make sure CI is green.
 
+## API so far
+
+All routes are under `/api/v1`. Responses use `{ data }` on success and `{ error: { code, message, details? } }` on failure (doc 02 §7.1). Error messages come back in Hindi by default, or English with `Accept-Language: en`.
+
+| Method | Path                                            | Access                |
+| ------ | ----------------------------------------------- | --------------------- |
+| GET    | `/health`                                       | Public                |
+| POST   | `/auth/register`, `/auth/login`                 | Public (rate-limited) |
+| POST   | `/auth/refresh`                                 | Refresh cookie        |
+| POST   | `/auth/logout`, `/auth/logout-all`              | Auth                  |
+| POST   | `/auth/password/forgot`, `/auth/password/reset` | Public (rate-limited) |
+| GET    | `/auth/me`                                      | Auth                  |
+| PATCH  | `/users/me`                                     | Auth                  |
+| PUT    | `/users/me/password`                            | Auth                  |
+| POST   | `/admin/users/:id/reset-code`                   | Admin (audited)       |
+| GET    | `/jurisdictions?type=&q=`                       | Public                |
+
+Access tokens last 15 minutes and are kept in memory by the client. The refresh token is an httpOnly cookie on `/api/v1/auth`, rotated on every use. Reusing an old one logs out that whole login (doc 02 §6.2, doc 05 §7).
+
 ## Status
 
-Phase 0 (setup) is in place. See doc 06 §4 for what comes next (Phase 1: authentication).
+- ✅ Phase 0 — setup
+- ✅ Phase 1 — authentication (tasks 1.1–1.10)
+- ⏭ Phase 2 — database (all 19 models, seeds, routing) — see doc 06 §4

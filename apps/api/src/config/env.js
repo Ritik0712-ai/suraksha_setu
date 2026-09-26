@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import { z } from "zod";
 
 const optional = z
@@ -30,6 +31,8 @@ const schema = z.object({
   AI_BASE_URL: optional,
   AI_INTERNAL_KEY: optional,
   GOOGLE_PLACES_KEY: optional,
+  // bcrypt cost (docs/02 SEC-02). Only tests may lower it.
+  BCRYPT_COST: z.coerce.number().int().min(4).max(15).default(12),
 });
 
 /** Parse and validate environment variables. Throws with a readable list of problems. */
@@ -50,6 +53,13 @@ export function loadEnv(source = process.env) {
     const missing = required.filter((k) => !env[k]);
     if (missing.length)
       throw new Error(`Missing required env in production: ${missing.join(", ")}`);
+    if (env.BCRYPT_COST < 12) throw new Error("BCRYPT_COST must be at least 12 in production");
+  } else {
+    // Outside production, missing secrets get a random per-process value so the API still boots.
+    // Every restart then logs everyone out, which is fine for local development.
+    for (const k of ["JWT_ACCESS_SECRET", "REFRESH_TOKEN_PEPPER"]) {
+      if (!env[k]) env[k] = randomBytes(32).toString("base64url");
+    }
   }
   return env;
 }

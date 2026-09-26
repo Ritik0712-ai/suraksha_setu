@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import C from "../src/config/constants.js";
+import C from "../../src/config/constants.js";
 
 // Guards the shared enum file that all three apps depend on.
 describe("shared/constants.json", () => {

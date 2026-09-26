@@ -23,6 +23,7 @@
     "other"
   ],
   "maxEmergencyContacts": 5,
+  "consentVersion": "2026-09-v1",
 
   "jurisdictionTypes": ["state", "district", "block", "gram_panchayat", "village"],
 

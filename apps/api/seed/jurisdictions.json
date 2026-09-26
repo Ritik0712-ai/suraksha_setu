@@ -1,0 +1,37 @@
+{
+  "$comment": "Pilot jurisdiction tree (docs/05 §11.1). Names, the GP and every centroid are PLACEHOLDERS until confirmed on field visit 1 (docs/06 §6). Centroids are [lng, lat]; all currently point at Sehore town. Replace the Mahodiya village centroid with the on-site reading before the pilot, since SOS/complaints fall back to it.",
+  "verified": false,
+  "tree": {
+    "name": { "en": "Madhya Pradesh", "hi": "मध्य प्रदेश" },
+    "type": "state",
+    "centroid": [77.4126, 23.2599],
+    "children": [
+      {
+        "name": { "en": "Sehore", "hi": "सीहोर" },
+        "type": "district",
+        "centroid": [77.0844, 23.2032],
+        "children": [
+          {
+            "name": { "en": "Sehore", "hi": "सीहोर" },
+            "type": "block",
+            "centroid": [77.0844, 23.2032],
+            "children": [
+              {
+                "name": { "en": "Mahodiya", "hi": "महोदिया" },
+                "type": "gram_panchayat",
+                "centroid": [77.0844, 23.2032],
+                "children": [
+                  {
+                    "name": { "en": "Mahodiya", "hi": "महोदिया" },
+                    "type": "village",
+                    "centroid": [77.0844, 23.2032]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

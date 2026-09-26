@@ -30,3 +30,6 @@ coverage/
 .vscode/*
 !.vscode/extensions.json
 *.log
+
+# Team admin seed list (phones) — never commit
+apps/api/seed/admins.local.json

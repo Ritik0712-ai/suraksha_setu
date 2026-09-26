@@ -12,11 +12,32 @@ export const ERROR_STATUS = {
   AI_UNAVAILABLE: 503,
 };
 
+// Message key used when an error is thrown without one.
+const DEFAULT_MESSAGE_KEY = {
+  VALIDATION_ERROR: "validation",
+  UNAUTHENTICATED: "unauthenticated",
+  TOKEN_EXPIRED: "token_expired",
+  FORBIDDEN: "forbidden",
+  NOT_FOUND: "not_found",
+  CONFLICT: "validation",
+  ACCOUNT_LOCKED: "account_locked",
+  RATE_LIMITED: "rate_limited",
+  INTERNAL: "internal",
+  AI_UNAVAILABLE: "internal",
+};
+
+/**
+ * @param code        one of ERROR_STATUS
+ * @param messageKey  key in lib/messages.js (translated per request); defaults per code
+ * @param details     optional [{ field, issue }]
+ */
 export class AppError extends Error {
-  constructor(code, message, details) {
-    super(message || code);
-    this.code = code in ERROR_STATUS ? code : "INTERNAL";
-    this.status = ERROR_STATUS[this.code];
+  constructor(code, messageKey, details) {
+    const c = code in ERROR_STATUS ? code : "INTERNAL";
+    super(messageKey || DEFAULT_MESSAGE_KEY[c]);
+    this.code = c;
+    this.status = ERROR_STATUS[c];
+    this.messageKey = messageKey || DEFAULT_MESSAGE_KEY[c];
     this.details = details;
   }
 }

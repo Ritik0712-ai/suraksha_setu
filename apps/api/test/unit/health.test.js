@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import request from "supertest";
-import { createApp } from "../src/app.js";
-import { loadEnv } from "../src/config/env.js";
+import { createApp } from "../../src/app.js";
+import { loadEnv } from "../../src/config/env.js";
 
 const baseEnv = { NODE_ENV: "test" };
 
