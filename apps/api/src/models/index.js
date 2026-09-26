@@ -1,6 +1,20 @@
-// Registers every model (used by scripts that operate on all collections).
+// Registers every model — all 19 collections from docs/05 §3.
 export { User } from "./User.js";
 export { Session } from "./Session.js";
 export { PasswordReset } from "./PasswordReset.js";
 export { Jurisdiction } from "./Jurisdiction.js";
+export { Department } from "./Department.js";
+export { Complaint } from "./Complaint.js";
+export { Upload } from "./Upload.js";
+export { Scheme } from "./Scheme.js";
+export { SavedScheme } from "./SavedScheme.js";
+export { SosAlert } from "./SosAlert.js";
+export { BloodDonor } from "./BloodDonor.js";
+export { DonorContactRequest } from "./DonorContactRequest.js";
+export { EmergencyService } from "./EmergencyService.js";
+export { ChatSession } from "./ChatSession.js";
+export { ChatMessage } from "./ChatMessage.js";
+export { Notification } from "./Notification.js";
 export { AuditLog } from "./AuditLog.js";
+export { UsageEvent } from "./UsageEvent.js";
+export { Counter } from "./Counter.js";

@@ -87,17 +87,19 @@ set -a && source .env && set +a
 python manage.py runserver 8000                  # internal only; needs X-Internal-Key
 ```
 
-### 4. Seed a local database (first time)
+### 4. Set up a local database (first time)
 
 ```bash
 cd apps/api
+npm run db:migrate              # run pending migrations (none yet — see migrations/README.md)
 npm run db:indexes              # create every index (production runs with autoIndex off)
-npm run db:seed:jurisdictions   # pilot tree: MP → Sehore → Sehore block → Mahodiya (placeholders until field visit 1)
+npm run db:seed                 # pilot jurisdictions + departments and routing (idempotent)
 cp seed/admins.example.json seed/admins.local.json   # add each team member's name + phone
 npm run db:seed:admins          # prints each admin's temporary password ONCE
 ```
 
-`seed/admins.local.json` is git-ignored because it holds phone numbers. Admins must change the temporary password at first login.
+- `seed/jurisdictions.json` and `seed/departments.json` hold **placeholders** until field visit 1 confirms the names, the Gram Panchayat, the village centroid and the routing (docs/05 §11).
+- `seed/admins.local.json` is git-ignored because it holds phone numbers. Admins must change the temporary password at first login.
 
 ## Checks (same as CI)
 
@@ -142,8 +144,22 @@ All routes are under `/api/v1`. Responses use `{ data }` on success and `{ error
 
 Access tokens last 15 minutes and are kept in memory by the client. The refresh token is an httpOnly cookie on `/api/v1/auth`, rotated on every use. Reusing an old one logs out that whole login (doc 02 §6.2, doc 05 §7).
 
+## Backups
+
+While the production database is on Atlas M0 (no automated backups), `.github/workflows/db-backup.yml` dumps it every night at 02:00 IST, encrypts the archive with AES-256, and keeps it as a private workflow artifact for 30 days (doc 02 §9.6). It needs two repository secrets: `MONGODB_URI_BACKUP` (a **read-only** user) and `BACKUP_PASSPHRASE` (keep a copy outside GitHub). Without them the job skips with a warning. Run it by hand from the Actions tab.
+
+To restore, download the artifact, then:
+
+```bash
+gpg --decrypt suraksha-setu-<date>.archive.gz.gpg > dump.archive.gz   # asks for the passphrase
+mongorestore --uri="<target MONGODB_URI>" --archive=dump.archive.gz --gzip --drop
+```
+
+Test a restore into a scratch database once before the pilot (doc 06 task 7.7).
+
 ## Status
 
 - ✅ Phase 0 — setup
 - ✅ Phase 1 — authentication (tasks 1.1–1.10)
-- ⏭ Phase 2 — database (all 19 models, seeds, routing) — see doc 06 §4
+- ✅ Phase 2 — database: all 19 models, migrations setup, seeds, jurisdiction resolver, department routing, complaint numbers, nightly backups (tasks 2.1–2.7)
+- ⏭ Phase 3 — core UI (design system, app shell, auth screens) — see doc 06 §4

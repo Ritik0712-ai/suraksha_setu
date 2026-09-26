@@ -1,6 +1,7 @@
 import { afterAll, afterEach, beforeAll } from "vitest";
 import mongoose from "mongoose";
 import { MongoMemoryReplSet } from "mongodb-memory-server";
+import "../../src/models/index.js"; // register all 19 models so every index exists
 
 /**
  * Starts an in-memory MongoDB replica set for the current test file (replica set so transactions

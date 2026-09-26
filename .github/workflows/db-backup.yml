@@ -1,0 +1,68 @@
+name: Nightly DB backup
+
+# docs/02 §9.6 / docs/06 task 2.7: while the database is on Atlas M0 (no automated backups),
+# dump it every night, encrypt the archive, and keep it as a private workflow artifact.
+#
+# Repository secrets needed (Settings → Secrets and variables → Actions):
+#   MONGODB_URI_BACKUP  connection string for a read-only user on the prod database
+#   BACKUP_PASSPHRASE   long random passphrase; store a copy somewhere safe outside GitHub
+#
+# Restore: see "Backups" in README.md.
+
+on:
+  schedule:
+    - cron: "30 20 * * *" # 02:00 IST
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check secrets
+        id: check
+        env:
+          URI: ${{ secrets.MONGODB_URI_BACKUP }}
+          PASS: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          if [ -z "$URI" ] || [ -z "$PASS" ]; then
+            echo "::warning::MONGODB_URI_BACKUP or BACKUP_PASSPHRASE is not set — skipping backup."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Dump database
+        if: steps.check.outputs.ready == 'true'
+        env:
+          URI: ${{ secrets.MONGODB_URI_BACKUP }}
+        run: |
+          mkdir -p backup
+          # The official image ships mongodump, so no tool version to pin or download here.
+          docker run --rm -e URI -v "$PWD/backup:/backup" mongo:8 \
+            sh -c 'mongodump --uri="$URI" --archive=/backup/dump.archive.gz --gzip'
+          ls -lh backup
+
+      - name: Encrypt archive
+        if: steps.check.outputs.ready == 'true'
+        env:
+          PASS: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          name="suraksha-setu-$(date -u +%Y-%m-%dT%H%MZ).archive.gz.gpg"
+          gpg --batch --yes --pinentry-mode loopback --passphrase-fd 0 \
+            --symmetric --cipher-algo AES256 \
+            --output "backup/$name" backup/dump.archive.gz <<< "$PASS"
+          rm backup/dump.archive.gz
+          echo "NAME=$name" >> "$GITHUB_ENV"
+
+      - name: Upload encrypted backup
+        if: steps.check.outputs.ready == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.NAME }}
+          path: backup/${{ env.NAME }}
+          retention-days: 30
+          if-no-files-found: error

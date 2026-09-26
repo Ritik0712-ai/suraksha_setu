@@ -66,6 +66,12 @@ const UserSchema = new Schema(
   { timestamps: true, collection: "users" },
 );
 
+// docs/05 §1.3: a contact can't be the user's own number, and phones are unique in the list.
+UserSchema.path("emergencyContacts").validate(function (list) {
+  const phones = list.map((c) => c.phone);
+  return !phones.includes(this.phone) && new Set(phones).size === phones.length;
+}, "invalid_contacts");
+
 UserSchema.path("authority").validate(function (v) {
   if (this.role !== "authority") return true;
   return Boolean(v && v.jurisdictionIds?.length);

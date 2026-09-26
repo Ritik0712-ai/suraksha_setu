@@ -1,0 +1,52 @@
+{
+  "$comment": "Pilot departments and routing (docs/05 §11.2, docs/02 §8.3). Confirm with the Panchayat on field visit 1. A jurisdiction is referenced by type + English name. handlesCategories: [] means the department is never auto-routed; an authority assigns it manually (PWD for district roads, Revenue/Patwari for land encroachment).",
+  "departments": [
+    {
+      "code": "GP_MAHODIYA",
+      "name": { "en": "Gram Panchayat Mahodiya", "hi": "ग्राम पंचायत महोदिया" },
+      "jurisdiction": { "type": "gram_panchayat", "name": "Mahodiya" },
+      "handlesCategories": [
+        "road_damage",
+        "garbage",
+        "streetlight",
+        "waterlogging",
+        "encroachment",
+        "other"
+      ]
+    },
+    {
+      "code": "PHED_SEHORE",
+      "name": {
+        "en": "Public Health Engineering Department (PHED), Sehore",
+        "hi": "लोक स्वास्थ्य यांत्रिकी विभाग (PHE), सीहोर"
+      },
+      "jurisdiction": { "type": "district", "name": "Sehore" },
+      "handlesCategories": ["water_supply"]
+    },
+    {
+      "code": "PWD_SEHORE",
+      "name": {
+        "en": "Public Works Department (PWD), Sehore",
+        "hi": "लोक निर्माण विभाग (PWD), सीहोर"
+      },
+      "jurisdiction": { "type": "district", "name": "Sehore" },
+      "handlesCategories": []
+    },
+    {
+      "code": "REVENUE_SEHORE",
+      "name": {
+        "en": "Revenue Department (Patwari), Sehore",
+        "hi": "राजस्व विभाग (पटवारी), सीहोर"
+      },
+      "jurisdiction": { "type": "district", "name": "Sehore" },
+      "handlesCategories": []
+    }
+  ],
+  "defaults": [
+    { "jurisdiction": { "type": "village", "name": "Mahodiya" }, "department": "GP_MAHODIYA" },
+    {
+      "jurisdiction": { "type": "gram_panchayat", "name": "Mahodiya" },
+      "department": "GP_MAHODIYA"
+    }
+  ]
+}
