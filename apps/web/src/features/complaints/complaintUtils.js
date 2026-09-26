@@ -1,15 +1,9 @@
-import { useTranslation } from "react-i18next";
 import C from "../../config/constants.js";
 import { toTenDigits } from "../../lib/phone.js";
 
-export const CATEGORIES = C.complaintCategories;
+export { useLocalized } from "../../lib/localized.js";
 
-/** Picks the current language from a { hi, en } name. */
-export function useLocalized() {
-  const { i18n } = useTranslation();
-  const lang = i18n.resolvedLanguage === "en" ? "en" : "hi";
-  return (name) => (name ? (name[lang] ?? name.hi ?? name.en ?? "") : "");
-}
+export const CATEGORIES = C.complaintCategories;
 
 /** docs/03 S-10 step 2: ≥ 0.85 "very sure", 0.60–0.84 "fairly sure", below that not shown. */
 export function confidenceLabel(confidence) {

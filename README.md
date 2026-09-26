@@ -97,6 +97,8 @@ npm run db:indexes              # create every index (production runs with autoI
 npm run db:seed                 # pilot jurisdictions + departments and routing (idempotent)
 cp seed/admins.example.json seed/admins.local.json   # add each team member's name + phone
 npm run db:seed:admins          # prints each admin's temporary password ONCE
+npm run db:seed:schemes         # 20 schemes as drafts (needs an admin; verify + publish in the portal)
+npm run db:seed:emergency       # optional: seed/emergency_services.csv, verified rows only
 ```
 
 - `seed/jurisdictions.json` and `seed/departments.json` hold **placeholders** until field visit 1 confirms the names, the Gram Panchayat, the village centroid and the routing (docs/05 §11).
@@ -131,38 +133,53 @@ A pre-commit hook (husky + lint-staged) runs ESLint and Prettier on staged JS/JS
 
 All routes are under `/api/v1`. Responses use `{ data }` on success and `{ error: { code, message, details? } }` on failure (doc 02 §7.1). Error messages come back in Hindi by default, or English with `Accept-Language: en`.
 
-| Method | Path                                                     | Access                 |
-| ------ | -------------------------------------------------------- | ---------------------- |
-| GET    | `/health`                                                | Public                 |
-| POST   | `/auth/register`, `/auth/login`                          | Public (rate-limited)  |
-| POST   | `/auth/refresh`                                          | Refresh cookie         |
-| POST   | `/auth/logout`, `/auth/logout-all`                       | Auth                   |
-| POST   | `/auth/password/forgot`, `/auth/password/reset`          | Public (rate-limited)  |
-| GET    | `/auth/me`                                               | Auth                   |
-| PATCH  | `/users/me`                                              | Auth                   |
-| PUT    | `/users/me/password`                                     | Auth                   |
-| DELETE | `/users/me` (password required, doc 05 §10)              | Auth                   |
-| GET    | `/users/me/contacts`                                     | Citizen                |
-| POST   | `/users/me/contacts` (max 5)                             | Citizen                |
-| PATCH  | `/users/me/contacts/:contactId`                          | Citizen                |
-| DELETE | `/users/me/contacts/:contactId`                          | Citizen                |
-| POST   | `/admin/users/:id/reset-code`                            | Admin (audited)        |
-| GET    | `/jurisdictions?type=&q=`                                | Public                 |
-| POST   | `/sos` (never rate-limited)                              | Citizen                |
-| GET    | `/sos/mine?open=1`                                       | Citizen                |
-| POST   | `/sos/:id/location`, `/sos/:id/resolve`                  | Owner                  |
-| GET    | `/sos/:id`                                               | Owner / in-scope staff |
-| GET    | `/sos/active?window=24h`                                 | Authority, Admin       |
-| POST   | `/sos/:id/acknowledge`, `/sos/:id/close`                 | In scope (audited)     |
-| POST   | `/sos/:id/reveal-phone`                                  | In scope (audited)     |
-| GET    | `/track/:token`                                          | Public                 |
-| POST   | `/complaints/classify` (multipart `image`)               | Citizen                |
-| GET    | `/complaints/classify/warmup`                            | Citizen                |
-| GET    | `/complaints/route-preview?category=&lat=&lng=`          | Citizen                |
-| POST   | `/complaints` (10 per day)                               | Citizen                |
-| GET    | `/complaints/mine?status=open\|resolved\|rejected&page=` | Citizen                |
-| GET    | `/complaints/:id`                                        | Owner / in-scope staff |
-| POST   | `/complaints/:id/reopen`                                 | Owner                  |
+| Method         | Path                                                                                                        | Access                              |
+| -------------- | ----------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| GET            | `/health`                                                                                                   | Public                              |
+| POST           | `/auth/register`, `/auth/login`                                                                             | Public (rate-limited)               |
+| POST           | `/auth/refresh`                                                                                             | Refresh cookie                      |
+| POST           | `/auth/logout`, `/auth/logout-all`                                                                          | Auth                                |
+| POST           | `/auth/password/forgot`, `/auth/password/reset`                                                             | Public (rate-limited)               |
+| GET            | `/auth/me`                                                                                                  | Auth                                |
+| PATCH          | `/users/me`                                                                                                 | Auth                                |
+| PUT            | `/users/me/password`                                                                                        | Auth                                |
+| DELETE         | `/users/me` (password required, doc 05 §10)                                                                 | Auth                                |
+| GET            | `/users/me/contacts`                                                                                        | Citizen                             |
+| POST           | `/users/me/contacts` (max 5)                                                                                | Citizen                             |
+| PATCH          | `/users/me/contacts/:contactId`                                                                             | Citizen                             |
+| DELETE         | `/users/me/contacts/:contactId`                                                                             | Citizen                             |
+| POST           | `/admin/users/:id/reset-code`                                                                               | Admin (audited)                     |
+| GET            | `/jurisdictions?type=&q=`                                                                                   | Public                              |
+| POST           | `/sos` (never rate-limited)                                                                                 | Citizen                             |
+| GET            | `/sos/mine?open=1`                                                                                          | Citizen                             |
+| POST           | `/sos/:id/location`, `/sos/:id/resolve`                                                                     | Owner                               |
+| GET            | `/sos/:id`                                                                                                  | Owner / in-scope staff              |
+| GET            | `/sos/active?window=24h`                                                                                    | Authority, Admin                    |
+| POST           | `/sos/:id/acknowledge`, `/sos/:id/close`                                                                    | In scope (audited)                  |
+| POST           | `/sos/:id/reveal-phone`                                                                                     | In scope (audited)                  |
+| GET            | `/track/:token`                                                                                             | Public                              |
+| POST           | `/complaints/classify` (multipart `image`)                                                                  | Citizen                             |
+| GET            | `/complaints/classify/warmup`                                                                               | Citizen                             |
+| GET            | `/complaints/route-preview?category=&lat=&lng=`                                                             | Citizen                             |
+| POST           | `/complaints` (10 per day)                                                                                  | Citizen                             |
+| GET            | `/complaints/mine?status=open\|resolved\|rejected&page=`                                                    | Citizen                             |
+| GET            | `/complaints/:id`                                                                                           | Owner / in-scope staff              |
+| POST           | `/complaints/:id/reopen`                                                                                    | Owner                               |
+| GET            | `/complaints` (filters, sort, pages), `/complaints/export.csv`                                              | Authority, Admin (scoped)           |
+| PATCH          | `/complaints/:id/status`, `/assign`, `/category`                                                            | Authority, Admin (audited)          |
+| POST           | `/complaints/:id/notes`, `/resolution-photo`, `/reveal-phone`                                               | Authority, Admin (audited)          |
+| GET            | `/schemes?category=&level=&q=`, `/schemes/:slug`                                                            | Public                              |
+| POST           | `/schemes/eligibility`                                                                                      | Public (answers kept only if asked) |
+| GET/PUT/DELETE | `/users/me/saved-schemes/:schemeId`                                                                         | Citizen                             |
+| GET            | `/emergency/helplines`, `/emergency/nearby?type=&lat=&lng=`                                                 | Public                              |
+| GET/PUT/DELETE | `/donors/me`, PATCH `/donors/me/availability`                                                               | Citizen                             |
+| GET            | `/donors/search?bloodGroup=&radiusKm=&includeCompatible=`                                                   | Citizen (masked)                    |
+| POST           | `/donors/:id/reveal` (10 per day, logged)                                                                   | Citizen                             |
+| GET            | `/notifications`, POST `/notifications/read`                                                                | Signed in                           |
+| GET            | `/admin/overview`, `/admin/analytics`, `/admin/meta`                                                        | Authority, Admin (scoped)           |
+| CRUD           | `/admin/users`, `/admin/departments`, `/admin/jurisdictions`, `/admin/schemes`, `/admin/emergency-services` | Admin (audited)                     |
+| GET            | `/admin/audit-logs`                                                                                         | Admin                               |
+| POST           | `/events`, `/client-errors`                                                                                 | Public (rate-limited)               |
 
 Real-time events use Socket.IO on the API server (`/socket.io`, access token in the handshake): `sos:new`, `sos:location`, `sos:updated`, `complaint:new`, `complaint:updated` to officers in scope and admins; `sos:acknowledged`, `notification:new` to the user (doc 02 §7.4). Jobs close SOS alerts with no update for 6 hours (every 10 min) and delete complaint photos never attached to a complaint within 24 h (hourly).
 
@@ -189,7 +206,11 @@ Test a restore into a scratch database once before the pilot (doc 06 task 7.7).
 - ✅ Phase 3 — core UI: design system, citizen + portal shells, auth/profile/contacts screens, system screens, route guards, PWA (tasks 3.1–3.10)
 - ✅ Phase 4A — Women's SOS: trigger + countdown, SMS/email/real-time alerts, live tracking page, "I am safe", auto-close, fake call (tasks 4A.1–4A.10)
 - ✅ Phase 4B — AI civic complaints: training pipeline, `/internal/classify` on LiteRT, photo upload + AI suggestion, routing, complaint numbers, "my complaints", detail with timeline, reopen, uploads cleanup (tasks 4B.1–4B.9; the real dataset and CNN v1 training run on Colab — see `ml/README.md`)
-- ⏭ Phase 4C onwards — see doc 06 §4 (the minimal authority dashboard, 4E.1, can come any time)
+- ✅ Phase 4C — schemes: catalogue + search, detail with trust line, offline copies, eligibility checker, saved schemes with document checklist, update notifications (tasks 4C.1–4C.7; the 20 schemes are imported as **drafts** until verified)
+- ✅ Phase 4D — emergency: helplines offline, curated directory (CSV import) with Google Places fallback, list + map (tasks 4D.1–4D.4)
+- ✅ Phase 4E — authority portal: overview, complaints table + management (every transition from doc 05 §5.6.1), live SOS map + drawer, analytics + CSV, users, schemes editor with rules builder, emergency directory, departments + routing gaps, areas tree, audit log, citizen notifications + status emails (tasks 4E.1–4E.7)
+- ✅ Phase 4F — blood donors: donor profile (consent, 90-day gap, availability), compatible nearby search with masked phones, reveal with a 10/day limit and a log (tasks 4F.1–4F.4)
+- ⏭ Phase 4G (Sahayak) onwards — see doc 06 §4
 
 ## SOS notes
 
@@ -213,6 +234,14 @@ Test a restore into a scratch database once before the pilot (doc 06 task 7.7).
   ```
 
 - **Real model:** trained on Colab from `ml/` and published as a GitHub Release; the AI service downloads it at build time (`scripts/fetch_model.py`, `MODEL_URL` + `MODEL_CARD_URL`). See [`ml/README.md`](ml/README.md).
+
+## Schemes, emergency and donor notes
+
+- **Schemes are drafts until verified.** `npm run db:seed:schemes` imports the 20 schemes from doc 05 §11.4 as drafts with general text only (no amounts or limits from memory). R4 checks each against the official source in the portal (A-09: edit → **Mark verified today & publish**). A scheme can't be published without a verification date, and one older than 90 days shows a warning on S-15. Seeded rules carry an "always check at the office" note, so the checker answers _maybe_ until that note is removed after verification.
+- **Emergency directory:** only services confirmed by phone or a visit go in (`verified_on`). Import them with `npm run db:seed:emergency` (copy `seed/emergency_services.template.csv`) or the portal's **Import CSV** (all rows validated first; nothing is written if one is wrong). With fewer than 3 curated results nearby, the API asks Google Places (`GOOGLE_PLACES_KEY`, server-side) and stores nothing from it.
+- **Donors:** search never returns phone numbers; `/reveal` does, at most 10 new donors per IST day per person, each logged (kept 180 days). Donors see how many people viewed their number this month and can hide themselves at once.
+- **Portal real-time:** the overview, complaints and live SOS pages update on socket events and refetch after a reconnect; the live SOS list polls every 30 s while the socket is down.
+- **Bundle size:** translation namespaces used only by some screens (`portal`, `schemes`, `blood`, `emergency`, `notifications`) load with those screens, keeping the citizen app's first download under 250 KB gzipped. Charts (MUI X Charts) load only on A-06.
 
 ## Frontend notes
 

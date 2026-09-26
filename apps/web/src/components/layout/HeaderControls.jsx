@@ -15,6 +15,7 @@ import { useTranslation } from "react-i18next";
 import { usersApi } from "../../api/endpoints.js";
 import { usePrefs } from "../../stores/prefs.js";
 import { useSession } from "../../stores/session.js";
+import { useUnreadCount } from "../../features/notifications/useUnread.js";
 
 /** Saves a preference to the profile in the background when logged in (docs/03 §2.3). */
 function syncToProfile(patch) {
@@ -116,14 +117,15 @@ export function TextSizeControl({ color = "primary" }) {
 }
 
 /** Notification bell (logged in only). The unread count arrives with task 4E.3. */
-export function NotificationBell({ color = "primary", unread = 0 }) {
+export function NotificationBell({ color = "primary", to = "/notifications" }) {
   const { t } = useTranslation();
+  const unread = useUnreadCount();
   return (
     <IconButton
       component={RouterLink}
-      to="/notifications"
+      to={to}
       color={color}
-      aria-label={t("header.notifications")}
+      aria-label={unread ? `${t("header.notifications")} (${unread})` : t("header.notifications")}
       sx={{ width: 48, height: 48 }}
     >
       <Badge badgeContent={unread} color="error" max={99}>

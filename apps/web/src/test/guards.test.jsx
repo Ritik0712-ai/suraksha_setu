@@ -35,7 +35,9 @@ describe("route guards (docs/03 §1)", () => {
   it("admins see the admin section of the sidebar", async () => {
     loggedInAs(officer({ role: "admin", authority: null }));
     renderApp("/portal/admin/users");
-    expect(await screen.findByRole("heading", { name: "उपयोगकर्ता" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("heading", { name: "उपयोगकर्ता और अधिकारी खाते" }),
+    ).toBeInTheDocument();
   });
 
   it("logged-in users skip the login page", async () => {
@@ -88,10 +90,9 @@ describe("route guards (docs/03 §1)", () => {
   });
 
   it("modules from later phases show the helplines (coming soon)", async () => {
-    renderApp("/emergency");
-    expect(
-      await screen.findByRole("heading", { level: 1, name: "आपातकालीन नंबर" }),
-    ).toBeInTheDocument();
+    loggedInAs(citizen());
+    renderApp("/sahayak");
+    expect(await screen.findByRole("heading", { level: 1, name: "सहायक" })).toBeInTheDocument();
     expect(screen.getByText(/यह सेवा बन रही है/)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /एम्बुलेंस — 108 पर कॉल करें/ })).toHaveAttribute(
       "href",

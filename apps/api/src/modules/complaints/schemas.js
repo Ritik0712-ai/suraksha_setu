@@ -61,3 +61,52 @@ export const routePreviewQuery = z
     if ((v.lat === undefined) !== (v.lng === undefined))
       ctx.addIssue({ code: "custom", path: ["lat"], message: "required" });
   });
+
+// --- authority / admin (docs/03 A-02, A-03) ---------------------------------------------------
+
+const csvList = (values) =>
+  z
+    .string()
+    .optional()
+    .transform((v) => (v ? v.split(",").filter(Boolean) : []))
+    .pipe(z.array(z.enum(values)));
+
+export const staffListQuery = z.object({
+  status: csvList(C.complaintStatus),
+  category: csvList(C.complaintCategories),
+  departmentId: objectId.optional(),
+  villageId: objectId.optional(),
+  from: z.coerce.date().optional(),
+  to: z.coerce.date().optional(),
+  q: z.string().trim().max(20).optional(),
+  sort: z.enum(["created", "age", "updated"]).default("created"),
+  order: z.enum(["asc", "desc"]).default("desc"),
+  page: z.coerce.number().int().min(1).max(1000).default(1),
+  limit: z.coerce
+    .number()
+    .refine((v) => [20, 50, 100].includes(v), "invalid")
+    .default(20),
+});
+
+const note = z.string().trim().min(1).max(1000);
+
+export const statusBody = z.object({
+  status: z.enum(C.complaintStatus),
+  publicNote: note.optional(),
+  internalNote: note.optional(),
+  rejection: z
+    .object({ code: z.enum(C.rejectionReasons), text: z.string().trim().max(300).optional() })
+    .optional(),
+});
+
+export const assignBody = z.object({
+  departmentId: objectId,
+  assigneeId: objectId.nullable().optional(),
+  publicNote: note.optional(),
+});
+
+export const categoryBody = z.object({ category: z.enum(C.complaintCategories) });
+
+export const noteBody = z.object({ visibility: z.enum(C.timelineVisibility), text: note });
+
+export const revealBody = z.object({ target: z.enum(["citizen", "onBehalf"]) });

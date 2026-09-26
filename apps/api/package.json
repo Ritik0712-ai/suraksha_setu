@@ -15,7 +15,9 @@
     "db:migrate:status": "migrate-mongo status -f migrate-mongo-config.js",
     "db:migrate:create": "migrate-mongo create -f migrate-mongo-config.js",
     "db:seed": "node --env-file-if-exists=.env src/scripts/db-seed.js",
-    "db:seed:admins": "node --env-file-if-exists=.env src/scripts/db-seed-admins.js"
+    "db:seed:admins": "node --env-file-if-exists=.env src/scripts/db-seed-admins.js",
+    "db:seed:schemes": "node --env-file-if-exists=.env src/scripts/db-seed-schemes.js",
+    "db:seed:emergency": "node --env-file-if-exists=.env src/scripts/db-seed-emergency.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

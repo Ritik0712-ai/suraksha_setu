@@ -27,6 +27,8 @@ export function createAuthLimiters(enabled = true) {
       register: passthrough,
       passwordReset: passthrough,
       track: passthrough,
+      nearby: passthrough,
+      events: passthrough,
     };
   return {
     // 5 failed logins per 15 min per phone + IP
@@ -42,5 +44,9 @@ export function createAuthLimiters(enabled = true) {
     passwordReset: limiter({ windowMs: 60 * MIN, limit: 3 }),
     // Public SOS tracking page refreshes every 30 s; this only stops token guessing.
     track: limiter({ windowMs: MIN, limit: 60 }),
+    // Nearby services may call Google Places (billed), so keep it modest per IP.
+    nearby: limiter({ windowMs: MIN, limit: 30 }),
+    // Client usage events and error reports (docs/02 §7.2 supporting endpoints).
+    events: limiter({ windowMs: MIN, limit: 30 }),
   };
 }

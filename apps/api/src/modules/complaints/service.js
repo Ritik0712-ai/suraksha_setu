@@ -2,32 +2,29 @@ import C from "../../config/constants.js";
 import { AppError } from "../../lib/errors.js";
 import { logger } from "../../lib/logger.js";
 import { notify } from "../../lib/notify.js";
-import { maskPhone } from "../../lib/phone.js";
 import { assertInScope } from "../../lib/scope.js";
+import { istDayStart } from "../../lib/time.js";
 import { withTransaction } from "../../lib/transaction.js";
+
+export { istDayStart };
 import { MAX_REOPENS, MAX_TIMELINE_EVENTS, Complaint } from "../../models/Complaint.js";
 import { nextComplaintNo } from "../../models/Counter.js";
 import { Department } from "../../models/Department.js";
 import { Jurisdiction } from "../../models/Jurisdiction.js";
 import { Upload } from "../../models/Upload.js";
 import { UsageEvent } from "../../models/UsageEvent.js";
-import { User } from "../../models/User.js";
 import { STALE_UPLOAD_MS } from "../../jobs/uploadJobs.js";
+import { citizenView, listItem, lookups, staffView } from "./views.js";
+import { REOPEN_WINDOW_MS, reopenState } from "./reopen.js";
+
+export { REOPEN_WINDOW_MS, reopenState };
 import { routeDepartment } from "../../services/departmentRouting.js";
 import { resolveJurisdiction } from "../../services/jurisdictionResolver.js";
 
 export const DAILY_COMPLAINT_LIMIT = 10; // docs/02 SEC-06
 export const DAILY_UPLOAD_LIMIT = 30; // retakes included; stops Cloudinary abuse
 export const AI_ACCEPT_MIN_CONFIDENCE = 0.6; // docs/03 S-10 step 2
-export const REOPEN_WINDOW_MS = 7 * 24 * 3600 * 1000; // docs/05 §5.6.1
 export const PAGE_SIZE = 20; // docs/03 S-12
-
-const IST_OFFSET_MS = 330 * 60 * 1000;
-/** Midnight IST today, so daily limits reset for the user at their midnight. */
-export function istDayStart(now = new Date()) {
-  const day = 24 * 3600 * 1000;
-  return new Date(Math.floor((now.getTime() + IST_OFFSET_MS) / day) * day - IST_OFFSET_MS);
-}
 
 const OPEN_STATUSES = C.complaintStatus.filter((s) => s !== "RESOLVED" && s !== "REJECTED");
 const STATUS_FILTER = {
@@ -36,104 +33,10 @@ const STATUS_FILTER = {
   rejected: "REJECTED",
 };
 
-const toLatLng = (p) => (p ? { lat: p.coordinates[1], lng: p.coordinates[0] } : null);
 const toPoint = ({ lat, lng }) => ({ type: "Point", coordinates: [lng, lat] });
-
-/** Whether the owner may reopen now (docs/05 §5.6.1), and until when. */
-export function reopenState(c, now = new Date()) {
-  if (c.status !== "RESOLVED" || !c.resolvedAt) return { canReopen: false, reopenUntil: null };
-  const until = new Date(new Date(c.resolvedAt).getTime() + REOPEN_WINDOW_MS);
-  return {
-    canReopen: now < until && c.reopenCount < MAX_REOPENS,
-    reopenUntil: until,
-  };
-}
 
 /** Civic complaints (docs/05 §5.6). `storage` holds photos, `ai` is the classifier client. */
 export function createComplaintService({ realtime, storage, ai }) {
-  // --- shapes ---------------------------------------------------------------------------------
-
-  async function lookups(docs) {
-    const deptIds = [...new Set(docs.map((d) => String(d.departmentId)))];
-    const jurIds = [...new Set(docs.map((d) => String(d.jurisdictionId)))];
-    const [depts, jurs] = await Promise.all([
-      Department.find({ _id: { $in: deptIds } })
-        .select("name code")
-        .lean(),
-      Jurisdiction.find({ _id: { $in: jurIds } })
-        .select("name")
-        .lean(),
-    ]);
-    const byId = (list) => new Map(list.map((x) => [String(x._id), x]));
-    return { depts: byId(depts), jurs: byId(jurs) };
-  }
-
-  const timelineEvent = (e) => ({
-    type: e.type,
-    fromStatus: e.fromStatus ?? null,
-    toStatus: e.toStatus ?? null,
-    text: e.text ?? null,
-    visibility: e.visibility,
-    actorRole: e.actorRole,
-    at: e.at,
-  });
-
-  /** Card on S-12 (and the portal's live "new complaint" row). */
-  function listItem(c, { depts, jurs }) {
-    return {
-      id: String(c._id),
-      complaintNo: c.complaintNo,
-      category: c.category,
-      status: c.status,
-      imageUrl: c.imageUrl ?? null,
-      landmark: c.landmark ?? null,
-      village: jurs.get(String(c.jurisdictionId))?.name ?? null,
-      department: depts.get(String(c.departmentId))?.name ?? null,
-      createdAt: c.createdAt,
-      updatedAt: c.updatedAt,
-    };
-  }
-
-  /** What the owner sees on S-13: public timeline only (docs/05 §15). */
-  function citizenView(c, maps) {
-    const dept = maps.depts.get(String(c.departmentId));
-    return {
-      ...listItem(c, maps),
-      categorySource: c.categorySource,
-      description: c.description ?? null,
-      location: toLatLng(c.location),
-      locationAccuracyM: c.locationAccuracyM ?? null,
-      onBehalfOf: c.onBehalfOf ? { name: c.onBehalfOf.name } : null,
-      department: dept ? { id: String(dept._id), name: dept.name } : null,
-      statusChangedAt: c.statusChangedAt,
-      resolutionImageUrl: c.resolutionImageUrl ?? null,
-      rejection: c.rejection ?? null,
-      reopenCount: c.reopenCount,
-      resolvedAt: c.resolvedAt ?? null,
-      ...reopenState(c),
-      timeline: c.timeline.filter((e) => e.visibility === "public").map(timelineEvent),
-    };
-  }
-
-  /** In-scope authority/admin: full record, citizen phone masked (docs/05 §8). */
-  async function staffView(c, maps) {
-    const citizen = c.citizenId
-      ? await User.findById(c.citizenId).select("name phone").lean()
-      : null;
-    return {
-      ...citizenView(c, maps),
-      aiSuggestion: c.aiSuggestion ?? null,
-      jurisdictionId: String(c.jurisdictionId),
-      assigneeId: c.assigneeId ? String(c.assigneeId) : null,
-      firstActionAt: c.firstActionAt ?? null,
-      onBehalfOf: c.onBehalfOf
-        ? { name: c.onBehalfOf.name, maskedPhone: maskPhone(c.onBehalfOf.phone) }
-        : null,
-      citizen: citizen ? { name: citizen.name, maskedPhone: maskPhone(citizen.phone) } : null,
-      timeline: c.timeline.map(timelineEvent),
-    };
-  }
-
   // --- photo + AI (docs/02 §8.2) --------------------------------------------------------------
 
   async function classify(userId, { buffer, mime }) {

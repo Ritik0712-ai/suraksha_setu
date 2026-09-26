@@ -1,0 +1,17 @@
+{
+  "title": "सूचनाएँ",
+  "markAll": "सभी को पढ़ा हुआ करें",
+  "empty": "अभी कोई सूचना नहीं।",
+  "unread": "नहीं पढ़ी",
+  "loadMore": "और दिखाएँ",
+  "notif": {
+    "complaintSubmitted": "शिकायत {{complaintNo}} दर्ज हो गई",
+    "complaintStatus": "शिकायत {{complaintNo}}: {{status}}",
+    "complaintNote": "शिकायत {{complaintNo}} पर नई जानकारी",
+    "complaintReopened": "शिकायत {{complaintNo}} दोबारा खोली गई",
+    "sosAcknowledged": "आपका SOS {{officerName}} ने देख लिया",
+    "sosClosed": "आपका SOS अधिकारी ने बंद किया",
+    "schemeUpdated": "जानकारी बदली गई: {{name}}",
+    "system": "सुरक्षा सेतु की ओर से संदेश"
+  }
+}

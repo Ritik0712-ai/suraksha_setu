@@ -1,12 +1,10 @@
-import { randomBytes } from "node:crypto";
 import C from "../config/constants.js";
-import { hashPassword } from "../lib/password.js";
+import { hashPassword, tempPassword } from "../lib/password.js";
 import { normalizePhone } from "../lib/phone.js";
 import { Jurisdiction } from "../models/Jurisdiction.js";
 import { User } from "../models/User.js";
 
-/** 12-character temporary password that always passes the password rules. */
-export const tempPassword = () => `Ss-${randomBytes(9).toString("base64url")}`;
+export { tempPassword };
 
 /**
  * Creates one admin per team member (docs/06 task 1.9, docs/05 §11.5) with

@@ -49,7 +49,7 @@ describe("S-03 login", () => {
     await type("पासवर्ड", "safe-pass-1");
     await userEvent.click(await screen.findByRole("button", { name: "लॉग इन करें" }));
     await waitFor(() => expect(router.state.location.pathname).toBe("/portal"));
-    expect(await screen.findByText("स्वागत है, Mr Verma")).toBeInTheDocument();
+    expect(await screen.findByText("नमस्ते, Mr Verma")).toBeInTheDocument();
   });
 
   it("ignores an off-site ?next (no open redirect)", async () => {

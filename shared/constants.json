@@ -1,7 +1,6 @@
 {
   "$comment": "Single source of truth for enums and static reference data (docs/02 §2.4, docs/05 §4). Read by apps/web, apps/api and apps/ai. Do not hard-code these values anywhere else.",
   "version": 1,
-
   "roles": ["citizen", "authority", "admin"],
   "actorRoles": ["citizen", "authority", "admin", "system"],
   "userStatus": ["active", "inactive", "deleted"],
@@ -24,9 +23,7 @@
   ],
   "maxEmergencyContacts": 5,
   "consentVersion": "2026-09-v1",
-
   "jurisdictionTypes": ["state", "district", "block", "gram_panchayat", "village"],
-
   "complaintCategories": [
     "road_damage",
     "garbage",
@@ -52,7 +49,6 @@
   "rejectionReasons": ["duplicate", "not_civic_issue", "outside_area", "inappropriate", "other"],
   "uploadPurposes": ["complaint", "resolution"],
   "uploadStatus": ["pending", "attached"],
-
   "sosStatus": [
     "ACTIVE",
     "ACKNOWLEDGED",
@@ -70,7 +66,6 @@
     "could_not_reach"
   ],
   "sosCreatedVia": ["online", "offline_retry"],
-
   "bloodGroups": ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
   "bloodCompatibility": {
     "$comment": "Recipient blood group -> donor groups that can give to it (docs/05 §5.11).",
@@ -83,9 +78,7 @@
     "AB-": ["AB-", "A-", "B-", "O-"],
     "AB+": ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]
   },
-
   "serviceTypes": ["hospital", "phc_chc", "police", "ambulance", "fire", "pharmacy", "blood_bank"],
-
   "schemeCategories": [
     "women",
     "farmers",
@@ -123,7 +116,6 @@
     "disability": ["yes", "no"],
     "unknownValues": ["dont_know", "undisclosed"]
   },
-
   "chatModes": ["general", "scheme_help", "letter"],
   "letterTypes": [
     "panchayat_complaint",
@@ -133,7 +125,6 @@
   ],
   "chatIntents": ["answer", "need_info", "letter_ready", "emergency", "out_of_scope"],
   "chatMessageRoles": ["user", "assistant", "notice"],
-
   "notificationTypes": [
     "complaint_submitted",
     "complaint_status",
@@ -158,55 +149,224 @@
     "donor_search",
     "app_install"
   ],
-
   "helplines": [
     {
       "number": "112",
       "key": "all_emergencies",
       "icon": "emergency",
-      "name": { "hi": "सभी आपात स्थितियाँ", "en": "All emergencies" }
+      "name": {
+        "hi": "सभी आपात स्थितियाँ",
+        "en": "All emergencies"
+      }
     },
     {
       "number": "108",
       "key": "ambulance",
       "icon": "ambulance",
-      "name": { "hi": "एम्बुलेंस", "en": "Ambulance" }
+      "name": {
+        "hi": "एम्बुलेंस",
+        "en": "Ambulance"
+      }
     },
     {
       "number": "100",
       "key": "police",
       "icon": "local_police",
-      "name": { "hi": "पुलिस", "en": "Police" }
+      "name": {
+        "hi": "पुलिस",
+        "en": "Police"
+      }
     },
     {
       "number": "101",
       "key": "fire",
       "icon": "fire_truck",
-      "name": { "hi": "दमकल (फ़ायर)", "en": "Fire" }
+      "name": {
+        "hi": "दमकल (फ़ायर)",
+        "en": "Fire"
+      }
     },
     {
       "number": "1091",
       "key": "women",
       "icon": "woman",
-      "name": { "hi": "महिला हेल्पलाइन", "en": "Women helpline" }
+      "name": {
+        "hi": "महिला हेल्पलाइन",
+        "en": "Women helpline"
+      }
     },
     {
       "number": "181",
       "key": "women_mp",
       "icon": "woman",
-      "name": { "hi": "महिला हेल्पलाइन (म.प्र.)", "en": "Women helpline (MP)" }
+      "name": {
+        "hi": "महिला हेल्पलाइन (म.प्र.)",
+        "en": "Women helpline (MP)"
+      }
     },
     {
       "number": "1098",
       "key": "child",
       "icon": "child_care",
-      "name": { "hi": "चाइल्ड हेल्पलाइन", "en": "Child helpline" }
+      "name": {
+        "hi": "चाइल्ड हेल्पलाइन",
+        "en": "Child helpline"
+      }
     },
     {
       "number": "1930",
       "key": "cyber_fraud",
       "icon": "security",
-      "name": { "hi": "साइबर फ़्रॉड", "en": "Cyber fraud" }
+      "name": {
+        "hi": "साइबर फ़्रॉड",
+        "en": "Cyber fraud"
+      }
+    }
+  ],
+  "schemeDocuments": [
+    {
+      "key": "aadhaar",
+      "icon": "badge",
+      "label": {
+        "hi": "आधार कार्ड",
+        "en": "Aadhaar card"
+      }
+    },
+    {
+      "key": "samagra_id",
+      "icon": "family",
+      "label": {
+        "hi": "समग्र आईडी",
+        "en": "Samagra ID"
+      }
+    },
+    {
+      "key": "ration_card",
+      "icon": "receipt",
+      "label": {
+        "hi": "राशन कार्ड",
+        "en": "Ration card"
+      }
+    },
+    {
+      "key": "bank_passbook",
+      "icon": "bank",
+      "label": {
+        "hi": "बैंक पासबुक",
+        "en": "Bank passbook"
+      }
+    },
+    {
+      "key": "photo",
+      "icon": "photo",
+      "label": {
+        "hi": "पासपोर्ट साइज़ फ़ोटो",
+        "en": "Passport-size photo"
+      }
+    },
+    {
+      "key": "income_cert",
+      "icon": "income",
+      "label": {
+        "hi": "आय प्रमाण पत्र",
+        "en": "Income certificate"
+      }
+    },
+    {
+      "key": "caste_cert",
+      "icon": "certificate",
+      "label": {
+        "hi": "जाति प्रमाण पत्र",
+        "en": "Caste certificate"
+      }
+    },
+    {
+      "key": "land_record",
+      "icon": "land",
+      "label": {
+        "hi": "ज़मीन के कागज़ (खसरा/B1)",
+        "en": "Land records (khasra/B1)"
+      }
+    },
+    {
+      "key": "domicile_cert",
+      "icon": "home",
+      "label": {
+        "hi": "मूल निवासी प्रमाण पत्र",
+        "en": "Domicile certificate"
+      }
+    },
+    {
+      "key": "age_proof",
+      "icon": "cake",
+      "label": {
+        "hi": "उम्र का प्रमाण",
+        "en": "Proof of age"
+      }
+    },
+    {
+      "key": "birth_cert",
+      "icon": "child",
+      "label": {
+        "hi": "जन्म प्रमाण पत्र",
+        "en": "Birth certificate"
+      }
+    },
+    {
+      "key": "mobile_number",
+      "icon": "phone",
+      "label": {
+        "hi": "मोबाइल नंबर",
+        "en": "Mobile number"
+      }
+    },
+    {
+      "key": "job_card",
+      "icon": "work",
+      "label": {
+        "hi": "जॉब कार्ड",
+        "en": "Job card"
+      }
+    },
+    {
+      "key": "disability_cert",
+      "icon": "accessible",
+      "label": {
+        "hi": "दिव्यांग प्रमाण पत्र",
+        "en": "Disability certificate"
+      }
+    },
+    {
+      "key": "death_cert_spouse",
+      "icon": "certificate",
+      "label": {
+        "hi": "पति/पत्नी का मृत्यु प्रमाण पत्र",
+        "en": "Spouse's death certificate"
+      }
+    },
+    {
+      "key": "pregnancy_record",
+      "icon": "pregnant",
+      "label": {
+        "hi": "MCP कार्ड / गर्भावस्था पंजीयन",
+        "en": "MCP card / pregnancy registration"
+      }
+    },
+    {
+      "key": "marksheet",
+      "icon": "school",
+      "label": {
+        "hi": "अंकसूची",
+        "en": "Marksheet"
+      }
+    },
+    {
+      "key": "sowing_certificate",
+      "icon": "grass",
+      "label": {
+        "hi": "बुवाई प्रमाण पत्र",
+        "en": "Sowing certificate"
+      }
     }
   ]
 }

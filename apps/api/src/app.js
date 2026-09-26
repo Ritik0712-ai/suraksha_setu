@@ -12,11 +12,17 @@ import { createAuthService } from "./modules/auth/service.js";
 import { authRouter } from "./modules/auth/routes.js";
 import { usersRouter } from "./modules/users/routes.js";
 import { adminRouter } from "./modules/admin/routes.js";
+import { savedSchemesRouter, schemesRouter } from "./modules/schemes/routes.js";
+import { emergencyRouter } from "./modules/emergency/routes.js";
+import { donorsRouter } from "./modules/donors/routes.js";
 import { jurisdictionsRouter } from "./modules/jurisdictions/routes.js";
 import { createSosService } from "./modules/sos/service.js";
 import { sosRouter, trackRouter } from "./modules/sos/routes.js";
 import { createComplaintService } from "./modules/complaints/service.js";
 import { complaintsRouter, filesRouter } from "./modules/complaints/routes.js";
+import { createComplaintManager } from "./modules/complaints/manage.js";
+import { notificationsRouter } from "./modules/notifications/routes.js";
+import { eventsRouter } from "./modules/events/routes.js";
 import { createAiClient } from "./lib/aiClient.js";
 import { noopRealtime } from "./lib/realtime.js";
 import { createStorage } from "./lib/storage.js";
@@ -45,6 +51,7 @@ export function createApp({
   const auth = createAuthService({ env, mailer: mail });
   const sos = createSosService({ env, mailer: mail, realtime });
   const complaints = createComplaintService({ realtime, storage, ai });
+  const manager = createComplaintManager({ realtime, storage, mailer: mail });
   const limiters = createAuthLimiters(rateLimits);
 
   app.disable("x-powered-by");
@@ -64,12 +71,18 @@ export function createApp({
   const v1 = express.Router();
   v1.use("/health", healthRouter({ env, fetchImpl }));
   v1.use("/auth", authRouter({ env, auth, limiters }));
+  v1.use("/users/me/saved-schemes", savedSchemesRouter({ env }));
   v1.use("/users", usersRouter({ env, auth }));
-  v1.use("/admin", adminRouter({ env, auth }));
+  v1.use("/admin", adminRouter({ env, auth, realtime }));
+  v1.use("/schemes", schemesRouter({ env }));
+  v1.use("/donors", donorsRouter({ env }));
+  v1.use("/emergency", emergencyRouter({ env, fetchImpl, limiter: limiters.nearby }));
   v1.use("/jurisdictions", jurisdictionsRouter());
   v1.use("/sos", sosRouter({ env, sos }));
   v1.use("/track", trackRouter({ sos, limiter: limiters.track }));
-  v1.use("/complaints", complaintsRouter({ env, complaints, ai }));
+  v1.use("/complaints", complaintsRouter({ env, complaints, manager, ai }));
+  v1.use("/notifications", notificationsRouter({ env }));
+  v1.use(eventsRouter({ env, limiter: limiters.events }));
   v1.use("/files", filesRouter({ storage }));
   app.use("/api/v1", v1);
 

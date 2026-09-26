@@ -243,7 +243,7 @@ export function PortalShell({ title }) {
               {title ?? t("title")}
             </Typography>
             <LanguageToggle />
-            <NotificationBell />
+            <NotificationBell to="/portal/notifications" />
           </Toolbar>
         </AppBar>
         <OfflineBanner />

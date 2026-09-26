@@ -46,6 +46,24 @@ export const handlers = [
   http.post("*/api/v1/auth/refresh", () => apiErr(401, "UNAUTHENTICATED", "Please log in again.")),
   http.get("*/api/v1/health", () => HttpResponse.json({ status: "ok", db: "up", ai: "up" })),
   http.get("*/api/v1/jurisdictions", () => HttpResponse.json({ data: [VILLAGE] })),
+  http.get("*/api/v1/notifications", () =>
+    HttpResponse.json({ data: { items: [], nextPage: null, unread: 0 } }),
+  ),
+  http.get("*/api/v1/users/me/contacts", () => HttpResponse.json({ data: [] })),
+  http.get("*/api/v1/admin/overview", () =>
+    HttpResponse.json({
+      data: {
+        scope: [VILLAGE.name],
+        kpis: { openComplaints: 0, resolvedThisWeek: 0, activeSos: 0, avgResolutionDays: null },
+        activeSos: [],
+        needsAction: [],
+        activity: [],
+      },
+    }),
+  ),
+  http.get("*/api/v1/admin/users", () =>
+    HttpResponse.json({ data: { items: [], total: 0, page: 1 } }),
+  ),
   http.patch("*/api/v1/users/me", async ({ request }) =>
     HttpResponse.json({ data: citizen(await request.json()) }),
   ),

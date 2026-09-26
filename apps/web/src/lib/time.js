@@ -24,3 +24,14 @@ export function formatDateTime(date) {
     minute: "2-digit",
   }).format(new Date(date));
 }
+
+/** "26 सित॰ 2026" in IST. */
+export function formatDate(date) {
+  const lang = i18n.resolvedLanguage === "en" ? "en-IN" : "hi-IN";
+  return new Intl.DateTimeFormat(lang, {
+    timeZone: "Asia/Kolkata",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(new Date(date));
+}

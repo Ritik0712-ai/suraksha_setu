@@ -1,0 +1,17 @@
+{
+  "title": "Notifications",
+  "markAll": "Mark all as read",
+  "empty": "No notifications yet.",
+  "unread": "Unread",
+  "loadMore": "Show more",
+  "notif": {
+    "complaintSubmitted": "Complaint {{complaintNo}} submitted",
+    "complaintStatus": "Complaint {{complaintNo}}: {{status}}",
+    "complaintNote": "New update on complaint {{complaintNo}}",
+    "complaintReopened": "Complaint {{complaintNo}} was reopened",
+    "sosAcknowledged": "Your SOS was seen by {{officerName}}",
+    "sosClosed": "Your SOS was closed by the authority",
+    "schemeUpdated": "Information updated: {{name}}",
+    "system": "Message from Suraksha Setu"
+  }
+}

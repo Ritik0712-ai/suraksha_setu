@@ -34,4 +34,6 @@ export const STORAGE_KEYS = {
   lang: "ss_lang",
   textSize: "ss_text_size",
   contacts: "ss_contacts", // cached for offline SOS (docs/03 S-28, doc 06 task 4A.9)
+  schemesList: "ss_schemes_list", // last scheme list, for offline S-14
+  schemesViewed: "ss_schemes_viewed", // last 10 viewed schemes, for offline S-15 (task 4C.4)
 };

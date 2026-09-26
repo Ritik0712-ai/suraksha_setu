@@ -49,3 +49,18 @@ export function requireRole(...roles) {
     next();
   };
 }
+
+/**
+ * Like requireAuth, but anonymous requests go through (req.user stays undefined). A bad or
+ * expired token is treated as anonymous too: public endpoints never fail because of it.
+ */
+export function optionalAuth(env) {
+  const strict = requireAuth(env);
+  return (req, res, next) => {
+    if (!req.headers.authorization) return next();
+    strict(req, res, (err) => {
+      if (err) req.user = undefined;
+      next();
+    });
+  };
+}

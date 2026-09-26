@@ -11,19 +11,18 @@ import {
 } from "./features/system/guards.jsx";
 import { ComingSoonPage, NotFoundPage } from "./features/system/SystemPages.jsx";
 import { RouteSkeleton } from "./components/ui/States.jsx";
+import { loadNamespaces } from "./i18n/index.js";
 
 // Route map from docs/03 §1. Screens other than Home load on demand, so citizens never download
 // portal or dev code. Modules built in later phases render a "coming soon" page with the
 // helplines until then.
 
-const page = (loader) => () => loader().then((m) => ({ Component: m.default }));
+// `ns`: translation namespaces the screen needs that aren't in the first download (i18n/index.js).
+const page =
+  (loader, ns = []) =>
+  () =>
+    Promise.all([loader(), loadNamespaces(ns)]).then(([m]) => ({ Component: m.default }));
 const soon = (titleKey) => ({ element: <ComingSoonPage titleKey={titleKey} /> });
-const portalSoon = (titleKey) => ({
-  lazy: () =>
-    import("./features/portal/PortalPlaceholder.jsx").then((m) => ({
-      Component: () => <m.default titleKey={titleKey} />,
-    })),
-});
 
 export const routes = [
   { path: "/welcome", element: <WelcomePage />, errorElement: <CrashPage /> },
@@ -65,11 +64,26 @@ export const routes = [
           { path: "fake-call", lazy: page(() => import("./features/sos/FakeCallPage.jsx")) },
 
           // Public modules (later phases).
-          { path: "emergency", ...soon("modules.emergency") },
-          { path: "schemes", ...soon("modules.schemes") },
-          { path: "schemes/check", ...soon("modules.check") },
-          { path: "schemes/check/results", ...soon("modules.check") },
-          { path: "schemes/:slug", ...soon("modules.schemes") },
+          {
+            path: "emergency",
+            lazy: page(() => import("./features/emergency/EmergencyPage.jsx"), ["emergency"]),
+          },
+          {
+            path: "schemes",
+            lazy: page(() => import("./features/schemes/SchemesPage.jsx"), ["schemes"]),
+          },
+          {
+            path: "schemes/check",
+            lazy: page(() => import("./features/schemes/EligibilityPage.jsx"), ["schemes"]),
+          },
+          {
+            path: "schemes/check/results",
+            lazy: page(() => import("./features/schemes/EligibilityResultsPage.jsx"), ["schemes"]),
+          },
+          {
+            path: "schemes/:slug",
+            lazy: page(() => import("./features/schemes/SchemeDetailPage.jsx"), ["schemes"]),
+          },
 
           {
             element: <RequireCitizen />,
@@ -97,13 +111,28 @@ export const routes = [
                 path: "complaints/:id",
                 lazy: page(() => import("./features/complaints/ComplaintDetailPage.jsx")),
               },
-              { path: "my-schemes", ...soon("modules.schemes") },
-              { path: "blood", ...soon("modules.blood") },
-              { path: "blood/donor", ...soon("modules.blood") },
+              {
+                path: "my-schemes",
+                lazy: page(() => import("./features/schemes/MySchemesPage.jsx"), ["schemes"]),
+              },
+              {
+                path: "blood",
+                lazy: page(() => import("./features/blood/BloodSearchPage.jsx"), ["blood"]),
+              },
+              {
+                path: "blood/donor",
+                lazy: page(() => import("./features/blood/DonorProfilePage.jsx"), ["blood"]),
+              },
               { path: "sahayak", ...soon("modules.sahayak") },
               { path: "sahayak/:sessionId", ...soon("modules.sahayak") },
               { path: "sahayak/:sessionId/letter/:messageId", ...soon("modules.sahayak") },
-              { path: "notifications", ...soon("modules.notifications") },
+              {
+                path: "notifications",
+                lazy: page(
+                  () => import("./features/notifications/NotificationsPage.jsx"),
+                  ["notifications"],
+                ),
+              },
             ],
           },
 
@@ -138,28 +167,66 @@ export const routes = [
         children: [
           {
             lazy: () =>
-              import("./components/layout/PortalShell.jsx").then((m) => ({
-                Component: m.PortalShell,
-              })),
+              Promise.all([
+                import("./components/layout/PortalShell.jsx"),
+                loadNamespaces(["portal"]),
+              ]).then(([m]) => ({ Component: m.PortalShell })),
             children: [
-              { index: true, ...portalSoon() },
-              { path: "complaints", ...portalSoon("nav.complaints") },
-              { path: "complaints/:id", ...portalSoon("nav.complaints") },
-              { path: "sos", ...portalSoon("nav.liveSos") },
-              { path: "sos/:id", ...portalSoon("nav.liveSos") },
-              { path: "analytics", ...portalSoon("nav.analytics") },
-              { path: "profile", ...portalSoon("nav.profile") },
+              { index: true, lazy: page(() => import("./features/portal/OverviewPage.jsx")) },
+              {
+                path: "complaints",
+                lazy: page(() => import("./features/portal/ComplaintsTablePage.jsx")),
+              },
+              {
+                path: "complaints/:id",
+                lazy: page(() => import("./features/portal/ComplaintManagePage.jsx")),
+              },
+              { path: "sos", lazy: page(() => import("./features/portal/LiveSosPage.jsx")) },
+              { path: "sos/:id", lazy: page(() => import("./features/portal/LiveSosPage.jsx")) },
+              {
+                path: "analytics",
+                lazy: page(() => import("./features/portal/AnalyticsPage.jsx")),
+              },
+              {
+                path: "profile",
+                lazy: page(() => import("./features/portal/PortalProfilePage.jsx")),
+              },
+              {
+                path: "notifications",
+                lazy: page(
+                  () => import("./features/notifications/NotificationsPage.jsx"),
+                  ["notifications"],
+                ),
+              },
               {
                 path: "admin",
                 element: <RequireStaff adminOnly />,
                 children: [
-                  { path: "users", ...portalSoon("nav.users") },
-                  { path: "schemes", ...portalSoon("nav.schemes") },
-                  { path: "schemes/:id", ...portalSoon("nav.schemes") },
-                  { path: "emergency-services", ...portalSoon("nav.emergencyDirectory") },
-                  { path: "departments", ...portalSoon("nav.departments") },
-                  { path: "jurisdictions", ...portalSoon("nav.jurisdictions") },
-                  { path: "audit", ...portalSoon("nav.audit") },
+                  { path: "users", lazy: page(() => import("./features/portal/UsersPage.jsx")) },
+                  {
+                    path: "schemes",
+                    lazy: page(() => import("./features/portal/SchemesAdminPage.jsx"), ["schemes"]),
+                  },
+                  {
+                    path: "schemes/:id",
+                    lazy: page(() => import("./features/portal/SchemeEditorPage.jsx"), ["schemes"]),
+                  },
+                  {
+                    path: "emergency-services",
+                    lazy: page(
+                      () => import("./features/portal/EmergencyDirectoryPage.jsx"),
+                      ["emergency"],
+                    ),
+                  },
+                  {
+                    path: "departments",
+                    lazy: page(() => import("./features/portal/DepartmentsPage.jsx")),
+                  },
+                  {
+                    path: "jurisdictions",
+                    lazy: page(() => import("./features/portal/JurisdictionsPage.jsx")),
+                  },
+                  { path: "audit", lazy: page(() => import("./features/portal/AuditPage.jsx")) },
                 ],
               },
             ],

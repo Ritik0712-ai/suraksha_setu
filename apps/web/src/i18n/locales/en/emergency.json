@@ -1,0 +1,38 @@
+{
+  "title": "Emergency help",
+  "helplines": "Emergency numbers — tap to call",
+  "nearby": "Nearby services",
+  "typeLabel": "Type of service",
+  "types": {
+    "hospital": "Hospital",
+    "police": "Police",
+    "ambulance": "Ambulance",
+    "fire": "Fire",
+    "pharmacy": "Pharmacy",
+    "phc_chc": "Health centre",
+    "blood_bank": "Blood bank"
+  },
+  "view": {
+    "label": "View",
+    "list": "List",
+    "map": "Map"
+  },
+  "allowTitle": "Allow location to find the nearest services",
+  "allow": "Allow",
+  "locating": "Finding your location…",
+  "deniedVillage": "Location is off, so services near your village are shown.",
+  "deniedGuest": "Location is off. Turn it on to see nearby services, or call a number above.",
+  "needsInternet": "Needs internet",
+  "distance": "{{km}} km",
+  "distanceM": "{{m}} m",
+  "verified": "Verified by team",
+  "google": "Google",
+  "open24": "Open 24×7",
+  "call": "Call",
+  "directions": "Directions",
+  "empty": "No {{type}} found nearby. Call 112 or 108.",
+  "call112": "Call 112",
+  "call108": "Call 108",
+  "you": "You are here",
+  "mapHint": "Tap a pin to see details"
+}

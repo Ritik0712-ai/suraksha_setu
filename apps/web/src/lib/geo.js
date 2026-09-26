@@ -47,3 +47,11 @@ export const mapsLink = ({ lat, lng }) =>
   `https://maps.google.com/?q=${lat.toFixed(6)},${lng.toFixed(6)}`;
 export const directionsLink = ({ lat, lng }) =>
   `https://www.google.com/maps/dir/?api=1&destination=${lat.toFixed(6)},${lng.toFixed(6)}`;
+
+/** "450 m" / "4.2 km" using the caller's namespace keys `distanceM` and `distance`. */
+export function formatDistance(t, m) {
+  if (m === null || m === undefined) return "";
+  return m < 1000
+    ? t("distanceM", { m: Math.round(m / 10) * 10 })
+    : t("distance", { km: (m / 1000).toFixed(1) });
+}

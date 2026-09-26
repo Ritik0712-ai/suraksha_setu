@@ -1,0 +1,2212 @@
+{
+  "$comment": "First scheme batch (docs/05 §11.4). Imported as DRAFTS. Text is deliberately general: amounts, age and income limits must be copied from the official source and each scheme marked verified in the portal (A-08) before publishing. Rules only encode definitional conditions; add numeric bands after verification.",
+  "schemes": [
+    {
+      "slug": "laadli-behna-yojana",
+      "name": {
+        "hi": "मुख्यमंत्री लाड़ली बहना योजना",
+        "en": "Mukhyamantri Laadli Behna Yojana"
+      },
+      "summary": {
+        "hi": "मध्य प्रदेश की पात्र महिलाओं को हर महीने आर्थिक सहायता सीधे बैंक खाते में।",
+        "en": "Monthly financial help paid directly into the bank account of eligible women in Madhya Pradesh."
+      },
+      "benefitShort": {
+        "hi": "महिलाओं को हर महीने सहायता राशि",
+        "en": "Monthly help for women"
+      },
+      "benefits": [
+        {
+          "hi": "हर महीने सहायता राशि सीधे आधार से जुड़े बैंक खाते में",
+          "en": "A monthly amount paid directly into the Aadhaar-linked bank account"
+        }
+      ],
+      "eligibilityText": [
+        {
+          "hi": "मध्य प्रदेश की निवासी महिला",
+          "en": "A woman living in Madhya Pradesh"
+        },
+        {
+          "hi": "तय उम्र सीमा के अंदर (विवाहित, विधवा, तलाकशुदा या परित्यक्ता)",
+          "en": "Within the set age range (married, widowed, divorced or deserted)"
+        },
+        {
+          "hi": "परिवार की आय तय सीमा से कम",
+          "en": "Family income below the set limit"
+        }
+      ],
+      "rules": {
+        "all": [
+          {
+            "field": "gender",
+            "op": "eq",
+            "value": "female",
+            "failReason": {
+              "hi": "यह योजना महिलाओं के लिए है",
+              "en": "This scheme is for women"
+            }
+          },
+          {
+            "field": "maritalStatus",
+            "op": "in",
+            "value": ["married", "widowed", "divorced_separated"],
+            "failReason": {
+              "hi": "यह योजना विवाहित, विधवा या तलाकशुदा महिलाओं के लिए है",
+              "en": "This scheme is for married, widowed or divorced women"
+            },
+            "unknownReason": {
+              "hi": "वैवाहिक स्थिति जाँची जाएगी",
+              "en": "Marital status will be checked"
+            }
+          }
+        ],
+        "any": [],
+        "alwaysCheck": [
+          {
+            "hi": "राशि, उम्र और आय की सीमा आधिकारिक स्रोत से जाँचें",
+            "en": "Confirm amounts, age and income limits with the official source"
+          },
+          {
+            "hi": "समग्र आईडी और आधार से जुड़ा बैंक खाता ज़रूरी है",
+            "en": "Samagra ID and an Aadhaar-linked bank account are required"
+          }
+        ]
+      },
+      "documents": [
+        {
+          "key": "samagra_id",
+          "label": {
+            "hi": "समग्र आईडी",
+            "en": "Samagra ID"
+          },
+          "icon": "family"
+        },
+        {
+          "key": "aadhaar",
+          "label": {
+            "hi": "आधार कार्ड",
+            "en": "Aadhaar card"
+          },
+          "icon": "badge"
+        },
+        {
+          "key": "bank_passbook",
+          "label": {
+            "hi": "बैंक पासबुक",
+            "en": "Bank passbook"
+          },
+          "icon": "bank"
+        },
+        {
+          "key": "mobile_number",
+          "label": {
+            "hi": "मोबाइल नंबर",
+            "en": "Mobile number"
+          },
+          "icon": "phone"
+        },
+        {
+          "key": "photo",
+          "label": {
+            "hi": "पासपोर्ट साइज़ फ़ोटो",
+            "en": "Passport-size photo"
+          },
+          "icon": "photo"
+        }
+      ],
+      "howToApply": [
+        {
+          "hi": "ग्राम पंचायत या शिविर में आवेदन फ़ॉर्म भरवाएँ",
+          "en": "Fill the form at the Gram Panchayat or a camp"
+        },
+        {
+          "hi": "आधार से e-KYC करवाएँ",
+          "en": "Complete e-KYC with Aadhaar"
+        },
+        {
+          "hi": "पावती (रसीद) संभाल कर रखें",
+          "en": "Keep the receipt safe"
+        }
+      ],
+      "whereToApply": [
+        {
+          "hi": "ग्राम पंचायत कार्यालय, महोदिया",
+          "en": "Gram Panchayat office, Mahodiya"
+        }
+      ],
+      "officialUrl": "https://cmladlibahna.mp.gov.in",
+      "sourceName": "MP Govt. — Laadli Behna portal",
+      "categories": ["women"],
+      "level": "state",
+      "tags": ["ladli", "behna", "लाड़ली", "बहना", "महिला"],
+      "state": "MP"
+    },
+    {
+      "slug": "ladli-laxmi-yojana",
+      "name": {
+        "hi": "लाड़ली लक्ष्मी योजना",
+        "en": "Ladli Laxmi Yojana"
+      },
+      "summary": {
+        "hi": "बेटियों की पढ़ाई और भविष्य के लिए चरणों में आर्थिक सहायता।",
+        "en": "Financial help in stages for a daughter's education and future."
+      },
+      "benefitShort": {
+        "hi": "बेटी की पढ़ाई के लिए सहायता",
+        "en": "Help for a daughter's education"
+      },
+      "benefits": [
+        {
+          "hi": "पढ़ाई के अलग-अलग पड़ाव पर छात्रवृत्ति",
+          "en": "Scholarship at different stages of schooling"
+        },
+        {
+          "hi": "तय उम्र पर एकमुश्त राशि (शर्तों के साथ)",
+          "en": "A lump sum at a set age (with conditions)"
+        }
+      ],
+      "eligibilityText": [
+        {
+          "hi": "मध्य प्रदेश में जन्मी बेटी",
+          "en": "A daughter born in Madhya Pradesh"
+        },
+        {
+          "hi": "आंगनवाड़ी में पंजीयन",
+          "en": "Registered at the Anganwadi"
+        },
+        {
+          "hi": "अन्य शर्तें आधिकारिक स्रोत पर देखें",
+          "en": "See the official source for other conditions"
+        }
+      ],
+      "rules": {
+        "all": [],
+        "any": [],
+        "alwaysCheck": [
+          {
+            "hi": "राशि, उम्र और आय की सीमा आधिकारिक स्रोत से जाँचें",
+            "en": "Confirm amounts, age and income limits with the official source"
+          },
+          {
+            "hi": "बेटी का पंजीयन आंगनवाड़ी से होता है",
+            "en": "The daughter is registered through the Anganwadi"
+          }
+        ]
+      },
+      "documents": [
+        {
+          "key": "birth_cert",
+          "label": {
+            "hi": "जन्म प्रमाण पत्र",
+            "en": "Birth certificate"
+          },
+          "icon": "child"
+        },
+        {
+          "key": "samagra_id",
+          "label": {
+            "hi": "समग्र आईडी",
+            "en": "Samagra ID"
+          },
+          "icon": "family"
+        },
+        {
+          "key": "aadhaar",
+          "label": {
+            "hi": "आधार कार्ड",
+            "en": "Aadhaar card"
+          },
+          "icon": "badge"
+        },
+        {
+          "key": "bank_passbook",
+          "label": {
+            "hi": "बैंक पासबुक",
+            "en": "Bank passbook"
+          },
+          "icon": "bank"
+        },
+        {
+          "key": "photo",
+          "label": {
+            "hi": "पासपोर्ट साइज़ फ़ोटो",
+            "en": "Passport-size photo"
+          },
+          "icon": "photo"
+        }
+      ],
+      "howToApply": [
+        {
+          "hi": "आंगनवाड़ी केंद्र में बेटी का पंजीयन करवाएँ",
+          "en": "Register the daughter at the Anganwadi centre"
+        },
+        {
+          "hi": "या ऑनलाइन पोर्टल पर आवेदन करें",
+          "en": "Or apply on the online portal"
+        }
+      ],
+      "whereToApply": [
+        {
+          "hi": "आंगनवाड़ी केंद्र या ANM दीदी",
+          "en": "Anganwadi centre or ANM"
+        },
+        {
+          "hi": "नज़दीकी CSC (लोक सेवा केंद्र)",
+          "en": "Nearest CSC (common service centre)"
+        }
+      ],
+      "officialUrl": "https://ladlilaxmi.mp.gov.in",
+      "sourceName": "MP Govt. — Ladli Laxmi portal",
+      "categories": ["women", "education"],
+      "level": "state",
+      "tags": ["ladli", "laxmi", "लाड़ली", "लक्ष्मी", "बेटी"],
+      "state": "MP"
+    },
+    {
+      "slug": "mukhyamantri-kisan-kalyan-yojana",
+      "name": {
+        "hi": "मुख्यमंत्री किसान कल्याण योजना",
+        "en": "Mukhyamantri Kisan Kalyan Yojana"
+      },
+      "summary": {
+        "hi": "PM-KISAN पाने वाले मध्य प्रदेश के किसानों को राज्य सरकार से अतिरिक्त सालाना सहायता।",
+        "en": "Extra yearly help from the state government for Madhya Pradesh farmers who get PM-KISAN."
+      },
+      "benefitShort": {
+        "hi": "किसानों को अतिरिक्त सालाना सहायता",
+        "en": "Extra yearly help for farmers"
+      },
+      "benefits": [
+        {
+          "hi": "किस्तों में सहायता राशि सीधे बैंक खाते में",
+          "en": "Instalments paid directly into the bank account"
+        }
+      ],
+      "eligibilityText": [
+        {
+          "hi": "मध्य प्रदेश के किसान जो PM-KISAN में पंजीकृत हैं",
+          "en": "Madhya Pradesh farmers registered in PM-KISAN"
+        }
+      ],
+      "rules": {
+        "all": [
+          {
+            "field": "occupation",
+            "op": "eq",
+            "value": "farmer_own_land",
+            "failReason": {
+              "hi": "यह योजना अपनी ज़मीन वाले किसानों के लिए है",
+              "en": "This scheme is for farmers who own land"
+            },
+            "unknownReason": {
+              "hi": "ज़मीन के कागज़ जाँचे जाएँगे",
+              "en": "Land records will be checked"
+            }
+          }
+        ],
+        "any": [],
+        "alwaysCheck": [
+          {
+            "hi": "राशि, उम्र और आय की सीमा आधिकारिक स्रोत से जाँचें",
+            "en": "Confirm amounts, age and income limits with the official source"
+          },
+          {
+            "hi": "PM-KISAN में पंजीयन ज़रूरी है",
+            "en": "PM-KISAN registration is required"
+          }
+        ]
+      },
+      "documents": [
+        {
+          "key": "aadhaar",
+          "label": {
+            "hi": "आधार कार्ड",
+            "en": "Aadhaar card"
+          },
+          "icon": "badge"
+        },
+        {
+          "key": "land_record",
+          "label": {
+            "hi": "ज़मीन के कागज़ (खसरा/B1)",
+            "en": "Land records (khasra/B1)"
+          },
+          "icon": "land"
+        },
+        {
+          "key": "bank_passbook",
+          "label": {
+            "hi": "बैंक पासबुक",
+            "en": "Bank passbook"
+          },
+          "icon": "bank"
+        },
+        {
+          "key": "samagra_id",
+          "label": {
+            "hi": "समग्र आईडी",
+            "en": "Samagra ID"
+          },
+          "icon": "family"
+        }
+      ],
+      "howToApply": [
+        {
+          "hi": "पहले PM-KISAN में पंजीयन करवाएँ",
+          "en": "First register in PM-KISAN"
+        },
+        {
+          "hi": "पटवारी/कृषि विभाग से जानकारी की पुष्टि करें",
+          "en": "Confirm details with the Patwari / agriculture office"
+        }
+      ],
+      "whereToApply": [
+        {
+          "hi": "ग्राम पंचायत कार्यालय, महोदिया",
+          "en": "Gram Panchayat office, Mahodiya"
+        },
+        {
+          "hi": "नज़दीकी CSC (लोक सेवा केंद्र)",
+          "en": "Nearest CSC (common service centre)"
+        }
+      ],
+      "officialUrl": "https://www.mp.gov.in",
+      "sourceName": "MP Govt. portal",
+      "categories": ["farmers"],
+      "level": "state",
+      "tags": ["kisan", "kalyan", "किसान", "कल्याण"],
+      "state": "MP"
+    },
+    {
+      "slug": "sambal-yojana",
+      "name": {
+        "hi": "मुख्यमंत्री जन कल्याण (संबल) योजना",
+        "en": "Mukhyamantri Jan Kalyan (Sambal) Yojana"
+      },
+      "summary": {
+        "hi": "असंगठित क्षेत्र के मज़दूरों और उनके परिवार के लिए कई तरह की सहायता।",
+        "en": "Several kinds of support for unorganised-sector workers and their families."
+      },
+      "benefitShort": {
+        "hi": "मज़दूर परिवारों के लिए सहायता",
+        "en": "Support for worker families"
+      },
+      "benefits": [
+        {
+          "hi": "दुर्घटना या मृत्यु पर परिवार को सहायता",
+          "en": "Help for the family on accident or death"
+        },
+        {
+          "hi": "प्रसूति सहायता और अन्य लाभ",
+          "en": "Maternity help and other benefits"
+        }
+      ],
+      "eligibilityText": [
+        {
+          "hi": "मध्य प्रदेश के असंगठित क्षेत्र के श्रमिक",
+          "en": "Unorganised-sector workers in Madhya Pradesh"
+        },
+        {
+          "hi": "संबल पोर्टल पर पंजीयन",
+          "en": "Registered on the Sambal portal"
+        }
+      ],
+      "rules": {
+        "all": [],
+        "any": [
+          {
+            "field": "occupation",
+            "op": "in",
+            "value": ["labourer", "farmer_no_land", "self_employed"],
+            "failReason": {
+              "hi": "यह योजना असंगठित मज़दूरों के लिए है",
+              "en": "This scheme is for unorganised workers"
+            }
+          }
+        ],
+        "alwaysCheck": [
+          {
+            "hi": "राशि, उम्र और आय की सीमा आधिकारिक स्रोत से जाँचें",
+            "en": "Confirm amounts, age and income limits with the official source"
+          }
+        ]
+      },
+      "documents": [
+        {
+          "key": "samagra_id",
+          "label": {
+            "hi": "समग्र आईडी",
+            "en": "Samagra ID"
+          },
+          "icon": "family"
+        },
+        {
+          "key": "aadhaar",
+          "label": {
+            "hi": "आधार कार्ड",
+            "en": "Aadhaar card"
+          },
+          "icon": "badge"
+        },
+        {
+          "key": "bank_passbook",
+          "label": {
+            "hi": "बैंक पासबुक",
+            "en": "Bank passbook"
+          },
+          "icon": "bank"
+        },
+        {
+          "key": "mobile_number",
+          "label": {
+            "hi": "मोबाइल नंबर",
+            "en": "Mobile number"
+          },
+          "icon": "phone"
+        }
+      ],
+      "howToApply": [
+        {
+          "hi": "ग्राम पंचायत या लोक सेवा केंद्र में संबल पंजीयन करवाएँ",
+          "en": "Register for Sambal at the Gram Panchayat or public service centre"
+        },
+        {
+          "hi": "पंजीयन कार्ड संभाल कर रखें",
+          "en": "Keep the registration card safe"
+        }
+      ],
+      "whereToApply": [
+        {
+          "hi": "ग्राम पंचायत कार्यालय, महोदिया",
+          "en": "Gram Panchayat office, Mahodiya"
+        },
+        {
+          "hi": "नज़दीकी CSC (लोक सेवा केंद्र)",
+          "en": "Nearest CSC (common service centre)"
+        }
+      ],
+      "officialUrl": "https://sambal.mp.gov.in",
+      "sourceName": "MP Govt. — Sambal portal",
+      "categories": ["social_security", "employment"],
+      "level": "state",
+      "tags": ["sambal", "संबल", "मज़दूर", "श्रमिक"],
+      "state": "MP"
+    },
+    {
+      "slug": "pm-kisan",
+      "name": {
+        "hi": "प्रधानमंत्री किसान सम्मान निधि (PM-KISAN)",
+        "en": "PM Kisan Samman Nidhi (PM-KISAN)"
+      },
+      "summary": {
+        "hi": "ज़मीन वाले किसान परिवारों को हर साल किस्तों में आय सहायता।",
+        "en": "Yearly income support in instalments for farmer families who own land."
+      },
+      "benefitShort": {
+        "hi": "किसानों को सालाना आय सहायता",
+        "en": "Yearly income support for farmers"
+      },
+      "benefits": [
+        {
+          "hi": "साल में किस्तों में राशि सीधे बैंक खाते में",
+          "en": "Instalments each year directly into the bank account"
+        }
+      ],
+      "eligibilityText": [
+        {
+          "hi": "खेती योग्य ज़मीन वाले किसान परिवार",
+          "en": "Farmer families who own cultivable land"
+        },
+        {
+          "hi": "कुछ वर्ग (जैसे आयकर दाता, सरकारी कर्मचारी) पात्र नहीं",
+          "en": "Some groups (e.g. income-tax payers, government employees) are excluded"
+        }
+      ],
+      "rules": {
+        "all": [
+          {
+            "field": "occupation",
+            "op": "eq",
+            "value": "farmer_own_land",
+            "failReason": {
+              "hi": "यह योजना अपनी ज़मीन वाले किसानों के लिए है",
+              "en": "This scheme is for farmers who own land"
+            },
+            "unknownReason": {
+              "hi": "ज़मीन के कागज़ जाँचे जाएँगे",
+              "en": "Land records will be checked"
+            }
+          },
+          {
+            "field": "occupation",
+            "op": "neq",
+            "value": "salaried",
+            "failReason": {
+              "hi": "नौकरीपेशा परिवार पात्र नहीं",
+              "en": "Salaried families are not eligible"
+            }
+          }
+        ],
+        "any": [],
+        "alwaysCheck": [
+          {
+            "hi": "राशि, उम्र और आय की सीमा आधिकारिक स्रोत से जाँचें",
+            "en": "Confirm amounts, age and income limits with the official source"
+          },
+          {
+            "hi": "e-KYC और आधार से जुड़ा खाता ज़रूरी है",
+            "en": "e-KYC and an Aadhaar-linked account are required"
+          }
+        ]
+      },
+      "documents": [
+        {
+          "key": "aadhaar",
+          "label": {
+            "hi": "आधार कार्ड",
+            "en": "Aadhaar card"
+          },
+          "icon": "badge"
+        },
+        {
+          "key": "land_record",
+          "label": {
+            "hi": "ज़मीन के कागज़ (खसरा/B1)",
+            "en": "Land records (khasra/B1)"
+          },
+          "icon": "land"
+        },
+        {
+          "key": "bank_passbook",
+          "label": {
+            "hi": "बैंक पासबुक",
+            "en": "Bank passbook"
+          },
+          "icon": "bank"
+        },
+        {
+          "key": "mobile_number",
+          "label": {
+            "hi": "मोबाइल नंबर",
+            "en": "Mobile number"
+          },
+          "icon": "phone"
+        }
+      ],
+      "howToApply": [
+        {
+          "hi": "PM-KISAN पोर्टल या CSC पर पंजीयन करें",
+          "en": "Register on the PM-KISAN portal or at a CSC"
+        },
+        {
+          "hi": "e-KYC पूरा करें",
+          "en": "Complete e-KYC"
+        },
+        {
+          "hi": "पोर्टल पर स्थिति देखें",
+          "en": "Check the status on the portal"
+        }
+      ],
+      "whereToApply": [
+        {
+          "hi": "नज़दीकी CSC (लोक सेवा केंद्र)",
+          "en": "Nearest CSC (common service centre)"
+        },
+        {
+          "hi": "ग्राम पंचायत कार्यालय, महोदिया",
+          "en": "Gram Panchayat office, Mahodiya"
+        }
+      ],
+      "officialUrl": "https://pmkisan.gov.in",
+      "sourceName": "PM-KISAN portal (Govt. of India)",
+      "categories": ["farmers"],
+      "level": "central",
+      "tags": ["kisan", "samman", "nidhi", "किसान", "सम्मान", "निधि"],
+      "helpline": "155261"
+    },
+    {
+      "slug": "pmay-gramin",
+      "name": {
+        "hi": "प्रधानमंत्री आवास योजना – ग्रामीण",
+        "en": "Pradhan Mantri Awas Yojana – Gramin (PMAY-G)"
+      },
+      "summary": {
+        "hi": "बेघर या कच्चे मकान वाले ग्रामीण परिवारों को पक्का घर बनाने के लिए सहायता।",
+        "en": "Help for homeless rural families or those in kutcha houses to build a pucca house."
+      },
+      "benefitShort": {
+        "hi": "पक्का घर बनाने के लिए सहायता",
+        "en": "Help to build a pucca house"
+      },
+      "benefits": [
+        {
+          "hi": "घर बनाने के लिए किस्तों में सहायता राशि",
+          "en": "Instalments to build a house"
+        },
+        {
+          "hi": "मनरेगा से मज़दूरी और शौचालय के लिए सहायता (शर्तों के साथ)",
+          "en": "Wages through MGNREGA and toilet support (with conditions)"
+        }
+      ],
+      "eligibilityText": [
+        {
+          "hi": "आवास+ / SECC सूची में शामिल परिवार",
+          "en": "Families on the Awaas+ / SECC list"
+        },
+        {
+          "hi": "पक्का घर न होना",
+          "en": "No pucca house"
+        }
+      ],
+      "rules": {
+        "all": [],
+        "any": [],
+        "alwaysCheck": [
+          {
+            "hi": "राशि, उम्र और आय की सीमा आधिकारिक स्रोत से जाँचें",
+            "en": "Confirm amounts, age and income limits with the official source"
+          },
+          {
+            "hi": "नाम पंचायत की पात्रता सूची में होना चाहिए",
+            "en": "The name must be on the panchayat's eligibility list"
+          }
+        ]
+      },
+      "documents": [
+        {
+          "key": "aadhaar",
+          "label": {
+            "hi": "आधार कार्ड",
+            "en": "Aadhaar card"
+          },
+          "icon": "badge"
+        },
+        {
+          "key": "samagra_id",
+          "label": {
+            "hi": "समग्र आईडी",
+            "en": "Samagra ID"
+          },
+          "icon": "family"
+        },
+        {
+          "key": "bank_passbook",
+          "label": {
+            "hi": "बैंक पासबुक",
+            "en": "Bank passbook"
+          },
+          "icon": "bank"
+        },
+        {
+          "key": "job_card",
+          "label": {
+            "hi": "जॉब कार्ड",
+            "en": "Job card"
+          },
+          "icon": "work"
+        }
+      ],
+      "howToApply": [
+        {
+          "hi": "ग्राम पंचायत में पात्रता सूची में अपना नाम जाँचें",
+          "en": "Check your name on the eligibility list at the Gram Panchayat"
+        },
+        {
+          "hi": "पंचायत सचिव से आवेदन की जानकारी लें",
+          "en": "Ask the panchayat secretary how to apply"
+        }
+      ],
+      "whereToApply": [
+        {
+          "hi": "ग्राम पंचायत कार्यालय, महोदिया",
+          "en": "Gram Panchayat office, Mahodiya"
+        }
+      ],
+      "officialUrl": "https://pmayg.nic.in",
+      "sourceName": "PMAY-G portal (Ministry of Rural Development)",
+      "categories": ["housing"],
+      "level": "central",
+      "tags": ["awas", "pmay", "आवास", "घर", "मकान"]
+    },
+    {
+      "slug": "ayushman-bharat-pmjay",
+      "name": {
+        "hi": "आयुष्मान भारत (PM-JAY) – आयुष्मान कार्ड",
+        "en": "Ayushman Bharat PM-JAY (Ayushman card)"
+      },
+      "summary": {
+        "hi": "पात्र परिवारों को सूचीबद्ध अस्पतालों में मुफ़्त इलाज।",
+        "en": "Free treatment at empanelled hospitals for eligible families."
+      },
+      "benefitShort": {
+        "hi": "अस्पताल में मुफ़्त इलाज",
+        "en": "Free hospital treatment"
+      },
+      "benefits": [
+        {
+          "hi": "सूचीबद्ध सरकारी और निजी अस्पतालों में कैशलेस इलाज",
+          "en": "Cashless treatment at empanelled government and private hospitals"
+        }
+      ],
+      "eligibilityText": [
+        {
+          "hi": "सूची में शामिल परिवार (SECC / राशन कार्ड आधारित)",
+          "en": "Families on the list (SECC / ration-card based)"
+        },
+        {
+          "hi": "अन्य श्रेणियाँ आधिकारिक स्रोत पर देखें",
+          "en": "See the official source for other categories"
+        }
+      ],
+      "rules": {
+        "all": [],
+        "any": [],
+        "alwaysCheck": [
+          {
+            "hi": "राशि, उम्र और आय की सीमा आधिकारिक स्रोत से जाँचें",
+            "en": "Confirm amounts, age and income limits with the official source"
+          },
+          {
+            "hi": "पात्रता सूची में नाम होना चाहिए",
+            "en": "The name must be on the eligibility list"
+          }
+        ]
+      },
+      "documents": [
+        {
+          "key": "aadhaar",
+          "label": {
+            "hi": "आधार कार्ड",
+            "en": "Aadhaar card"
+          },
+          "icon": "badge"
+        },
+        {
+          "key": "ration_card",
+          "label": {
+            "hi": "राशन कार्ड",
+            "en": "Ration card"
+          },
+          "icon": "receipt"
+        },
+        {
+          "key": "samagra_id",
+          "label": {
+            "hi": "समग्र आईडी",
+            "en": "Samagra ID"
+          },
+          "icon": "family"
+        },
+        {
+          "key": "mobile_number",
+          "label": {
+            "hi": "मोबाइल नंबर",
+            "en": "Mobile number"
+          },
+          "icon": "phone"
+        }
+      ],
+      "howToApply": [
+        {
+          "hi": "आयुष्मान ऐप या पोर्टल पर पात्रता जाँचें",
+          "en": "Check eligibility on the Ayushman app or portal"
+        },
+        {
+          "hi": "CSC या अस्पताल में आयुष्मान कार्ड बनवाएँ",
+          "en": "Get the Ayushman card made at a CSC or hospital"
+        }
+      ],
+      "whereToApply": [
+        {
+          "hi": "नज़दीकी CSC (लोक सेवा केंद्र)",
+          "en": "Nearest CSC (common service centre)"
+        },
+        {
+          "hi": "सरकारी अस्पताल / स्वास्थ्य केंद्र",
+          "en": "Government hospital / health centre"
+        }
+      ],
+      "officialUrl": "https://pmjay.gov.in",
+      "sourceName": "PM-JAY (National Health Authority)",
+      "categories": ["health"],
+      "level": "central",
+      "tags": ["ayushman", "card", "आयुष्मान", "इलाज", "अस्पताल"],
+      "helpline": "14555"
+    },
+    {
+      "slug": "pm-ujjwala-yojana",
+      "name": {
+        "hi": "प्रधानमंत्री उज्ज्वला योजना",
+        "en": "Pradhan Mantri Ujjwala Yojana"
+      },
+      "summary": {
+        "hi": "गरीब परिवारों की महिलाओं को LPG गैस कनेक्शन।",
+        "en": "LPG gas connections for women from poor households."
+      },
+      "benefitShort": {
+        "hi": "महिलाओं को गैस कनेक्शन",
+        "en": "Gas connection for women"
+      },
+      "benefits": [
+        {
+          "hi": "LPG कनेक्शन (शर्तों के अनुसार सहायता सहित)",
+          "en": "An LPG connection (with support as per the rules)"
+        }
+      ],
+      "eligibilityText": [
+        {
+          "hi": "गरीब परिवार की बालिग महिला",
+          "en": "An adult woman from a poor household"
+        },
+        {
+          "hi": "परिवार में पहले से LPG कनेक्शन न हो",
+          "en": "No existing LPG connection in the household"
+        }
+      ],
+      "rules": {
+        "all": [
+          {
+            "field": "gender",
+            "op": "eq",
+            "value": "female",
+            "failReason": {
+              "hi": "यह योजना महिलाओं के लिए है",
+              "en": "This scheme is for women"
+            }
+          },
+          {
+            "field": "ageBand",
+            "op": "nin",
+            "value": ["lt_18"],
+            "failReason": {
+              "hi": "आवेदक बालिग होना चाहिए",
+              "en": "The applicant must be an adult"
+            }
+          }
+        ],
+        "any": [],
+        "alwaysCheck": [
+          {
+            "hi": "राशि, उम्र और आय की सीमा आधिकारिक स्रोत से जाँचें",
+            "en": "Confirm amounts, age and income limits with the official source"
+          },
+          {
+            "hi": "परिवार में पहले से गैस कनेक्शन नहीं होना चाहिए",
+            "en": "The household must not already have a gas connection"
+          }
+        ]
+      },
+      "documents": [
+        {
+          "key": "aadhaar",
+          "label": {
+            "hi": "आधार कार्ड",
+            "en": "Aadhaar card"
+          },
+          "icon": "badge"
+        },
+        {
+          "key": "ration_card",
+          "label": {
+            "hi": "राशन कार्ड",
+            "en": "Ration card"
+          },
+          "icon": "receipt"
+        },
+        {
+          "key": "bank_passbook",
+          "label": {
+            "hi": "बैंक पासबुक",
+            "en": "Bank passbook"
+          },
+          "icon": "bank"
+        },
+        {
+          "key": "photo",
+          "label": {
+            "hi": "पासपोर्ट साइज़ फ़ोटो",
+            "en": "Passport-size photo"
+          },
+          "icon": "photo"
+        }
+      ],
+      "howToApply": [
+        {
+          "hi": "नज़दीकी गैस एजेंसी या पोर्टल पर आवेदन करें",
+          "en": "Apply at the nearest gas agency or on the portal"
+        },
+        {
+          "hi": "KYC फ़ॉर्म और दस्तावेज़ जमा करें",
+          "en": "Submit the KYC form and documents"
+        }
+      ],
+      "whereToApply": [
+        {
+          "hi": "नज़दीकी LPG गैस एजेंसी",
+          "en": "Nearest LPG gas agency"
+        },
+        {
+          "hi": "नज़दीकी CSC (लोक सेवा केंद्र)",
+          "en": "Nearest CSC (common service centre)"
+        }
+      ],
+      "officialUrl": "https://pmuy.gov.in",
+      "sourceName": "PMUY portal (Ministry of Petroleum)",
+      "categories": ["women", "social_security"],
+      "level": "central",
+      "tags": ["ujjwala", "gas", "lpg", "उज्ज्वला", "गैस"]
+    },
+    {
+      "slug": "pm-matru-vandana-yojana",
+      "name": {
+        "hi": "प्रधानमंत्री मातृ वंदना योजना",
+        "en": "Pradhan Mantri Matru Vandana Yojana"
+      },
+      "summary": {
+        "hi": "गर्भवती और स्तनपान कराने वाली माताओं को पोषण और आराम के लिए नकद सहायता।",
+        "en": "Cash help for pregnant and breastfeeding mothers for nutrition and rest."
+      },
+      "benefitShort": {
+        "hi": "गर्भवती माताओं को नकद सहायता",
+        "en": "Cash help for pregnant mothers"
+      },
+      "benefits": [
+        {
+          "hi": "शर्तें पूरी होने पर किस्तों में राशि सीधे बैंक खाते में",
+          "en": "Instalments into the bank account when conditions are met"
+        }
+      ],
+      "eligibilityText": [
+        {
+          "hi": "गर्भवती या स्तनपान कराने वाली महिला",
+          "en": "A pregnant or breastfeeding woman"
+        },
+        {
+          "hi": "सरकारी नौकरी वाली महिलाएँ पात्र नहीं",
+          "en": "Women in government jobs are excluded"
+        }
+      ],
+      "rules": {
+        "all": [
+          {
+            "field": "gender",
+            "op": "eq",
+            "value": "female",
+            "failReason": {
+              "hi": "यह योजना महिलाओं के लिए है",
+              "en": "This scheme is for women"
+            }
+          },
+          {
+            "field": "ageBand",
+            "op": "nin",
+            "value": ["lt_18", "gt_60"],
+            "failReason": {
+              "hi": "यह योजना माताओं के लिए है",
+              "en": "This scheme is for mothers"
+            }
+          }
+        ],
+        "any": [],
+        "alwaysCheck": [
+          {
+            "hi": "राशि, उम्र और आय की सीमा आधिकारिक स्रोत से जाँचें",
+            "en": "Confirm amounts, age and income limits with the official source"
+          },
+          {
+            "hi": "गर्भावस्था का पंजीयन ज़रूरी है",
+            "en": "Pregnancy registration is required"
+          }
+        ]
+      },
+      "documents": [
+        {
+          "key": "aadhaar",
+          "label": {
+            "hi": "आधार कार्ड",
+            "en": "Aadhaar card"
+          },
+          "icon": "badge"
+        },
+        {
+          "key": "bank_passbook",
+          "label": {
+            "hi": "बैंक पासबुक",
+            "en": "Bank passbook"
+          },
+          "icon": "bank"
+        },
+        {
+          "key": "pregnancy_record",
+          "label": {
+            "hi": "MCP कार्ड / गर्भावस्था पंजीयन",
+            "en": "MCP card / pregnancy registration"
+          },
+          "icon": "pregnant"
+        },
+        {
+          "key": "mobile_number",
+          "label": {
+            "hi": "मोबाइल नंबर",
+            "en": "Mobile number"
+          },
+          "icon": "phone"
+        }
+      ],
+      "howToApply": [
+        {
+          "hi": "आंगनवाड़ी या ANM के पास गर्भावस्था का पंजीयन करवाएँ",
+          "en": "Register the pregnancy with the Anganwadi or ANM"
+        },
+        {
+          "hi": "फ़ॉर्म भरकर दस्तावेज़ जमा करें",
+          "en": "Fill the form and submit documents"
+        }
+      ],
+      "whereToApply": [
+        {
+          "hi": "आंगनवाड़ी केंद्र या ANM दीदी",
+          "en": "Anganwadi centre or ANM"
+        }
+      ],
+      "officialUrl": "https://pmmvy.wcd.gov.in",
+      "sourceName": "PMMVY (Ministry of Women and Child Development)",
+      "categories": ["women", "health"],
+      "level": "central",
+      "tags": ["matru", "vandana", "मातृ", "वंदना", "गर्भवती"]
+    },
+    {
+      "slug": "janani-suraksha-yojana",
+      "name": {
+        "hi": "जननी सुरक्षा योजना",
+        "en": "Janani Suraksha Yojana"
+      },
+      "summary": {
+        "hi": "सरकारी अस्पताल में प्रसव कराने पर माँ को नकद सहायता।",
+        "en": "Cash help for the mother when the delivery happens at a government facility."
+      },
+      "benefitShort": {
+        "hi": "अस्पताल में प्रसव पर सहायता",
+        "en": "Help for delivery at a hospital"
+      },
+      "benefits": [
+        {
+          "hi": "संस्थागत प्रसव पर नकद सहायता",
+          "en": "Cash help for an institutional delivery"
+        },
+        {
+          "hi": "ASHA दीदी की मदद",
+          "en": "Support from the ASHA worker"
+        }
+      ],
+      "eligibilityText": [
+        {
+          "hi": "सरकारी या मान्यता प्राप्त अस्पताल में प्रसव",
+          "en": "Delivery at a government or accredited hospital"
+        },
+        {
+          "hi": "अन्य शर्तें आधिकारिक स्रोत पर देखें",
+          "en": "See the official source for other conditions"
+        }
+      ],
+      "rules": {
+        "all": [
+          {
+            "field": "gender",
+            "op": "eq",
+            "value": "female",
+            "failReason": {
+              "hi": "यह योजना महिलाओं के लिए है",
+              "en": "This scheme is for women"
+            }
+          }
+        ],
+        "any": [],
+        "alwaysCheck": [
+          {
+            "hi": "राशि, उम्र और आय की सीमा आधिकारिक स्रोत से जाँचें",
+            "en": "Confirm amounts, age and income limits with the official source"
+          }
+        ]
+      },
+      "documents": [
+        {
+          "key": "aadhaar",
+          "label": {
+            "hi": "आधार कार्ड",
+            "en": "Aadhaar card"
+          },
+          "icon": "badge"
+        },
+        {
+          "key": "bank_passbook",
+          "label": {
+            "hi": "बैंक पासबुक",
+            "en": "Bank passbook"
+          },
+          "icon": "bank"
+        },
+        {
+          "key": "pregnancy_record",
+          "label": {
+            "hi": "MCP कार्ड / गर्भावस्था पंजीयन",
+            "en": "MCP card / pregnancy registration"
+          },
+          "icon": "pregnant"
+        }
+      ],
+      "howToApply": [
+        {
+          "hi": "ASHA दीदी से गर्भावस्था पंजीयन करवाएँ",
+          "en": "Register the pregnancy through the ASHA worker"
+        },
+        {
+          "hi": "सरकारी अस्पताल में प्रसव करवाएँ",
+          "en": "Deliver at a government hospital"
+        }
+      ],
+      "whereToApply": [
+        {
+          "hi": "सरकारी अस्पताल / स्वास्थ्य केंद्र",
+          "en": "Government hospital / health centre"
+        },
+        {
+          "hi": "आंगनवाड़ी केंद्र या ANM दीदी",
+          "en": "Anganwadi centre or ANM"
+        }
+      ],
+      "officialUrl": "https://nhm.gov.in",
+      "sourceName": "National Health Mission",
+      "categories": ["women", "health"],
+      "level": "central",
+      "tags": ["janani", "suraksha", "जननी", "प्रसव"]
+    },
+    {
+      "slug": "nsap-pension",
+      "name": {
+        "hi": "राष्ट्रीय सामाजिक सहायता कार्यक्रम (वृद्धावस्था / विधवा / दिव्यांग पेंशन)",
+        "en": "National Social Assistance Programme (old-age / widow / disability pension)"
+      },
+      "summary": {
+        "hi": "गरीब बुज़ुर्गों, विधवाओं और दिव्यांगजनों को हर महीने पेंशन।",
+        "en": "A monthly pension for poor elderly people, widows and persons with disabilities."
+      },
+      "benefitShort": {
+        "hi": "बुज़ुर्ग, विधवा, दिव्यांग पेंशन",
+        "en": "Pension for elderly, widows, disabled"
+      },
+      "benefits": [
+        {
+          "hi": "हर महीने पेंशन सीधे बैंक खाते में",
+          "en": "A monthly pension into the bank account"
+        }
+      ],
+      "eligibilityText": [
+        {
+          "hi": "गरीबी रेखा से नीचे (BPL) परिवार",
+          "en": "Below-poverty-line (BPL) household"
+        },
+        {
+          "hi": "बुज़ुर्ग, विधवा या दिव्यांग (तय उम्र/प्रतिशत के अनुसार)",
+          "en": "Elderly, widowed or disabled (as per set age/percentage)"
+        }
+      ],
+      "rules": {
+        "all": [
+          {
+            "field": "rationCard",
+            "op": "eq",
+            "value": "bpl_antyodaya",
+            "failReason": {
+              "hi": "यह पेंशन BPL परिवारों के लिए है",
+              "en": "This pension is for BPL households"
+            },
+            "unknownReason": {
+              "hi": "BPL स्थिति जाँची जाएगी",
+              "en": "BPL status will be checked"
+            }
+          }
+        ],
+        "any": [
+          {
+            "field": "ageBand",
+            "op": "eq",
+            "value": "gt_60",
+            "failReason": {
+              "hi": "बुज़ुर्ग, विधवा या दिव्यांग होना चाहिए",
+              "en": "Must be elderly, widowed or disabled"
+            }
+          },
+          {
+            "field": "maritalStatus",
+            "op": "eq",
+            "value": "widowed",
+            "failReason": {
+              "hi": "बुज़ुर्ग, विधवा या दिव्यांग होना चाहिए",
+              "en": "Must be elderly, widowed or disabled"
+            },
+            "unknownReason": {
+              "hi": "वैवाहिक स्थिति जाँची जाएगी",
+              "en": "Marital status will be checked"
+            }
+          },
+          {
+            "field": "disability",
+            "op": "eq",
+            "value": "yes",
+            "failReason": {
+              "hi": "बुज़ुर्ग, विधवा या दिव्यांग होना चाहिए",
+              "en": "Must be elderly, widowed or disabled"
+            }
+          }
+        ],
+        "alwaysCheck": [
+          {
+            "hi": "राशि, उम्र और आय की सीमा आधिकारिक स्रोत से जाँचें",
+            "en": "Confirm amounts, age and income limits with the official source"
+          }
+        ]
+      },
+      "documents": [
+        {
+          "key": "aadhaar",
+          "label": {
+            "hi": "आधार कार्ड",
+            "en": "Aadhaar card"
+          },
+          "icon": "badge"
+        },
+        {
+          "key": "samagra_id",
+          "label": {
+            "hi": "समग्र आईडी",
+            "en": "Samagra ID"
+          },
+          "icon": "family"
+        },
+        {
+          "key": "bank_passbook",
+          "label": {
+            "hi": "बैंक पासबुक",
+            "en": "Bank passbook"
+          },
+          "icon": "bank"
+        },
+        {
+          "key": "age_proof",
+          "label": {
+            "hi": "उम्र का प्रमाण",
+            "en": "Proof of age"
+          },
+          "icon": "cake"
+        },
+        {
+          "key": "ration_card",
+          "label": {
+            "hi": "राशन कार्ड",
+            "en": "Ration card"
+          },
+          "icon": "receipt"
+        }
+      ],
+      "howToApply": [
+        {
+          "hi": "ग्राम पंचायत में पेंशन आवेदन दें",
+          "en": "Apply for the pension at the Gram Panchayat"
+        },
+        {
+          "hi": "विधवा/दिव्यांग होने का प्रमाण साथ लगाएँ",
+          "en": "Attach proof of widowhood/disability"
+        }
+      ],
+      "whereToApply": [
+        {
+          "hi": "ग्राम पंचायत कार्यालय, महोदिया",
+          "en": "Gram Panchayat office, Mahodiya"
+        }
+      ],
+      "officialUrl": "https://nsap.nic.in",
+      "sourceName": "NSAP (Ministry of Rural Development)",
+      "categories": ["pension", "social_security"],
+      "level": "central",
+      "tags": ["pension", "vridha", "vidhwa", "पेंशन", "वृद्धावस्था", "विधवा", "दिव्यांग"]
+    },
+    {
+      "slug": "mgnrega-job-card",
+      "name": {
+        "hi": "मनरेगा (जॉब कार्ड)",
+        "en": "MGNREGA (job card)"
+      },
+      "summary": {
+        "hi": "हर ग्रामीण परिवार को साल में तय दिनों के मज़दूरी वाले काम का अधिकार।",
+        "en": "A legal right to a set number of days of paid work each year for every rural household."
+      },
+      "benefitShort": {
+        "hi": "गाँव में मज़दूरी वाला काम",
+        "en": "Paid work in the village"
+      },
+      "benefits": [
+        {
+          "hi": "गाँव के पास मज़दूरी वाला काम",
+          "en": "Paid work near the village"
+        },
+        {
+          "hi": "मज़दूरी सीधे बैंक खाते में",
+          "en": "Wages paid into the bank account"
+        }
+      ],
+      "eligibilityText": [
+        {
+          "hi": "ग्रामीण परिवार का कोई भी बालिग सदस्य जो शारीरिक काम करना चाहे",
+          "en": "Any adult member of a rural household willing to do manual work"
+        }
+      ],
+      "rules": {
+        "all": [
+          {
+            "field": "ageBand",
+            "op": "nin",
+            "value": ["lt_18"],
+            "failReason": {
+              "hi": "आवेदक बालिग होना चाहिए",
+              "en": "The applicant must be an adult"
+            }
+          }
+        ],
+        "any": [],
+        "alwaysCheck": [
+          {
+            "hi": "राशि, उम्र और आय की सीमा आधिकारिक स्रोत से जाँचें",
+            "en": "Confirm amounts, age and income limits with the official source"
+          }
+        ]
+      },
+      "documents": [
+        {
+          "key": "aadhaar",
+          "label": {
+            "hi": "आधार कार्ड",
+            "en": "Aadhaar card"
+          },
+          "icon": "badge"
+        },
+        {
+          "key": "photo",
+          "label": {
+            "hi": "पासपोर्ट साइज़ फ़ोटो",
+            "en": "Passport-size photo"
+          },
+          "icon": "photo"
+        },
+        {
+          "key": "bank_passbook",
+          "label": {
+            "hi": "बैंक पासबुक",
+            "en": "Bank passbook"
+          },
+          "icon": "bank"
+        }
+      ],
+      "howToApply": [
+        {
+          "hi": "ग्राम पंचायत में जॉब कार्ड के लिए आवेदन दें",
+          "en": "Apply for a job card at the Gram Panchayat"
+        },
+        {
+          "hi": "काम के लिए लिखित माँग दें और रसीद लें",
+          "en": "Ask for work in writing and take a receipt"
+        }
+      ],
+      "whereToApply": [
+        {
+          "hi": "ग्राम पंचायत कार्यालय, महोदिया",
+          "en": "Gram Panchayat office, Mahodiya"
+        }
+      ],
+      "officialUrl": "https://nrega.nic.in",
+      "sourceName": "MGNREGA (Ministry of Rural Development)",
+      "categories": ["employment"],
+      "level": "central",
+      "tags": ["nrega", "mgnrega", "job card", "मनरेगा", "जॉब कार्ड", "मज़दूरी"]
+    },
+    {
+      "slug": "pm-fasal-bima-yojana",
+      "name": {
+        "hi": "प्रधानमंत्री फसल बीमा योजना",
+        "en": "Pradhan Mantri Fasal Bima Yojana"
+      },
+      "summary": {
+        "hi": "प्राकृतिक आपदा, कीट या बीमारी से फसल खराब होने पर बीमा सुरक्षा।",
+        "en": "Insurance cover when crops are lost to natural disasters, pests or disease."
+      },
+      "benefitShort": {
+        "hi": "फसल खराब होने पर बीमा",
+        "en": "Crop loss insurance"
+      },
+      "benefits": [
+        {
+          "hi": "फसल नुकसान पर बीमा राशि",
+          "en": "Insurance payout for crop loss"
+        }
+      ],
+      "eligibilityText": [
+        {
+          "hi": "अधिसूचित फसल उगाने वाले किसान (बटाईदार भी)",
+          "en": "Farmers growing notified crops (including sharecroppers)"
+        }
+      ],
+      "rules": {
+        "all": [
+          {
+            "field": "occupation",
+            "op": "in",
+            "value": ["farmer_own_land", "farmer_no_land"],
+            "failReason": {
+              "hi": "यह योजना किसानों के लिए है",
+              "en": "This scheme is for farmers"
+            }
+          }
+        ],
+        "any": [],
+        "alwaysCheck": [
+          {
+            "hi": "राशि, उम्र और आय की सीमा आधिकारिक स्रोत से जाँचें",
+            "en": "Confirm amounts, age and income limits with the official source"
+          },
+          {
+            "hi": "बुवाई के मौसम की अंतिम तिथि से पहले पंजीयन करें",
+            "en": "Enrol before the season's deadline"
+          }
+        ]
+      },
+      "documents": [
+        {
+          "key": "aadhaar",
+          "label": {
+            "hi": "आधार कार्ड",
+            "en": "Aadhaar card"
+          },
+          "icon": "badge"
+        },
+        {
+          "key": "land_record",
+          "label": {
+            "hi": "ज़मीन के कागज़ (खसरा/B1)",
+            "en": "Land records (khasra/B1)"
+          },
+          "icon": "land"
+        },
+        {
+          "key": "bank_passbook",
+          "label": {
+            "hi": "बैंक पासबुक",
+            "en": "Bank passbook"
+          },
+          "icon": "bank"
+        },
+        {
+          "key": "sowing_certificate",
+          "label": {
+            "hi": "बुवाई प्रमाण पत्र",
+            "en": "Sowing certificate"
+          },
+          "icon": "grass"
+        }
+      ],
+      "howToApply": [
+        {
+          "hi": "बैंक, CSC या पोर्टल पर समय से पंजीयन करें",
+          "en": "Enrol on time at the bank, a CSC or the portal"
+        },
+        {
+          "hi": "नुकसान होने पर 72 घंटे में सूचना दें",
+          "en": "Report a loss quickly (see the official time limit)"
+        }
+      ],
+      "whereToApply": [
+        {
+          "hi": "आपकी बैंक शाखा या बैंक मित्र",
+          "en": "Your bank branch or bank mitra"
+        },
+        {
+          "hi": "नज़दीकी CSC (लोक सेवा केंद्र)",
+          "en": "Nearest CSC (common service centre)"
+        }
+      ],
+      "officialUrl": "https://pmfby.gov.in",
+      "sourceName": "PMFBY portal (Ministry of Agriculture)",
+      "categories": ["farmers"],
+      "level": "central",
+      "tags": ["fasal", "bima", "फसल", "बीमा"]
+    },
+    {
+      "slug": "kisan-credit-card",
+      "name": {
+        "hi": "किसान क्रेडिट कार्ड",
+        "en": "Kisan Credit Card"
+      },
+      "summary": {
+        "hi": "खेती और उससे जुड़े कामों के लिए कम ब्याज पर बैंक से कर्ज़।",
+        "en": "Bank credit at low interest for farming and related work."
+      },
+      "benefitShort": {
+        "hi": "खेती के लिए सस्ता कर्ज़",
+        "en": "Low-cost credit for farming"
+      },
+      "benefits": [
+        {
+          "hi": "खेती के खर्च के लिए कर्ज़ की सीमा",
+          "en": "A credit limit for farming costs"
+        },
+        {
+          "hi": "समय पर चुकाने पर ब्याज में छूट (नियमों के अनुसार)",
+          "en": "Interest relief for timely repayment (as per rules)"
+        }
+      ],
+      "eligibilityText": [
+        {
+          "hi": "किसान, पशुपालक और मछली पालक",
+          "en": "Farmers, livestock and fish farmers"
+        }
+      ],
+      "rules": {
+        "all": [
+          {
+            "field": "occupation",
+            "op": "in",
+            "value": ["farmer_own_land", "farmer_no_land"],
+            "failReason": {
+              "hi": "यह योजना किसानों के लिए है",
+              "en": "This scheme is for farmers"
+            }
+          }
+        ],
+        "any": [],
+        "alwaysCheck": [
+          {
+            "hi": "राशि, उम्र और आय की सीमा आधिकारिक स्रोत से जाँचें",
+            "en": "Confirm amounts, age and income limits with the official source"
+          }
+        ]
+      },
+      "documents": [
+        {
+          "key": "aadhaar",
+          "label": {
+            "hi": "आधार कार्ड",
+            "en": "Aadhaar card"
+          },
+          "icon": "badge"
+        },
+        {
+          "key": "land_record",
+          "label": {
+            "hi": "ज़मीन के कागज़ (खसरा/B1)",
+            "en": "Land records (khasra/B1)"
+          },
+          "icon": "land"
+        },
+        {
+          "key": "photo",
+          "label": {
+            "hi": "पासपोर्ट साइज़ फ़ोटो",
+            "en": "Passport-size photo"
+          },
+          "icon": "photo"
+        },
+        {
+          "key": "bank_passbook",
+          "label": {
+            "hi": "बैंक पासबुक",
+            "en": "Bank passbook"
+          },
+          "icon": "bank"
+        }
+      ],
+      "howToApply": [
+        {
+          "hi": "अपनी बैंक शाखा में KCC फ़ॉर्म भरें",
+          "en": "Fill the KCC form at your bank branch"
+        },
+        {
+          "hi": "ज़मीन के कागज़ और फ़ोटो जमा करें",
+          "en": "Submit land records and photos"
+        }
+      ],
+      "whereToApply": [
+        {
+          "hi": "आपकी बैंक शाखा या बैंक मित्र",
+          "en": "Your bank branch or bank mitra"
+        }
+      ],
+      "officialUrl": "https://www.myscheme.gov.in",
+      "sourceName": "myScheme (Govt. of India)",
+      "categories": ["farmers", "financial_inclusion"],
+      "level": "central",
+      "tags": ["kcc", "kisan", "credit", "किसान", "क्रेडिट", "कर्ज़"]
+    },
+    {
+      "slug": "pm-jan-dhan-yojana",
+      "name": {
+        "hi": "प्रधानमंत्री जन धन योजना",
+        "en": "PM Jan Dhan Yojana"
+      },
+      "summary": {
+        "hi": "बिना न्यूनतम बैलेंस के बैंक खाता, रुपे कार्ड और बीमा सुविधा।",
+        "en": "A bank account with no minimum balance, a RuPay card and insurance cover."
+      },
+      "benefitShort": {
+        "hi": "ज़ीरो बैलेंस बैंक खाता",
+        "en": "Zero-balance bank account"
+      },
+      "benefits": [
+        {
+          "hi": "ज़ीरो बैलेंस बचत खाता",
+          "en": "A zero-balance savings account"
+        },
+        {
+          "hi": "रुपे डेबिट कार्ड और दुर्घटना बीमा (नियमों के अनुसार)",
+          "en": "RuPay debit card and accident cover (as per rules)"
+        }
+      ],
+      "eligibilityText": [
+        {
+          "hi": "कोई भी भारतीय नागरिक जिसके पास बैंक खाता नहीं है",
+          "en": "Any Indian citizen without a bank account"
+        }
+      ],
+      "rules": {
+        "all": [],
+        "any": [],
+        "alwaysCheck": [
+          {
+            "hi": "राशि, उम्र और आय की सीमा आधिकारिक स्रोत से जाँचें",
+            "en": "Confirm amounts, age and income limits with the official source"
+          }
+        ]
+      },
+      "documents": [
+        {
+          "key": "aadhaar",
+          "label": {
+            "hi": "आधार कार्ड",
+            "en": "Aadhaar card"
+          },
+          "icon": "badge"
+        },
+        {
+          "key": "photo",
+          "label": {
+            "hi": "पासपोर्ट साइज़ फ़ोटो",
+            "en": "Passport-size photo"
+          },
+          "icon": "photo"
+        },
+        {
+          "key": "mobile_number",
+          "label": {
+            "hi": "मोबाइल नंबर",
+            "en": "Mobile number"
+          },
+          "icon": "phone"
+        }
+      ],
+      "howToApply": [
+        {
+          "hi": "बैंक शाखा या बैंक मित्र के पास खाता खुलवाएँ",
+          "en": "Open an account at a bank branch or with a bank mitra"
+        }
+      ],
+      "whereToApply": [
+        {
+          "hi": "आपकी बैंक शाखा या बैंक मित्र",
+          "en": "Your bank branch or bank mitra"
+        }
+      ],
+      "officialUrl": "https://pmjdy.gov.in",
+      "sourceName": "PMJDY (Department of Financial Services)",
+      "categories": ["financial_inclusion"],
+      "level": "central",
+      "tags": ["jan dhan", "bank", "account", "जन धन", "बैंक", "खाता"]
+    },
+    {
+      "slug": "pm-jeevan-jyoti-suraksha-bima",
+      "name": {
+        "hi": "प्रधानमंत्री जीवन ज्योति / सुरक्षा बीमा योजना",
+        "en": "PM Jeevan Jyoti / PM Suraksha Bima Yojana"
+      },
+      "summary": {
+        "hi": "बहुत कम सालाना प्रीमियम पर जीवन और दुर्घटना बीमा।",
+        "en": "Life and accident insurance for a very small yearly premium."
+      },
+      "benefitShort": {
+        "hi": "सस्ता जीवन व दुर्घटना बीमा",
+        "en": "Low-cost life and accident cover"
+      },
+      "benefits": [
+        {
+          "hi": "जीवन बीमा (PMJJBY)",
+          "en": "Life cover (PMJJBY)"
+        },
+        {
+          "hi": "दुर्घटना बीमा (PMSBY)",
+          "en": "Accident cover (PMSBY)"
+        }
+      ],
+      "eligibilityText": [
+        {
+          "hi": "बैंक खाता धारक, तय उम्र सीमा में",
+          "en": "Bank account holders within the set age range"
+        }
+      ],
+      "rules": {
+        "all": [
+          {
+            "field": "ageBand",
+            "op": "nin",
+            "value": ["lt_18"],
+            "failReason": {
+              "hi": "आवेदक बालिग होना चाहिए",
+              "en": "The applicant must be an adult"
+            }
+          }
+        ],
+        "any": [],
+        "alwaysCheck": [
+          {
+            "hi": "राशि, उम्र और आय की सीमा आधिकारिक स्रोत से जाँचें",
+            "en": "Confirm amounts, age and income limits with the official source"
+          }
+        ]
+      },
+      "documents": [
+        {
+          "key": "aadhaar",
+          "label": {
+            "hi": "आधार कार्ड",
+            "en": "Aadhaar card"
+          },
+          "icon": "badge"
+        },
+        {
+          "key": "bank_passbook",
+          "label": {
+            "hi": "बैंक पासबुक",
+            "en": "Bank passbook"
+          },
+          "icon": "bank"
+        }
+      ],
+      "howToApply": [
+        {
+          "hi": "बैंक शाखा में फ़ॉर्म भरें और ऑटो-डेबिट की सहमति दें",
+          "en": "Fill the form at your bank and agree to auto-debit"
+        }
+      ],
+      "whereToApply": [
+        {
+          "hi": "आपकी बैंक शाखा या बैंक मित्र",
+          "en": "Your bank branch or bank mitra"
+        }
+      ],
+      "officialUrl": "https://jansuraksha.gov.in",
+      "sourceName": "Jan Suraksha portal (Department of Financial Services)",
+      "categories": ["social_security"],
+      "level": "central",
+      "tags": ["bima", "insurance", "jeevan jyoti", "suraksha", "बीमा"]
+    },
+    {
+      "slug": "atal-pension-yojana",
+      "name": {
+        "hi": "अटल पेंशन योजना",
+        "en": "Atal Pension Yojana"
+      },
+      "summary": {
+        "hi": "असंगठित क्षेत्र के लोगों के लिए बुढ़ापे में तय मासिक पेंशन की योजना।",
+        "en": "A pension plan that gives a fixed monthly pension in old age for unorganised-sector workers."
+      },
+      "benefitShort": {
+        "hi": "बुढ़ापे के लिए पेंशन",
+        "en": "Pension for old age"
+      },
+      "benefits": [
+        {
+          "hi": "तय उम्र के बाद हर महीने पेंशन (अंशदान के अनुसार)",
+          "en": "A monthly pension after a set age (as per contribution)"
+        }
+      ],
+      "eligibilityText": [
+        {
+          "hi": "बैंक खाता धारक, तय उम्र सीमा में जुड़ सकते हैं",
+          "en": "Bank account holders can join within the set age range"
+        }
+      ],
+      "rules": {
+        "all": [
+          {
+            "field": "ageBand",
+            "op": "in",
+            "value": ["18_20", "21_40"],
+            "failReason": {
+              "hi": "इस योजना में केवल कम उम्र में जुड़ सकते हैं",
+              "en": "You can only join this scheme at a younger age"
+            }
+          }
+        ],
+        "any": [],
+        "alwaysCheck": [
+          {
+            "hi": "राशि, उम्र और आय की सीमा आधिकारिक स्रोत से जाँचें",
+            "en": "Confirm amounts, age and income limits with the official source"
+          }
+        ]
+      },
+      "documents": [
+        {
+          "key": "aadhaar",
+          "label": {
+            "hi": "आधार कार्ड",
+            "en": "Aadhaar card"
+          },
+          "icon": "badge"
+        },
+        {
+          "key": "bank_passbook",
+          "label": {
+            "hi": "बैंक पासबुक",
+            "en": "Bank passbook"
+          },
+          "icon": "bank"
+        },
+        {
+          "key": "mobile_number",
+          "label": {
+            "hi": "मोबाइल नंबर",
+            "en": "Mobile number"
+          },
+          "icon": "phone"
+        }
+      ],
+      "howToApply": [
+        {
+          "hi": "बैंक शाखा में APY फ़ॉर्म भरें",
+          "en": "Fill the APY form at your bank branch"
+        }
+      ],
+      "whereToApply": [
+        {
+          "hi": "आपकी बैंक शाखा या बैंक मित्र",
+          "en": "Your bank branch or bank mitra"
+        }
+      ],
+      "officialUrl": "https://www.myscheme.gov.in",
+      "sourceName": "myScheme (Govt. of India)",
+      "categories": ["pension"],
+      "level": "central",
+      "tags": ["atal", "pension", "अटल", "पेंशन"]
+    },
+    {
+      "slug": "sukanya-samriddhi-yojana",
+      "name": {
+        "hi": "सुकन्या समृद्धि योजना",
+        "en": "Sukanya Samriddhi Yojana"
+      },
+      "summary": {
+        "hi": "बेटी के भविष्य के लिए अच्छे ब्याज वाला बचत खाता।",
+        "en": "A savings account with good interest for a daughter's future."
+      },
+      "benefitShort": {
+        "hi": "बेटी के लिए बचत खाता",
+        "en": "Savings account for a daughter"
+      },
+      "benefits": [
+        {
+          "hi": "अच्छी ब्याज दर और टैक्स छूट",
+          "en": "Good interest rate and tax benefits"
+        }
+      ],
+      "eligibilityText": [
+        {
+          "hi": "छोटी उम्र की बेटी के नाम पर माता-पिता/अभिभावक खाता खोल सकते हैं",
+          "en": "Parents/guardians can open it in a young daughter's name"
+        }
+      ],
+      "rules": {
+        "all": [],
+        "any": [],
+        "alwaysCheck": [
+          {
+            "hi": "राशि, उम्र और आय की सीमा आधिकारिक स्रोत से जाँचें",
+            "en": "Confirm amounts, age and income limits with the official source"
+          },
+          {
+            "hi": "बेटी की उम्र सीमा आधिकारिक स्रोत पर देखें",
+            "en": "See the official source for the daughter's age limit"
+          }
+        ]
+      },
+      "documents": [
+        {
+          "key": "birth_cert",
+          "label": {
+            "hi": "जन्म प्रमाण पत्र",
+            "en": "Birth certificate"
+          },
+          "icon": "child"
+        },
+        {
+          "key": "aadhaar",
+          "label": {
+            "hi": "आधार कार्ड",
+            "en": "Aadhaar card"
+          },
+          "icon": "badge"
+        },
+        {
+          "key": "photo",
+          "label": {
+            "hi": "पासपोर्ट साइज़ फ़ोटो",
+            "en": "Passport-size photo"
+          },
+          "icon": "photo"
+        }
+      ],
+      "howToApply": [
+        {
+          "hi": "डाकघर या बैंक में खाता खुलवाएँ",
+          "en": "Open the account at a post office or bank"
+        }
+      ],
+      "whereToApply": [
+        {
+          "hi": "डाकघर या बैंक शाखा",
+          "en": "Post office or bank branch"
+        }
+      ],
+      "officialUrl": "https://www.myscheme.gov.in",
+      "sourceName": "myScheme (Govt. of India)",
+      "categories": ["women", "financial_inclusion"],
+      "level": "central",
+      "tags": ["sukanya", "samriddhi", "सुकन्या", "बेटी", "बचत"]
+    },
+    {
+      "slug": "swachh-bharat-gramin-toilet",
+      "name": {
+        "hi": "स्वच्छ भारत मिशन – ग्रामीण (घरेलू शौचालय)",
+        "en": "Swachh Bharat Mission – Gramin (household toilet)"
+      },
+      "summary": {
+        "hi": "घर में शौचालय बनाने के लिए प्रोत्साहन राशि।",
+        "en": "An incentive to build a toilet at home."
+      },
+      "benefitShort": {
+        "hi": "घर में शौचालय के लिए सहायता",
+        "en": "Help to build a home toilet"
+      },
+      "benefits": [
+        {
+          "hi": "शौचालय बनने पर प्रोत्साहन राशि",
+          "en": "An incentive once the toilet is built"
+        }
+      ],
+      "eligibilityText": [
+        {
+          "hi": "जिन ग्रामीण परिवारों के घर में शौचालय नहीं है",
+          "en": "Rural households without a toilet"
+        },
+        {
+          "hi": "श्रेणी शर्तें आधिकारिक स्रोत पर देखें",
+          "en": "See the official source for category conditions"
+        }
+      ],
+      "rules": {
+        "all": [],
+        "any": [],
+        "alwaysCheck": [
+          {
+            "hi": "राशि, उम्र और आय की सीमा आधिकारिक स्रोत से जाँचें",
+            "en": "Confirm amounts, age and income limits with the official source"
+          },
+          {
+            "hi": "घर में पहले से शौचालय नहीं होना चाहिए",
+            "en": "The house must not already have a toilet"
+          }
+        ]
+      },
+      "documents": [
+        {
+          "key": "aadhaar",
+          "label": {
+            "hi": "आधार कार्ड",
+            "en": "Aadhaar card"
+          },
+          "icon": "badge"
+        },
+        {
+          "key": "bank_passbook",
+          "label": {
+            "hi": "बैंक पासबुक",
+            "en": "Bank passbook"
+          },
+          "icon": "bank"
+        },
+        {
+          "key": "photo",
+          "label": {
+            "hi": "पासपोर्ट साइज़ फ़ोटो",
+            "en": "Passport-size photo"
+          },
+          "icon": "photo"
+        }
+      ],
+      "howToApply": [
+        {
+          "hi": "ग्राम पंचायत में आवेदन दें",
+          "en": "Apply at the Gram Panchayat"
+        },
+        {
+          "hi": "शौचालय बनने के बाद फ़ोटो सत्यापन करवाएँ",
+          "en": "Get photo verification after building"
+        }
+      ],
+      "whereToApply": [
+        {
+          "hi": "ग्राम पंचायत कार्यालय, महोदिया",
+          "en": "Gram Panchayat office, Mahodiya"
+        }
+      ],
+      "officialUrl": "https://www.myscheme.gov.in",
+      "sourceName": "myScheme (Govt. of India)",
+      "categories": ["housing", "health"],
+      "level": "central",
+      "tags": ["swachh", "toilet", "shauchalay", "स्वच्छ", "शौचालय"]
+    },
+    {
+      "slug": "post-matric-scholarship-sc",
+      "name": {
+        "hi": "अनुसूचित जाति के विद्यार्थियों के लिए पोस्ट-मैट्रिक छात्रवृत्ति",
+        "en": "Post-matric scholarship for SC students"
+      },
+      "summary": {
+        "hi": "कक्षा 10 के बाद पढ़ाई जारी रखने के लिए SC विद्यार्थियों को छात्रवृत्ति।",
+        "en": "A scholarship for SC students to continue studying after class 10."
+      },
+      "benefitShort": {
+        "hi": "SC विद्यार्थियों को छात्रवृत्ति",
+        "en": "Scholarship for SC students"
+      },
+      "benefits": [
+        {
+          "hi": "फ़ीस और पढ़ाई के खर्च के लिए सहायता",
+          "en": "Help with fees and study costs"
+        }
+      ],
+      "eligibilityText": [
+        {
+          "hi": "अनुसूचित जाति के विद्यार्थी, कक्षा 11 या आगे",
+          "en": "Scheduled Caste students in class 11 or above"
+        },
+        {
+          "hi": "परिवार की आय तय सीमा से कम",
+          "en": "Family income below the set limit"
+        }
+      ],
+      "rules": {
+        "all": [
+          {
+            "field": "socialCategory",
+            "op": "eq",
+            "value": "sc",
+            "failReason": {
+              "hi": "यह छात्रवृत्ति अनुसूचित जाति के विद्यार्थियों के लिए है",
+              "en": "This scholarship is for SC students"
+            },
+            "unknownReason": {
+              "hi": "जाति प्रमाण पत्र जाँचा जाएगा",
+              "en": "The caste certificate will be checked"
+            }
+          },
+          {
+            "field": "occupation",
+            "op": "eq",
+            "value": "student",
+            "failReason": {
+              "hi": "यह छात्रवृत्ति विद्यार्थियों के लिए है",
+              "en": "This scholarship is for students"
+            }
+          }
+        ],
+        "any": [],
+        "alwaysCheck": [
+          {
+            "hi": "राशि, उम्र और आय की सीमा आधिकारिक स्रोत से जाँचें",
+            "en": "Confirm amounts, age and income limits with the official source"
+          }
+        ]
+      },
+      "documents": [
+        {
+          "key": "caste_cert",
+          "label": {
+            "hi": "जाति प्रमाण पत्र",
+            "en": "Caste certificate"
+          },
+          "icon": "certificate"
+        },
+        {
+          "key": "income_cert",
+          "label": {
+            "hi": "आय प्रमाण पत्र",
+            "en": "Income certificate"
+          },
+          "icon": "income"
+        },
+        {
+          "key": "marksheet",
+          "label": {
+            "hi": "अंकसूची",
+            "en": "Marksheet"
+          },
+          "icon": "school"
+        },
+        {
+          "key": "aadhaar",
+          "label": {
+            "hi": "आधार कार्ड",
+            "en": "Aadhaar card"
+          },
+          "icon": "badge"
+        },
+        {
+          "key": "bank_passbook",
+          "label": {
+            "hi": "बैंक पासबुक",
+            "en": "Bank passbook"
+          },
+          "icon": "bank"
+        }
+      ],
+      "howToApply": [
+        {
+          "hi": "राष्ट्रीय छात्रवृत्ति पोर्टल या राज्य पोर्टल पर पंजीयन करें",
+          "en": "Register on the National Scholarship Portal or state portal"
+        },
+        {
+          "hi": "संस्थान से सत्यापन करवाएँ",
+          "en": "Get it verified by your institution"
+        }
+      ],
+      "whereToApply": [
+        {
+          "hi": "आपका स्कूल/कॉलेज या CSC",
+          "en": "Your school/college or a CSC"
+        }
+      ],
+      "officialUrl": "https://scholarships.gov.in",
+      "sourceName": "National Scholarship Portal",
+      "categories": ["education"],
+      "level": "central",
+      "tags": ["scholarship", "sc", "छात्रवृत्ति", "विद्यार्थी"]
+    }
+  ]
+}

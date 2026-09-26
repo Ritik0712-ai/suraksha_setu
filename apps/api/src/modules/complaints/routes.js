@@ -7,11 +7,24 @@ import { LOCAL_NAME, sniffImage } from "../../lib/storage.js";
 import { requireAuth, requireRole } from "../../middleware/auth.js";
 import { validate } from "../../middleware/validate.js";
 import { objectId } from "../auth/schemas.js";
-import { createBody, mineQuery, reopenBody, routePreviewQuery } from "./schemas.js";
+import { audit } from "../../lib/audit.js";
+import {
+  assignBody,
+  categoryBody,
+  createBody,
+  mineQuery,
+  noteBody,
+  reopenBody,
+  revealBody,
+  routePreviewQuery,
+  staffListQuery,
+  statusBody,
+} from "./schemas.js";
 
 const wrap = (fn) => (req, res, next) => fn(req, res, next).catch(next);
 const idParam = { params: z.object({ id: objectId }) };
 const citizen = requireRole("citizen");
+const staff = requireRole("authority", "admin");
 
 export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024; // docs/02 SEC-07
 
@@ -36,9 +49,36 @@ function imageUpload() {
 }
 
 /** /api/v1/complaints — citizen side (docs/02 §7.2 "Complaints (M2)"). */
-export function complaintsRouter({ env, complaints, ai }) {
+export function complaintsRouter({ env, complaints, manager, ai }) {
   const router = Router();
   router.use(requireAuth(env));
+
+  // --- authority / admin: list + export (before /:id) -------------------------------------
+
+  router.get(
+    "/",
+    staff,
+    validate({ query: staffListQuery }),
+    wrap(async (req, res) => res.json({ data: await manager.list(req.user, req.validatedQuery) })),
+  );
+
+  router.get(
+    "/export.csv",
+    staff,
+    validate({ query: staffListQuery }),
+    wrap(async (req, res) => {
+      const f = req.validatedQuery;
+      const { csv, count } = await manager.exportCsv(req.user, f);
+      const day = (d) => (d ? d.toISOString().slice(0, 10) : "all");
+      res.set("Content-Type", "text/csv; charset=utf-8");
+      res.set(
+        "Content-Disposition",
+        `attachment; filename="complaints_${day(f.from)}_${day(f.to)}.csv"`,
+      );
+      res.set("X-Row-Count", String(count));
+      res.send(csv);
+    }),
+  );
 
   router.post(
     "/classify",
@@ -90,7 +130,98 @@ export function complaintsRouter({ env, complaints, ai }) {
     "/:id",
     validate(idParam),
     wrap(async (req, res) => {
-      res.json({ data: await complaints.detail(req.user, req.params.id) });
+      if (req.user.role === "citizen")
+        return res.json({ data: await complaints.detail(req.user, req.params.id) });
+      res.json({ data: await manager.detail(req.user, req.params.id) });
+    }),
+  );
+
+  // --- authority / admin: management (docs/03 A-03) -----------------------------------------
+
+  const managed = (action, fn, changes) =>
+    wrap(async (req, res) => {
+      const c = await fn(req);
+      await audit(req, {
+        action,
+        targetType: "complaints",
+        targetId: c._id,
+        changes: changes?.(req, c),
+      });
+      res.json({ data: await manager.view(req.user, c) });
+    });
+
+  router.patch(
+    "/:id/status",
+    staff,
+    validate({ ...idParam, body: statusBody }),
+    managed(
+      "complaint.status_changed",
+      (req) => manager.changeStatus(req.user, req.params.id, req.body),
+      (req) => ({ status: [null, req.body.status] }),
+    ),
+  );
+
+  router.get(
+    "/:id/assign-options",
+    staff,
+    validate(idParam),
+    wrap(async (req, res) =>
+      res.json({ data: await manager.assignOptions(req.user, req.params.id) }),
+    ),
+  );
+
+  router.patch(
+    "/:id/assign",
+    staff,
+    validate({ ...idParam, body: assignBody }),
+    managed(
+      "complaint.assigned",
+      (req) => manager.assign(req.user, req.params.id, req.body),
+      (req) => ({ departmentId: [null, req.body.departmentId] }),
+    ),
+  );
+
+  router.patch(
+    "/:id/category",
+    staff,
+    validate({ ...idParam, body: categoryBody }),
+    managed(
+      "complaint.category_changed",
+      (req) => manager.recategorise(req.user, req.params.id, req.body),
+      (req) => ({ category: [null, req.body.category] }),
+    ),
+  );
+
+  router.post(
+    "/:id/notes",
+    staff,
+    validate({ ...idParam, body: noteBody }),
+    managed("complaint.note_added", (req) => manager.addNote(req.user, req.params.id, req.body)),
+  );
+
+  router.post(
+    "/:id/resolution-photo",
+    staff,
+    validate(idParam),
+    imageUpload(),
+    managed("complaint.resolution_photo", (req) =>
+      manager.resolutionPhoto(req.user, req.params.id, req.image),
+    ),
+  );
+
+  router.post(
+    "/:id/reveal-phone",
+    staff,
+    validate({ ...idParam, body: revealBody }),
+    wrap(async (req, res) => {
+      const phone = await manager.revealPhone(req.user, req.params.id, req.body.target);
+      await audit(req, {
+        action: "complaint.phone_revealed",
+        targetType: "complaints",
+        targetId: req.params.id,
+        changes: { target: [null, req.body.target] },
+      });
+      res.json({ data: { phone } });
     }),
   );
 

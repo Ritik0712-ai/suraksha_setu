@@ -1,0 +1,158 @@
+{
+  "title": "Government schemes",
+  "subtitle": "Information from official sources, in simple language.",
+  "cta": {
+    "title": "Which schemes are for you? Find out in 2 minutes",
+    "action": "Check now"
+  },
+  "searchLabel": "Search schemes",
+  "searchPlaceholder": "Search schemes",
+  "categoryLabel": "Scheme category",
+  "categories": {
+    "all": "All",
+    "women": "Women",
+    "farmers": "Farmers",
+    "health": "Health",
+    "housing": "Housing",
+    "education": "Education",
+    "pension": "Pension",
+    "employment": "Employment",
+    "social_security": "Social security",
+    "financial_inclusion": "Banking"
+  },
+  "level": {
+    "central": "Central",
+    "state": "MP"
+  },
+  "save": "Save",
+  "saved": "Saved",
+  "savedToast": "Saved to My schemes",
+  "removedToast": "Removed",
+  "loginToSave": "Log in to save schemes",
+  "emptySearch": "No scheme found for “{{q}}”. Try another word or ask Sahayak.",
+  "emptyCategory": "No schemes in this category yet.",
+  "askSahayak": "Ask Sahayak",
+  "offlineCached": "You're offline. Showing schemes saved on this phone.",
+  "detail": {
+    "source": "Source",
+    "lastChecked": "Last checked",
+    "stale": "This information may be outdated. Please confirm at the office.",
+    "benefits": "What you get",
+    "eligibility": "Who can apply",
+    "documents": "Documents needed",
+    "how": "How to apply",
+    "where": "Where to apply",
+    "helpline": "Helpline",
+    "askSahayak": "Ask Sahayak about this scheme",
+    "check": "Check if I'm eligible",
+    "official": "Open official website",
+    "disclaimer": "Final eligibility is decided by the government office.",
+    "notFound": "This scheme isn't available.",
+    "allSchemes": "All schemes",
+    "share": "Share",
+    "shareText": "{{name}} — {{benefit}}",
+    "shareCopied": "Link copied",
+    "docsHint": "Save this scheme to tick the documents you have.",
+    "docsReady": "Documents ready: {{ready}} of {{total}}",
+    "callHelpline": "Call {{number}}"
+  },
+  "check": {
+    "title": "Check eligibility",
+    "privacy": "Your answers are not saved unless you are logged in and choose to save them.",
+    "progress": "Question {{current}} of {{total}}",
+    "back": "Back",
+    "see": "See my schemes",
+    "saveAnswers": "Remember my answers on my profile",
+    "start": "Start",
+    "ready": "All done! Tap below to see which schemes may be for you.",
+    "q": {
+      "forWhom": "Who is this for?",
+      "gender": "Gender",
+      "ageBand": "Age",
+      "maritalStatus": "Marital status",
+      "occupation": "Main work",
+      "incomeBand": "Annual family income",
+      "socialCategory": "Social category",
+      "rationCard": "Does the family have a ration card?",
+      "disability": "Anyone in the family with a disability?"
+    },
+    "a": {
+      "forWhom": {
+        "self": "Myself",
+        "family_member": "Someone in my family"
+      },
+      "gender": {
+        "female": "Female",
+        "male": "Male",
+        "other": "Other"
+      },
+      "ageBand": {
+        "lt_18": "Under 18",
+        "18_20": "18–20",
+        "21_40": "21–40",
+        "41_60": "41–60",
+        "gt_60": "Over 60"
+      },
+      "maritalStatus": {
+        "married": "Married",
+        "widowed": "Widowed",
+        "divorced_separated": "Divorced or separated",
+        "unmarried": "Unmarried"
+      },
+      "occupation": {
+        "farmer_own_land": "Farmer (own land)",
+        "farmer_no_land": "Farmer (no own land)",
+        "labourer": "Labourer",
+        "homemaker": "Homemaker",
+        "student": "Student",
+        "self_employed": "Self-employed",
+        "salaried": "Salaried",
+        "none": "None"
+      },
+      "incomeBand": {
+        "lt_1l": "Under ₹1 lakh",
+        "1l_2_5l": "₹1–2.5 lakh",
+        "2_5l_5l": "₹2.5–5 lakh",
+        "gt_5l": "Over ₹5 lakh",
+        "dont_know": "Don't know"
+      },
+      "socialCategory": {
+        "sc": "SC",
+        "st": "ST",
+        "obc": "OBC",
+        "general": "General",
+        "undisclosed": "Prefer not to say"
+      },
+      "rationCard": {
+        "bpl_antyodaya": "BPL / Antyodaya",
+        "other": "Other ration card",
+        "none": "No",
+        "dont_know": "Don't know"
+      },
+      "disability": {
+        "yes": "Yes",
+        "no": "No"
+      }
+    }
+  },
+  "results": {
+    "title": "Your schemes",
+    "summary": "We found {{count}} schemes for you",
+    "likely": "Likely eligible",
+    "maybe": "Maybe — check",
+    "no": "Not eligible",
+    "view": "View details",
+    "change": "Change answers",
+    "empty": "We couldn't match a scheme from our list. Our list is small — ask at your Gram Panchayat or CSC centre, or ask Sahayak.",
+    "noAnswers": "Answer a few questions first.",
+    "start": "Check eligibility"
+  },
+  "my": {
+    "title": "My schemes",
+    "empty": "No saved schemes. Save schemes to track your documents.",
+    "browse": "Browse schemes",
+    "docsReady": "Documents ready: {{ready}} of {{total}}",
+    "remove": "Remove",
+    "updated": "Updated"
+  }
+}

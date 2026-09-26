@@ -137,6 +137,58 @@ export const MESSAGES = {
     en: "This complaint was just updated. Please reload.",
     hi: "यह शिकायत अभी-अभी बदली गई है। कृपया दोबारा लोड करें।",
   },
+  scheme_not_found: {
+    en: "This scheme isn't available.",
+    hi: "यह योजना उपलब्ध नहीं है।",
+  },
+  scheme_not_verified: {
+    en: "Verify the scheme against the official source before publishing.",
+    hi: "प्रकाशित करने से पहले योजना को आधिकारिक स्रोत से जाँचें।",
+  },
+  scheme_published: {
+    en: "Unpublish the scheme before deleting it.",
+    hi: "हटाने से पहले योजना को अप्रकाशित करें।",
+  },
+  slug_taken: {
+    en: "Another scheme already uses this slug.",
+    hi: "यह slug किसी और योजना में इस्तेमाल हो रहा है।",
+  },
+  csv_empty: {
+    en: "The CSV file has no rows.",
+    hi: "CSV फ़ाइल में कोई पंक्ति नहीं है।",
+  },
+  csv_columns: {
+    en: "The CSV file is missing columns. Use the template.",
+    hi: "CSV फ़ाइल में कुछ कॉलम नहीं हैं। टेम्पलेट इस्तेमाल करें।",
+  },
+  csv_rows: {
+    en: "Some rows have errors. Nothing was imported.",
+    hi: "कुछ पंक्तियों में गलती है। कुछ भी इम्पोर्ट नहीं हुआ।",
+  },
+  donor_not_found: {
+    en: "Donor not found.",
+    hi: "रक्तदाता नहीं मिला।",
+  },
+  donor_reveal_limit: {
+    en: "You've viewed 10 numbers today. Try tomorrow or call the hospital blood bank.",
+    hi: "आज आप 10 नंबर देख चुके हैं। कल कोशिश करें या अस्पताल के ब्लड बैंक को फ़ोन करें।",
+  },
+  invalid_transition: {
+    en: "This action isn't allowed for the complaint's current status.",
+    hi: "शिकायत की अभी की स्थिति में यह काम नहीं हो सकता।",
+  },
+  cannot_change_self: {
+    en: "You can't change your own role or deactivate yourself.",
+    hi: "आप अपनी भूमिका नहीं बदल सकते या खुद को निष्क्रिय नहीं कर सकते।",
+  },
+  code_taken: {
+    en: "Another department already uses this code.",
+    hi: "यह कोड किसी और विभाग का है।",
+  },
+  jurisdiction_has_children: {
+    en: "Move or remove the places under it first.",
+    hi: "पहले इसके नीचे की जगहों को हटाएँ या बदलें।",
+  },
 };
 
 /** Picks "hi" or "en" from Accept-Language. Hindi is the default (docs/01 FR-GEN-01). */

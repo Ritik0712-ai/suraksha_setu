@@ -252,7 +252,7 @@ function ProfileCard({ user, villageName }) {
   );
 }
 
-function ChangePasswordDialog({ open, onClose }) {
+export function ChangePasswordDialog({ open, onClose }) {
   const { t } = useTranslation("profile");
   const fieldError = useFieldError();
   const setSession = useSession((s) => s.setSession);

@@ -26,7 +26,7 @@ const ICONS = {
  * National helplines from shared/constants.json — static, so it works offline (docs/01
  * FR-EMG-01). Tapping a card calls the number.
  */
-export function HelplinesGrid() {
+export function HelplinesGrid({ onCall }) {
   const { t, i18n } = useTranslation();
   const lang = i18n.resolvedLanguage === "en" ? "en" : "hi";
   return (
@@ -49,6 +49,7 @@ export function HelplinesGrid() {
             <ButtonBase
               component="a"
               href={`tel:${h.number}`}
+              onClick={() => onCall?.(h.number)}
               aria-label={`${h.name[lang]} — ${t("actions.call", { number: h.number })}`}
               focusRipple
               sx={{
