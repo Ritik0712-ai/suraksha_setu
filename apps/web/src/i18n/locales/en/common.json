@@ -1,0 +1,10 @@
+{
+  "appName": "Suraksha Setu",
+  "tagline": "Safety, complaints, schemes — all in one place",
+  "emergencyBar": "Emergency? Call 112",
+  "languageToggleLabel": "Language / भाषा",
+  "setupNotice": "The app is being built. All services will be available here soon.",
+  "footer": {
+    "disclaimer": "Suraksha Setu is an independent student project of VIT Bhopal. Not a government service."
+  }
+}

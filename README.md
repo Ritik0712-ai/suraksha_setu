@@ -1,1 +1,114 @@
-# suraksha_setu
+# सुरक्षा सेतु · Suraksha Setu
+
+A bilingual (Hindi + English), mobile-first web app for rural communities that brings together:
+
+- one-tap SOS for women's safety
+- AI-assisted civic complaints
+- government-scheme guidance
+- a blood-donor directory
+- nearby emergency services
+- a Hindi writing assistant (Sahayak)
+
+The pilot village is **Mahodiya, Sehore district, Madhya Pradesh**.
+
+> Suraksha Setu is an **independent student project** of VIT Bhopal (DSN3099 — Engineering Projects in Community Service). It is **not** a government service and is not affiliated with any government body.
+
+## Documents
+
+Read these before writing code. Each task in the plan says which sections apply.
+
+| Doc                                                            | What it decides                                                      |
+| -------------------------------------------------------------- | -------------------------------------------------------------------- |
+| [01 PRD](docs/01_PRD.md)                                       | What we build and why (modules, requirements, user stories, metrics) |
+| [02 Technical Requirements](docs/02_Technical_Requirements.md) | Stack, architecture, **APIs**, auth, security, deployment            |
+| [03 App Flow](docs/03_App_Flow.md)                             | Every screen and **behaviour** (wins on behaviour)                   |
+| [04 UI/UX Design Brief](docs/04_UI_UX_Design_Brief.md)         | **Visuals**, tokens, components (wins on visuals)                    |
+| [05 Backend Schema](docs/05_Backend_Schema.md)                 | **Data** model, permissions, retention (wins on data)                |
+| [06 Implementation Plan](docs/06_Implementation_Plan.md)       | Phases, task IDs, owners, review milestones                          |
+
+## Repository layout
+
+```
+suraksha-setu/
+├── apps/
+│   ├── web/            # React 18 + Vite + MUI v5 PWA (citizen app + authority portal)
+│   ├── api/            # Node.js 22 + Express 4 + Mongoose 8 (the only service the browser calls)
+│   └── ai/             # Python 3.11 + Django 5 + DRF (CNN classifier, Sahayak) — internal only
+├── shared/
+│   └── constants.json  # every enum, helplines, blood compatibility — read by all 3 apps
+├── docs/               # docs 01–06
+└── .github/workflows/  # CI
+```
+
+**Rule:** enum values (categories, statuses, roles, blood groups, …) come only from `shared/constants.json`. Never hard-code them anywhere else.
+
+## Run it locally
+
+### Prerequisites
+
+- Node.js **22** (LTS) and npm 10+
+- Python **3.11**
+- MongoDB: either a free Atlas **dev** cluster or local Mongo (`docker run -d -p 27017:27017 mongo:7`). The API still starts without one, but `/health` reports `db: "down"`.
+
+### 1. Install
+
+```bash
+git clone https://github.com/Ritik0712-ai/suraksha_setu.git
+cd suraksha_setu
+npm install                       # web + api (npm workspaces) and the git hooks
+
+cd apps/ai
+python3.11 -m venv .venv
+source .venv/bin/activate         # Windows: .venv\Scripts\activate
+pip install -r requirements-dev.txt
+cd ../..
+```
+
+### 2. Configure
+
+Copy each `.env.example` and fill in the values. Never commit a real `.env`.
+
+```bash
+cp apps/api/.env.example apps/api/.env
+cp apps/web/.env.example apps/web/.env.local
+cp apps/ai/.env.example  apps/ai/.env
+```
+
+For local work you only need `MONGODB_URI` (api) and the **same** `AI_INTERNAL_KEY` in both `apps/api/.env` and `apps/ai/.env`.
+
+### 3. Start the three services (three terminals)
+
+```bash
+npm run dev:api                                  # http://localhost:5000/api/v1/health
+npm run dev:web                                  # http://localhost:5173 (proxies /api → :5000)
+
+cd apps/ai && source .venv/bin/activate
+set -a && source .env && set +a
+python manage.py runserver 8000                  # internal only; needs X-Internal-Key
+```
+
+## Checks (same as CI)
+
+```bash
+npm run lint            # ESLint (web + api)
+npm run format:check    # Prettier
+npm run i18n:check      # every key exists in both hi and en
+npm test                # Vitest (web + api)
+npm run build -w apps/web
+
+cd apps/ai && ruff check . && black --check . && pytest -q
+```
+
+A pre-commit hook (husky + lint-staged) runs ESLint and Prettier on staged JS/JSON/MD/CSS files. Python files are checked in CI.
+
+## Working on a task
+
+1. Pick one task ID from [doc 06](docs/06_Implementation_Plan.md) (for example `4A.7`).
+2. Branch: `feat/<task-id>-<short-name>`.
+3. Follow doc 03 for behaviour, 04 for visuals, 05 for data and 02 for APIs. Quote the section you implemented in the PR description.
+4. Add every user-visible string to **both** `apps/web/src/i18n/locales/hi` and `.../en`.
+5. Add tests. Open a PR, get at least 1 review, and make sure CI is green.
+
+## Status
+
+Phase 0 (setup) is in place. See doc 06 §4 for what comes next (Phase 1: authentication).

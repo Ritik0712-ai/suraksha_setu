@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Builds and caches
+dist/
+build/
+coverage/
+.vite/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# Env and secrets (commit only .env.example)
+.env
+.env.*
+!.env.example
+
+# ML artefacts are downloaded at build time, never committed (docs/02 §9.2)
+*.tflite
+*.h5
+*.keras
+
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.log

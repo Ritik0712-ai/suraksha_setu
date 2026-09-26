@@ -1,0 +1,4 @@
+# Runtime (docs/02 §4.2). Pinned to minor versions; bump deliberately.
+Django>=5.2,<5.3
+djangorestframework>=3.15,<3.17
+gunicorn>=23,<24

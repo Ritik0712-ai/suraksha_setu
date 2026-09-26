@@ -1,0 +1,211 @@
+{
+  "$comment": "Single source of truth for enums and static reference data (docs/02 §2.4, docs/05 §4). Read by apps/web, apps/api and apps/ai. Do not hard-code these values anywhere else.",
+  "version": 1,
+
+  "roles": ["citizen", "authority", "admin"],
+  "actorRoles": ["citizen", "authority", "admin", "system"],
+  "userStatus": ["active", "inactive", "deleted"],
+  "languages": ["hi", "en"],
+  "defaultLanguage": "hi",
+  "textSizes": ["sm", "md", "lg"],
+  "defaultTextSize": "md",
+  "genders": ["female", "male", "other", "undisclosed"],
+  "contactRelations": [
+    "mother",
+    "father",
+    "husband",
+    "wife",
+    "brother",
+    "sister",
+    "son",
+    "daughter",
+    "friend",
+    "other"
+  ],
+  "maxEmergencyContacts": 5,
+
+  "jurisdictionTypes": ["state", "district", "block", "gram_panchayat", "village"],
+
+  "complaintCategories": [
+    "road_damage",
+    "garbage",
+    "streetlight",
+    "waterlogging",
+    "water_supply",
+    "encroachment",
+    "other"
+  ],
+  "complaintStatus": ["SUBMITTED", "VERIFIED", "ASSIGNED", "IN_PROGRESS", "RESOLVED", "REJECTED"],
+  "timelineTypes": [
+    "created",
+    "status_change",
+    "assigned",
+    "category_changed",
+    "public_note",
+    "internal_note",
+    "reopened",
+    "resolution_photo"
+  ],
+  "timelineVisibility": ["public", "internal"],
+  "categorySource": ["ai_accepted", "user_selected", "authority_corrected"],
+  "rejectionReasons": ["duplicate", "not_civic_issue", "outside_area", "inappropriate", "other"],
+  "uploadPurposes": ["complaint", "resolution"],
+  "uploadStatus": ["pending", "attached"],
+
+  "sosStatus": [
+    "ACTIVE",
+    "ACKNOWLEDGED",
+    "RESOLVED_SAFE",
+    "RESOLVED_BY_AUTHORITY",
+    "FALSE_ALARM",
+    "AUTO_CLOSED"
+  ],
+  "sosOpenStatus": ["ACTIVE", "ACKNOWLEDGED"],
+  "sosLocationSource": ["gps", "last_known", "village"],
+  "sosCloseOutcomes": [
+    "citizen_safe_confirmed",
+    "responder_reached",
+    "false_alarm",
+    "could_not_reach"
+  ],
+  "sosCreatedVia": ["online", "offline_retry"],
+
+  "bloodGroups": ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"],
+  "bloodCompatibility": {
+    "$comment": "Recipient blood group -> donor groups that can give to it (docs/05 §5.11).",
+    "O-": ["O-"],
+    "O+": ["O+", "O-"],
+    "A-": ["A-", "O-"],
+    "A+": ["A+", "A-", "O+", "O-"],
+    "B-": ["B-", "O-"],
+    "B+": ["B+", "B-", "O+", "O-"],
+    "AB-": ["AB-", "A-", "B-", "O-"],
+    "AB+": ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]
+  },
+
+  "serviceTypes": ["hospital", "phc_chc", "police", "ambulance", "fire", "pharmacy", "blood_bank"],
+
+  "schemeCategories": [
+    "women",
+    "farmers",
+    "health",
+    "housing",
+    "education",
+    "pension",
+    "employment",
+    "social_security",
+    "financial_inclusion"
+  ],
+  "schemeLevels": ["central", "state"],
+  "schemeStatus": ["draft", "published"],
+  "eligibilityResults": ["likely", "maybe", "no"],
+  "eligibilityOps": ["eq", "neq", "in", "nin"],
+  "eligibilityAnswers": {
+    "$comment": "Questionnaire answer fields and values (docs/05 §5.8.3). Values listed in unknownValues count as unknown.",
+    "forWhom": ["self", "family_member"],
+    "gender": ["female", "male", "other"],
+    "ageBand": ["lt_18", "18_20", "21_40", "41_60", "gt_60"],
+    "maritalStatus": ["married", "widowed", "divorced_separated", "unmarried"],
+    "occupation": [
+      "farmer_own_land",
+      "farmer_no_land",
+      "labourer",
+      "homemaker",
+      "student",
+      "self_employed",
+      "salaried",
+      "none"
+    ],
+    "incomeBand": ["lt_1l", "1l_2_5l", "2_5l_5l", "gt_5l", "dont_know"],
+    "socialCategory": ["sc", "st", "obc", "general", "undisclosed"],
+    "rationCard": ["bpl_antyodaya", "other", "none", "dont_know"],
+    "disability": ["yes", "no"],
+    "unknownValues": ["dont_know", "undisclosed"]
+  },
+
+  "chatModes": ["general", "scheme_help", "letter"],
+  "letterTypes": [
+    "panchayat_complaint",
+    "bdo_application",
+    "certificate_application",
+    "general_application"
+  ],
+  "chatIntents": ["answer", "need_info", "letter_ready", "emergency", "out_of_scope"],
+  "chatMessageRoles": ["user", "assistant", "notice"],
+
+  "notificationTypes": [
+    "complaint_submitted",
+    "complaint_status",
+    "complaint_note",
+    "complaint_reopened",
+    "sos_acknowledged",
+    "sos_closed",
+    "scheme_updated",
+    "donor_number_viewed",
+    "scheme_verification_due",
+    "system"
+  ],
+  "passwordResetKinds": ["email_token", "admin_code"],
+  "usageEventTypes": [
+    "scheme_view",
+    "eligibility_completed",
+    "letter_generated",
+    "complaint_ai_accepted",
+    "complaint_ai_changed",
+    "sos_triggered",
+    "emergency_call_tap",
+    "donor_search",
+    "app_install"
+  ],
+
+  "helplines": [
+    {
+      "number": "112",
+      "key": "all_emergencies",
+      "icon": "emergency",
+      "name": { "hi": "सभी आपात स्थितियाँ", "en": "All emergencies" }
+    },
+    {
+      "number": "108",
+      "key": "ambulance",
+      "icon": "ambulance",
+      "name": { "hi": "एम्बुलेंस", "en": "Ambulance" }
+    },
+    {
+      "number": "100",
+      "key": "police",
+      "icon": "local_police",
+      "name": { "hi": "पुलिस", "en": "Police" }
+    },
+    {
+      "number": "101",
+      "key": "fire",
+      "icon": "fire_truck",
+      "name": { "hi": "दमकल (फ़ायर)", "en": "Fire" }
+    },
+    {
+      "number": "1091",
+      "key": "women",
+      "icon": "woman",
+      "name": { "hi": "महिला हेल्पलाइन", "en": "Women helpline" }
+    },
+    {
+      "number": "181",
+      "key": "women_mp",
+      "icon": "woman",
+      "name": { "hi": "महिला हेल्पलाइन (म.प्र.)", "en": "Women helpline (MP)" }
+    },
+    {
+      "number": "1098",
+      "key": "child",
+      "icon": "child_care",
+      "name": { "hi": "चाइल्ड हेल्पलाइन", "en": "Child helpline" }
+    },
+    {
+      "number": "1930",
+      "key": "cyber_fraud",
+      "icon": "security",
+      "name": { "hi": "साइबर फ़्रॉड", "en": "Cyber fraud" }
+    }
+  ]
+}
