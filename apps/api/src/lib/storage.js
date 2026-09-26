@@ -153,7 +153,11 @@ export function createMemoryStorage() {
  */
 export function createStorage(env, { fetchImpl } = {}) {
   if (env.CLOUDINARY_URL)
-    return createCloudinaryStorage({ url: env.CLOUDINARY_URL, envName: env.NODE_ENV, fetchImpl });
+    return createCloudinaryStorage({
+      url: env.CLOUDINARY_URL,
+      envName: env.APP_ENV || env.NODE_ENV,
+      fetchImpl,
+    });
   if (env.NODE_ENV === "production") {
     logger.warn("CLOUDINARY_URL is not set: complaint photos are disabled");
     return null;

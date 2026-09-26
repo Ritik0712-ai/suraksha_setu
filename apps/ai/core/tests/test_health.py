@@ -46,3 +46,9 @@ def test_health_reports_model_version_from_model_card(client, settings, tmp_path
     settings.MODEL_PATH = str(model)
     res = client.get("/internal/health", headers={"X-Internal-Key": KEY})
     assert res.json()["modelVersion"] == "civic_cnn_v3"
+
+
+def test_public_health_needs_no_key_and_reveals_nothing(client):
+    res = client.get("/health")
+    assert res.status_code == 200
+    assert res.json() == {"status": "ok"}

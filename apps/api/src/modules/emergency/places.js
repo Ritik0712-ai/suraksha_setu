@@ -1,4 +1,5 @@
 import { logger } from "../../lib/logger.js";
+import { istDayStart } from "../../lib/time.js";
 
 // Google Places API (New) Nearby Search — only when the curated directory has fewer than 3
 // results (docs/02 ADR-09). Nothing from Places is stored: results go straight to the client
@@ -19,6 +20,30 @@ const FIELDS = [
 ].join(",");
 
 export const placesSupports = (type) => Boolean(TYPES[type]);
+
+/**
+ * Daily budget for billed Places calls (docs/02 §7.5, docs/06 task 5.2): a hard stop in code on
+ * top of the quota and budget alert in Google Cloud Console. Resets at IST midnight.
+ */
+export function createPlacesBudget(limit, now = () => new Date()) {
+  let day = null;
+  let used = 0;
+  const today = () => istDayStart(now()).getTime();
+  return {
+    take() {
+      if (today() !== day) {
+        day = today();
+        used = 0;
+      }
+      if (used >= limit) return false;
+      used += 1;
+      return true;
+    },
+    get used() {
+      return used;
+    },
+  };
+}
 
 /** → [{ placeId, name, address, lat, lng, phone }] or [] on any failure. */
 export async function placesNearby({ key, fetchImpl = fetch, type, lat, lng, radiusM, lang }) {

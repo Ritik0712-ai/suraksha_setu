@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { act, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderApp } from "./utils.jsx";
+import C from "../config/constants.js";
 import { HttpResponse, citizen, http, loggedInAs, officer, server } from "./server.js";
 import { dispatchSocketEvent } from "../lib/socket.js";
 import { blankScheme, slugify, toBody } from "../features/portal/schemeForm.js";
@@ -406,5 +407,57 @@ describe("guards and helpers", () => {
     expect(body.documents[0]).toMatchObject({ key: "aadhaar", label: { en: "Aadhaar card" } });
     expect(body.tags).toEqual(["kisan", "किसान"]);
     expect(body.state).toBeNull();
+  });
+});
+
+describe("A-06 analytics — Sahayak usage (docs/06 task 5.6)", () => {
+  const analytics = (sahayak) => ({
+    from: "2026-09-01",
+    to: "2026-09-27",
+    byCategory: C.complaintCategories.map((category) => ({ category, count: 0 })),
+    funnel: ["SUBMITTED", "VERIFIED", "ASSIGNED", "IN_PROGRESS", "RESOLVED"].map((status) => ({
+      status,
+      count: 0,
+    })),
+    complaintsPerDay: [],
+    resolutionByWeek: [],
+    sosPerDay: [],
+    sosAvgAckMinutes: null,
+    schemes: { checks: 0, topViewed: [] },
+    ai: { withSuggestion: 0, acceptedPct: null, correctedPct: null },
+    sahayak,
+  });
+
+  it("admins see LLM usage; authorities don't", async () => {
+    loggedInAs(officer({ role: "admin", authority: null }));
+    server.use(
+      http.get("*/api/v1/admin/analytics", () =>
+        HttpResponse.json({
+          data: analytics({
+            userMessages: 40,
+            llmReplies: 35,
+            letters: 6,
+            emergencies: 2,
+            users: 9,
+            tokensInPer100: 210000,
+            tokensOutPer100: 18000,
+            avgLatencyMs: 2400,
+          }),
+        }),
+      ),
+    );
+    renderApp("/portal/analytics");
+    expect(await screen.findByText("सहायक का उपयोग (सिर्फ़ एडमिन)")).toBeInTheDocument();
+    expect(screen.getByText("210000")).toBeInTheDocument();
+  });
+
+  it("hidden for authorities", async () => {
+    loggedInAs(officer());
+    server.use(
+      http.get("*/api/v1/admin/analytics", () => HttpResponse.json({ data: analytics(null) })),
+    );
+    renderApp("/portal/analytics");
+    expect(await screen.findByText(/AI/)).toBeInTheDocument();
+    expect(screen.queryByText("सहायक का उपयोग (सिर्फ़ एडमिन)")).not.toBeInTheDocument();
   });
 });

@@ -30,9 +30,19 @@ const schema = z.object({
   SMTP_USER: optional,
   SMTP_PASS: optional,
   MAIL_FROM: optional,
+  // Backup SMTP (e.g. Brevo), used only when the primary fails (docs/02 §4.1).
+  SMTP_FALLBACK_HOST: optional,
+  SMTP_FALLBACK_PORT: z.coerce.number().int().positive().default(587),
+  SMTP_FALLBACK_USER: optional,
+  SMTP_FALLBACK_PASS: optional,
   AI_BASE_URL: optional,
   AI_INTERNAL_KEY: optional,
   GOOGLE_PLACES_KEY: optional,
+  // Hard cap on billed Places calls per IST day, per API instance (docs/02 §7.5 cost control).
+  PLACES_DAILY_LIMIT: z.coerce.number().int().min(0).default(300),
+  // development | preview | production — separates Cloudinary folders (docs/06 task 5.1).
+  // Defaults to NODE_ENV, so a Vercel/Render preview can set "preview".
+  APP_ENV: optional,
   // bcrypt cost (docs/02 SEC-02). Only tests may lower it.
   BCRYPT_COST: z.coerce.number().int().min(4).max(15).default(12),
 });

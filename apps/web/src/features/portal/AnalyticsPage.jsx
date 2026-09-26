@@ -59,6 +59,18 @@ function Chart({ title, rows, header, filename, children, empty }) {
 }
 
 /** A-06 Analytics (docs/03). Scoped to the officer's areas by the API. */
+// Admin-only LLM usage (docs/06 task 5.6); the API sends `sahayak: null` to authorities.
+const SAHAYAK_ROWS = [
+  "userMessages",
+  "llmReplies",
+  "letters",
+  "emergencies",
+  "users",
+  "tokensInPer100",
+  "tokensOutPer100",
+  "avgLatencyMs",
+];
+
 export default function AnalyticsPage() {
   const { t } = useTranslation("portal");
   const [preset, setPreset] = useState("30");
@@ -252,6 +264,29 @@ export default function AnalyticsPage() {
               </TableBody>
             </Table>
           </Chart>
+          {d.sahayak && (
+            <Chart
+              title={t("analytics.charts.sahayak")}
+              header={SAHAYAK_ROWS.map((k) => t(`analytics.sahayak.${k}`))}
+              rows={[SAHAYAK_ROWS.map((k) => d.sahayak[k] ?? "")]}
+              filename={`sahayak_usage_${suffix}.csv`}
+              empty={d.sahayak.userMessages === 0}
+            >
+              <Table size="small">
+                <TableBody>
+                  {SAHAYAK_ROWS.map((k) => (
+                    <TableRow key={k}>
+                      <TableCell>{t(`analytics.sahayak.${k}`)}</TableCell>
+                      <TableCell align="right">{d.sahayak[k] ?? "—"}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                {t("analytics.sahayak.costHint")}
+              </Typography>
+            </Chart>
+          )}
         </Box>
       )}
     </Stack>

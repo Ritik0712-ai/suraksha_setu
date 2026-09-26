@@ -4,6 +4,7 @@ import { useTestDb } from "../helpers/db.js";
 import { PASSWORD, createUser, loginAs, makeApp, seedJurisdictions } from "../helpers/app.js";
 import {
   AuditLog,
+  ChatMessage,
   Complaint,
   Department,
   Jurisdiction,
@@ -147,11 +148,54 @@ describe("GET /admin/analytics (docs/03 A-06)", () => {
     expect(d.resolutionByWeek).toHaveLength(1);
     expect(d.schemes).toEqual({ checks: 1, topViewed: [{ slug: "pm-kisan", views: 2 }] });
     expect(d.ai).toEqual({ withSuggestion: 0, acceptedPct: null, correctedPct: null });
+    expect(d.sahayak).toBeNull(); // LLM usage is for admins only
 
     const bad = await asGp("get", "/admin/analytics").query({ from: today, to: "2020-01-01" });
     expect(bad.status).toBe(400);
     const tooLong = await asGp("get", "/admin/analytics").query({ from: "2020-01-01", to: today });
     expect(tooLong.status).toBe(400);
+  });
+});
+
+describe("Sahayak usage in analytics (docs/06 task 5.6)", () => {
+  it("admins see message, letter and token counts — never message text", async () => {
+    const sessionId = new mongoose.Types.ObjectId();
+    const expireAt = new Date(Date.now() + 86400_000);
+    const base = { sessionId, userId: citizen._id, expireAt };
+    await ChatMessage.create([
+      { ...base, role: "user", text: "q1" },
+      {
+        ...base,
+        role: "assistant",
+        text: "a1",
+        intent: "answer",
+        llm: { provider: "gemini", model: "m", tokensIn: 1000, tokensOut: 100, latencyMs: 2000 },
+      },
+      { ...base, role: "user", text: "q2" },
+      {
+        ...base,
+        role: "assistant",
+        text: "a2",
+        intent: "letter_ready",
+        letter: { to: "a", subject: "b", body: "c", applicantName: "d" },
+        llm: { provider: "gemini", model: "m", tokensIn: 3000, tokensOut: 300, latencyMs: 4000 },
+      },
+      { ...base, role: "user", text: "bachao" },
+      { ...base, role: "notice", text: "SOS", intent: "emergency" },
+    ]);
+    const today = new Date().toISOString().slice(0, 10);
+    const res = await asAdmin("get", "/admin/analytics").query({ from: today, to: today });
+    expect(res.body.data.sahayak).toEqual({
+      userMessages: 3,
+      llmReplies: 2,
+      letters: 1,
+      emergencies: 1,
+      users: 1,
+      tokensInPer100: 200000,
+      tokensOutPer100: 20000,
+      avgLatencyMs: 3000,
+    });
+    expect(JSON.stringify(res.body)).not.toContain("bachao");
   });
 });
 

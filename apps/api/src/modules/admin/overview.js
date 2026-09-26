@@ -9,6 +9,7 @@ import { Department } from "../../models/Department.js";
 import { Jurisdiction } from "../../models/Jurisdiction.js";
 import { SosAlert } from "../../models/SosAlert.js";
 import { UsageEvent } from "../../models/UsageEvent.js";
+import { ChatMessage } from "../../models/ChatMessage.js";
 import { User } from "../../models/User.js";
 
 const wrap = (fn) => (req, res, next) => fn(req, res, next).catch(next);
@@ -246,6 +247,7 @@ async function analytics(user, { from, to }) {
       ]),
     ]);
 
+  const sahayak = user.role === "admin" ? await sahayakUsage(range) : null;
   const count = (list, key) => list.find((x) => x._id === key)?.count ?? 0;
   const pct = (a, b) => (b ? Math.round((a / b) * 1000) / 10 : null);
   const a = ai[0] ?? { withSuggestion: 0, accepted: 0, corrected: 0 };
@@ -274,6 +276,42 @@ async function analytics(user, { from, to }) {
       acceptedPct: pct(a.accepted, a.withSuggestion),
       correctedPct: pct(a.corrected, a.withSuggestion),
     },
+    sahayak,
+  };
+}
+
+/**
+ * Sahayak usage and LLM cost for admins (docs/06 task 5.6: "cost per 100 messages measured").
+ * Counts only — never message text. Multiply tokens by the provider's price to get the cost.
+ */
+async function sahayakUsage(range) {
+  const [rows] = await ChatMessage.aggregate([
+    { $match: { createdAt: range } },
+    {
+      $group: {
+        _id: null,
+        userMessages: { $sum: { $cond: [{ $eq: ["$role", "user"] }, 1, 0] } },
+        llmReplies: { $sum: { $cond: [{ $ne: [{ $ifNull: ["$llm", null] }, null] }, 1, 0] } },
+        letters: { $sum: { $cond: [{ $eq: ["$intent", "letter_ready"] }, 1, 0] } },
+        emergencies: { $sum: { $cond: [{ $eq: ["$intent", "emergency"] }, 1, 0] } },
+        tokensIn: { $sum: { $ifNull: ["$llm.tokensIn", 0] } },
+        tokensOut: { $sum: { $ifNull: ["$llm.tokensOut", 0] } },
+        latencyMs: { $avg: "$llm.latencyMs" },
+        users: { $addToSet: "$userId" },
+      },
+    },
+  ]);
+  const r = rows ?? { userMessages: 0, llmReplies: 0, letters: 0, emergencies: 0 };
+  const per100 = (n) => (r.llmReplies ? Math.round((n / r.llmReplies) * 100) : null);
+  return {
+    userMessages: r.userMessages,
+    llmReplies: r.llmReplies,
+    letters: r.letters,
+    emergencies: r.emergencies,
+    users: r.users?.length ?? 0,
+    tokensInPer100: per100(r.tokensIn ?? 0),
+    tokensOutPer100: per100(r.tokensOut ?? 0),
+    avgLatencyMs: r.latencyMs ? Math.round(r.latencyMs) : null,
   };
 }
 

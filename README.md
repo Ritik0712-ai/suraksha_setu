@@ -239,6 +239,15 @@ Test a restore into a scratch database once before the pilot (doc 06 task 7.7).
 
 - **Real model:** trained on Colab from `ml/` and published as a GitHub Release; the AI service downloads it at build time (`scripts/fetch_model.py`, `MODEL_URL` + `MODEL_CARD_URL`). See [`ml/README.md`](ml/README.md).
 
+## Integration notes (Phase 5)
+
+- **Email:** primary SMTP (Gmail app password) with an optional backup (`SMTP_FALLBACK_*`, e.g. Brevo) that is tried only when the primary fails, so SOS emails still go out if Gmail throttles us.
+- **Google Places:** server key only (`GOOGLE_PLACES_KEY`), called only when the curated directory has fewer than 3 results, and capped in code at `PLACES_DAILY_LIMIT` calls per IST day (default 300) on top of the Cloud Console quota and budget alert.
+- **Cloudinary:** folders are `suraksha/<APP_ENV>/<purpose>` so development, preview and production never mix.
+- **Uptime:** the API has `GET /api/v1/health` (`{ status, db, ai }`); the AI service has a key-less `GET /health` (`{ status: "ok" }` only) for UptimeRobot and Render.
+- **LLM cost:** A-06 Analytics shows admins Sahayak usage — messages, letters, emergency cards, and input/output tokens per 100 replies (multiply by the provider's price for the cost per 100 messages).
+- Setting up each account (keys, restrictions, quotas, alerts) is in [docs/runbook.md](docs/runbook.md).
+
 ## Sahayak notes
 
 - **Flow:** browser → `POST /api/v1/chat/sessions/:id/messages` (auth, 30 messages per IST day, last 10 turns) → Django `POST /internal/sahayak/reply` → LLM. The LLM gets our rules and the relevant **published** schemes in the system prompt; the user's words only ever travel as user turns (doc 02 SEC-16). It has no tools and no database write access. Scheme cards are limited to slugs we sent, so it can't link to made-up pages.

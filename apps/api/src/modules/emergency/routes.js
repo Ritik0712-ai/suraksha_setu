@@ -8,7 +8,7 @@ import { validate } from "../../middleware/validate.js";
 import { Jurisdiction } from "../../models/Jurisdiction.js";
 import { User } from "../../models/User.js";
 import { EmergencyService } from "../../models/EmergencyService.js";
-import { placesNearby } from "./places.js";
+import { createPlacesBudget, placesNearby } from "./places.js";
 import { nearbyQuery } from "./schemas.js";
 
 const wrap = (fn) => (req, res, next) => fn(req, res, next).catch(next);
@@ -35,6 +35,7 @@ export const curatedView = (s, from) => ({
 /** /api/v1/emergency (docs/02 §7.2 "Emergency services (M5)"). Public. */
 export function emergencyRouter({ env, fetchImpl, limiter }) {
   const router = Router();
+  const placesBudget = createPlacesBudget(env.PLACES_DAILY_LIMIT);
 
   router.get("/helplines", (_req, res) => {
     res.set("Cache-Control", "public, max-age=86400");
@@ -86,7 +87,7 @@ export function emergencyRouter({ env, fetchImpl, limiter }) {
       }));
 
       let placesUsed = false;
-      if (services.length < MIN_CURATED && env.GOOGLE_PLACES_KEY) {
+      if (services.length < MIN_CURATED && env.GOOGLE_PLACES_KEY && placesBudget.take()) {
         const found = await placesNearby({
           key: env.GOOGLE_PLACES_KEY,
           fetchImpl,
