@@ -28,9 +28,15 @@ def test_health_fails_closed_when_key_not_configured(client, settings):
 def test_health_ok_with_key(client, settings, tmp_path):
     settings.MODEL_PATH = str(tmp_path / "missing.tflite")
     settings.LLM_PROVIDER = "gemini"
+    settings.LLM_API_KEY = ""
     res = client.get("/internal/health", headers={"X-Internal-Key": KEY})
     assert res.status_code == 200
-    assert res.json() == {"status": "ok", "modelVersion": None, "llmProvider": "gemini"}
+    assert res.json() == {
+        "status": "ok",
+        "modelVersion": None,
+        "llmProvider": "gemini",
+        "llmConfigured": False,
+    }
 
 
 def test_health_reports_model_version_from_model_card(client, settings, tmp_path):

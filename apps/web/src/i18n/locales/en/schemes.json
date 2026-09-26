@@ -154,5 +154,6 @@
     "docsReady": "Documents ready: {{ready}} of {{total}}",
     "remove": "Remove",
     "updated": "Updated"
-  }
+  },
+  "askSahayakPrompt": "I may be eligible for these schemes: {{names}}. Tell me more about them."
 }

@@ -6,7 +6,14 @@ import { initialLanguage } from "../stores/prefs.js";
 // One JSON file per namespace per language; every key must exist in both (npm run i18n:check).
 // Namespaces only some screens need load with those screens, keeping the citizen app's first
 // download small (docs/02 §5: ≤ 250 KB gz); the rest ship with the app.
-export const LAZY_NAMESPACES = ["portal", "schemes", "blood", "emergency", "notifications"];
+export const LAZY_NAMESPACES = [
+  "portal",
+  "schemes",
+  "blood",
+  "emergency",
+  "notifications",
+  "sahayak",
+];
 const all = import.meta.glob(
   [
     "./locales/*/portal.json",
@@ -14,6 +21,7 @@ const all = import.meta.glob(
     "./locales/*/blood.json",
     "./locales/*/emergency.json",
     "./locales/*/notifications.json",
+    "./locales/*/sahayak.json",
   ],
   { import: "default" },
 );
@@ -25,6 +33,7 @@ const eager = import.meta.glob(
     "!./locales/*/blood.json",
     "!./locales/*/emergency.json",
     "!./locales/*/notifications.json",
+    "!./locales/*/sahayak.json",
   ],
   { eager: true, import: "default" },
 );

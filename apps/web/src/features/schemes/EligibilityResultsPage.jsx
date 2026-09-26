@@ -54,6 +54,15 @@ export default function EligibilityResultsPage() {
     );
 
   const found = results.counts.likely + results.counts.maybe;
+  // "Ask Sahayak" carries a short summary of the results as the first question (docs/03 S-17).
+  const names = results.results
+    .filter((r) => r.result !== "no")
+    .slice(0, 5)
+    .map((r) => localized(r.name))
+    .join(", ");
+  const sahayakLink = names
+    ? `/sahayak?q=${encodeURIComponent(t("askSahayakPrompt", { names }))}`
+    : "/sahayak";
   return (
     <Stack spacing={2.5} sx={{ maxWidth: 760, mx: "auto", pb: 4 }}>
       <PageTitle sx={{ mb: 0 }}>{t("results.title")}</PageTitle>
@@ -122,7 +131,7 @@ export default function EligibilityResultsPage() {
         <Button variant="outlined" component={RouterLink} to="/schemes/check">
           {t("results.change")}
         </Button>
-        <Button variant="outlined" component={RouterLink} to="/sahayak">
+        <Button variant="outlined" component={RouterLink} to={sahayakLink}>
           {t("askSahayak")}
         </Button>
       </Stack>

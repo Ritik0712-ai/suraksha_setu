@@ -36,13 +36,25 @@ export function fakeMailer() {
   };
 }
 
-/** Stand-in for the AI client: set `next` to the suggestion the next classify returns. */
+/**
+ * Stand-in for the AI client: set `next` to the suggestion the next classify returns, and
+ * `sahayak` to the next Sahayak result ({ ok, reply } or { ok: false, reason }).
+ */
 export function fakeAi() {
   const ai = {
     configured: true,
     calls: [],
     next: null,
     up: true,
+    sahayakCalls: [],
+    sahayak: {
+      ok: true,
+      reply: { intent: "answer", text: "ठीक है", cards: [], chips: [], letter: null, llm: {} },
+    },
+    async sahayakReply(payload) {
+      ai.sahayakCalls.push(payload);
+      return typeof ai.sahayak === "function" ? ai.sahayak(payload) : ai.sahayak;
+    },
     async classify(imageUrl) {
       ai.calls.push(imageUrl);
       return ai.next;

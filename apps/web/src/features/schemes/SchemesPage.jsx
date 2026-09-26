@@ -137,7 +137,11 @@ export default function SchemesPage() {
             icon={SearchOffRounded}
             title={t("emptySearch", { q })}
             action={
-              <Button variant="outlined" component={RouterLink} to="/sahayak">
+              <Button
+                variant="outlined"
+                component={RouterLink}
+                to={`/sahayak?q=${encodeURIComponent(q)}`}
+              >
                 {t("askSahayak")}
               </Button>
             }

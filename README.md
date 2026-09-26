@@ -176,6 +176,10 @@ All routes are under `/api/v1`. Responses use `{ data }` on success and `{ error
 | GET            | `/donors/search?bloodGroup=&radiusKm=&includeCompatible=`                                                   | Citizen (masked)                    |
 | POST           | `/donors/:id/reveal` (10 per day, logged)                                                                   | Citizen                             |
 | GET            | `/notifications`, POST `/notifications/read`                                                                | Signed in                           |
+| GET/POST       | `/chat/sessions` (start: `mode`, `schemeId?`, `letterType?`; list: last 20)                                 | Citizen                             |
+| GET/DELETE     | `/chat/sessions/:id`                                                                                        | Owner                               |
+| POST           | `/chat/sessions/:id/messages` (30 per day; emergency words answered before the LLM)                         | Owner                               |
+| PUT            | `/chat/sessions/:id/messages/:messageId/letter` (S-26 edit)                                                 | Owner                               |
 | GET            | `/admin/overview`, `/admin/analytics`, `/admin/meta`                                                        | Authority, Admin (scoped)           |
 | CRUD           | `/admin/users`, `/admin/departments`, `/admin/jurisdictions`, `/admin/schemes`, `/admin/emergency-services` | Admin (audited)                     |
 | GET            | `/admin/audit-logs`                                                                                         | Admin                               |
@@ -210,7 +214,7 @@ Test a restore into a scratch database once before the pilot (doc 06 task 7.7).
 - ✅ Phase 4D — emergency: helplines offline, curated directory (CSV import) with Google Places fallback, list + map (tasks 4D.1–4D.4)
 - ✅ Phase 4E — authority portal: overview, complaints table + management (every transition from doc 05 §5.6.1), live SOS map + drawer, analytics + CSV, users, schemes editor with rules builder, emergency directory, departments + routing gaps, areas tree, audit log, citizen notifications + status emails (tasks 4E.1–4E.7)
 - ✅ Phase 4F — blood donors: donor profile (consent, 90-day gap, availability), compatible nearby search with masked phones, reveal with a 10/day limit and a log (tasks 4F.1–4F.4)
-- ⏭ Phase 4G (Sahayak) onwards — see doc 06 §4
+- ✅ Phase 4G — Sahayak: LLM provider adapter (Gemini default, Anthropic, offline `fake`), grounding on published schemes, emergency pre-check, chat API with limits, S-24/S-25/S-26 with letters (edit, copy, WhatsApp, print), 50-question evaluation set (tasks 4G.1–4G.7)
 
 ## SOS notes
 
@@ -234,6 +238,14 @@ Test a restore into a scratch database once before the pilot (doc 06 task 7.7).
   ```
 
 - **Real model:** trained on Colab from `ml/` and published as a GitHub Release; the AI service downloads it at build time (`scripts/fetch_model.py`, `MODEL_URL` + `MODEL_CARD_URL`). See [`ml/README.md`](ml/README.md).
+
+## Sahayak notes
+
+- **Flow:** browser → `POST /api/v1/chat/sessions/:id/messages` (auth, 30 messages per IST day, last 10 turns) → Django `POST /internal/sahayak/reply` → LLM. The LLM gets our rules and the relevant **published** schemes in the system prompt; the user's words only ever travel as user turns (doc 02 SEC-16). It has no tools and no database write access. Scheme cards are limited to slugs we sent, so it can't link to made-up pages.
+- **Emergency first:** `shared/emergencyCheck.js` (word list in `constants.json → sahayak`) runs in the browser (the SOS card shows instantly) and in the API (no LLM call). Strong phrases ("bachao", "मार रहा", "accident") always match; weak ones ("help", "मदद") only when the whole message is ≤ 4 words, so "help me write a letter" still reaches Sahayak. A false alarm has a "No, I'm not in danger" button that resends with the check skipped.
+- **Letters:** the letter session asks one thing at a time (doc 03 S-25), then returns `{ to, subject, body, applicantName, includeMobile }`. The API adds the date (IST), the village, and the phone number only if the user said yes — the phone never goes to the LLM. S-26 prints only the letter (A4, 2 cm margins) via the browser, so Hindi renders correctly. Recipient lines per letter type are drafts in `apps/ai/core/sahayak/prompt.py` for R4 to confirm.
+- **Configure** (apps/ai): `LLM_PROVIDER=gemini`, `LLM_API_KEY`, optional `LLM_MODEL` (default `gemini-3.5-flash`), and `MONGODB_URI_READONLY` (a read-only user with the database name in the path). Without a key, Sahayak shows "resting" and the rest of the app works. For local work without a key: `LLM_PROVIDER=fake`.
+- **Evaluation (4G.7):** `apps/ai/eval/sahayak_eval_set.json` has 50 questions (25 scheme, 15 letter, 10 tricky). `python scripts/run_sahayak_eval.py` runs them against the configured LLM and writes a report plus a CSV with a `human_ok` column for the team review before the pilot. Emergency detection is checked in CI (`apps/api/test/unit/sahayak.test.js`).
 
 ## Schemes, emergency and donor notes
 

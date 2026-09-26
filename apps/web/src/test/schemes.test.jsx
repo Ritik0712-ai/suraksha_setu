@@ -121,7 +121,7 @@ describe("S-14 schemes list", () => {
     expect(await screen.findByText(/“tractor” से कोई योजना नहीं मिली/)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "सहायक से पूछें" })).toHaveAttribute(
       "href",
-      "/sahayak",
+      "/sahayak?q=tractor",
     );
   });
 

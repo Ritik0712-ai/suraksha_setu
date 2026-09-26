@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Box,
   Button,
@@ -29,10 +30,11 @@ import {
 } from "@mui/icons-material";
 import { SahayakIcon } from "../../components/icons/index.jsx";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Link as RouterLink, useParams } from "react-router-dom";
+import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { apiError } from "../../api/client.js";
-import { schemesApi } from "../../api/endpoints.js";
+import { chatApi, schemesApi } from "../../api/endpoints.js";
+import { useSession } from "../../stores/session.js";
 import { copyText } from "../../lib/device.js";
 import { useLocalized } from "../../lib/localized.js";
 import { formatDate } from "../../lib/time.js";
@@ -137,7 +139,10 @@ export default function SchemeDetailPage() {
   const { t } = useTranslation("schemes");
   const localized = useLocalized();
   const { slug } = useParams();
+  const navigate = useNavigate();
   const { isSaved, onToggle } = useSaveScheme();
+  const citizen = useSession((x) => x.status === "authed" && x.user?.role === "citizen");
+  const [asking, setAsking] = useState(false);
 
   const q = useQuery({
     queryKey: ["scheme", slug],
@@ -176,6 +181,23 @@ export default function SchemeDetailPage() {
 
   const s = q.data;
   const name = localized(s.name);
+
+  // FR-SCH-06: opens Sahayak with this scheme loaded (a scheme_help session).
+  const askSahayak = async () => {
+    if (!citizen) {
+      navigate(`/login?next=${encodeURIComponent(`/schemes/${s.slug}`)}`);
+      return;
+    }
+    setAsking(true);
+    try {
+      const session = await chatApi.start({ mode: "scheme_help", schemeId: s.id });
+      navigate(`/sahayak/${session.id}`, { state: { session } });
+    } catch (err) {
+      const x = apiError(err);
+      toast(x.network ? t("states.networkError", { ns: "common" }) : x.message, "error");
+      setAsking(false);
+    }
+  };
   const saved = isSaved(s.id) || Boolean(s.saved);
   const stale =
     !s.lastVerifiedAt || Date.now() - new Date(s.lastVerifiedAt) > STALE_DAYS * 86400_000;
@@ -284,7 +306,12 @@ export default function SchemeDetailPage() {
         >
           {t("detail.check")}
         </Button>
-        <Button variant="outlined" startIcon={<SahayakIcon />} component={RouterLink} to="/sahayak">
+        <Button
+          variant="outlined"
+          startIcon={<SahayakIcon />}
+          onClick={askSahayak}
+          disabled={asking || Boolean(s.offline)}
+        >
           {t("detail.askSahayak")}
         </Button>
         <Button

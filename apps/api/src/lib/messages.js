@@ -185,6 +185,26 @@ export const MESSAGES = {
     en: "Another department already uses this code.",
     hi: "यह कोड किसी और विभाग का है।",
   },
+  chat_not_found: {
+    en: "Chat not found.",
+    hi: "बातचीत नहीं मिली।",
+  },
+  chat_limit: {
+    en: "Today's limit is over. Come back tomorrow, or browse schemes.",
+    hi: "आज की सीमा पूरी हो गई। कल फिर आएँ, या योजनाएँ देखें।",
+  },
+  sahayak_resting: {
+    en: "Sahayak is resting right now. You can still browse schemes.",
+    hi: "सहायक अभी आराम कर रहा है। आप योजनाएँ देख सकते हैं।",
+  },
+  sahayak_failed: {
+    en: "Couldn't get a reply.",
+    hi: "जवाब नहीं आ सका।",
+  },
+  letter_not_found: {
+    en: "This letter was not found.",
+    hi: "यह पत्र नहीं मिला।",
+  },
   jurisdiction_has_children: {
     en: "Move or remove the places under it first.",
     hi: "पहले इसके नीचे की जगहों को हटाएँ या बदलें।",

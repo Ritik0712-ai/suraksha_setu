@@ -1,0 +1,87 @@
+{
+  "title": "Sahayak",
+  "home": {
+    "hello": "Hi! I'm Sahayak. I help with scheme information and writing applications.",
+    "startLabel": "Start with",
+    "chips": {
+      "schemes": "Which schemes can I get?",
+      "panchayat": "Write a letter to the Panchayat",
+      "bdo": "Application to BDO",
+      "certificate": "Apply for a certificate",
+      "complaint": "How do I file a complaint?",
+      "emergency": "Emergency numbers"
+    },
+    "recent": "Recent chats",
+    "disclaimer": "Sahayak can make mistakes. Check important information at the office.",
+    "startFailed": "Couldn't start the chat. Try again."
+  },
+  "input": {
+    "label": "Type your question…",
+    "send": "Send",
+    "left_one": "{{count}} message left today",
+    "left_other": "{{count}} messages left today"
+  },
+  "chat": {
+    "back": "All chats",
+    "menu": "Chat options",
+    "delete": "Delete chat",
+    "deleteTitle": "Delete this chat?",
+    "deleteBody": "The messages and letters in this chat will be removed.",
+    "deleted": "Chat deleted",
+    "typing": "Sahayak is typing…",
+    "you": "You",
+    "sahayak": "Sahayak",
+    "noReply": "Couldn't get a reply",
+    "resting": "Sahayak is resting right now. You can still browse schemes.",
+    "limit": "Today's limit is over. Come back tomorrow, or browse schemes.",
+    "browseSchemes": "Browse schemes",
+    "viewScheme": "View",
+    "letterReady": "Letter ready",
+    "viewLetter": "View letter",
+    "notFound": "This chat isn't available.",
+    "log": "Conversation",
+    "quickReplies": "Quick replies",
+    "outOfScope": "I can help with schemes, complaints, letters and emergency help."
+  },
+  "emergency": {
+    "title": "Are you in danger?",
+    "body": "Press SOS to alert your contacts, or call 112 now.",
+    "sos": "SOS",
+    "call112": "Call 112",
+    "notInDanger": "No, I'm not in danger — answer my question"
+  },
+  "letter": {
+    "title": "Letter",
+    "edit": "Edit",
+    "doneEditing": "Save changes",
+    "cancelEdit": "Cancel",
+    "copy": "Copy text",
+    "copied": "Letter copied",
+    "whatsapp": "Share on WhatsApp",
+    "print": "Print / Save PDF",
+    "saved": "Letter saved",
+    "footer": "Drafted with Sahayak — please read and check before submitting.",
+    "notFound": "This letter isn't available.",
+    "fields": {
+      "to": "To (office)",
+      "subject": "Subject",
+      "body": "Letter text",
+      "applicantName": "Your name"
+    },
+    "format": {
+      "to": "To,",
+      "subject": "Subject:",
+      "salutation": "Sir/Madam,",
+      "thanks": "Thank you.",
+      "applicant": "Yours faithfully,",
+      "mobile": "Mobile:",
+      "date": "Date:"
+    }
+  },
+  "letterTypes": {
+    "panchayat_complaint": "Letter to the Panchayat",
+    "bdo_application": "Application to the BDO",
+    "certificate_application": "Application for a certificate",
+    "general_application": "General application"
+  }
+}

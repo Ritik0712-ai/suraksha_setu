@@ -101,6 +101,17 @@ export const donorsApi = {
     data(api.post(`/donors/${id}/reveal`, { bloodGroupSearched })),
 };
 
+// Sahayak (docs/02 §7.2 "Sahayak (M7)"). An LLM reply can take several seconds on 2G.
+export const chatApi = {
+  sessions: () => data(api.get("/chat/sessions")),
+  start: (body) => data(api.post("/chat/sessions", body)),
+  get: (id) => data(api.get(`/chat/sessions/${id}`)),
+  send: (id, body) => data(api.post(`/chat/sessions/${id}/messages`, body, { timeout: 30000 })),
+  saveLetter: (id, messageId, body) =>
+    data(api.put(`/chat/sessions/${id}/messages/${messageId}/letter`, body)),
+  remove: (id) => data(api.delete(`/chat/sessions/${id}`)),
+};
+
 export const notificationsApi = {
   list: (params) => data(api.get("/notifications", { params })),
   read: (body) => data(api.post("/notifications/read", body)),

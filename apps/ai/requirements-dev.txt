@@ -3,3 +3,4 @@ pytest>=8,<9
 pytest-django>=4.9,<5
 ruff>=0.6
 black>=24
+mongomock>=4.1,<5

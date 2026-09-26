@@ -89,15 +89,12 @@ describe("route guards (docs/03 §1)", () => {
     expect(await screen.findByText("यह पेज नहीं मिला")).toBeInTheDocument();
   });
 
-  it("modules from later phases show the helplines (coming soon)", async () => {
+  it("Sahayak is a citizen route (S-24)", async () => {
     loggedInAs(citizen());
+    server.use(http.get("*/api/v1/chat/sessions", () => HttpResponse.json({ data: [] })));
     renderApp("/sahayak");
     expect(await screen.findByRole("heading", { level: 1, name: "सहायक" })).toBeInTheDocument();
-    expect(screen.getByText(/यह सेवा बन रही है/)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /एम्बुलेंस — 108 पर कॉल करें/ })).toHaveAttribute(
-      "href",
-      "tel:108",
-    );
+    expect(screen.getByText(/मैं सहायक हूँ/)).toBeInTheDocument();
   });
 });
 

@@ -9,20 +9,18 @@ import {
   RequireCitizen,
   RequireStaff,
 } from "./features/system/guards.jsx";
-import { ComingSoonPage, NotFoundPage } from "./features/system/SystemPages.jsx";
+import { NotFoundPage } from "./features/system/SystemPages.jsx";
 import { RouteSkeleton } from "./components/ui/States.jsx";
 import { loadNamespaces } from "./i18n/index.js";
 
 // Route map from docs/03 §1. Screens other than Home load on demand, so citizens never download
-// portal or dev code. Modules built in later phases render a "coming soon" page with the
-// helplines until then.
+// portal or dev code.
 
 // `ns`: translation namespaces the screen needs that aren't in the first download (i18n/index.js).
 const page =
   (loader, ns = []) =>
   () =>
     Promise.all([loader(), loadNamespaces(ns)]).then(([m]) => ({ Component: m.default }));
-const soon = (titleKey) => ({ element: <ComingSoonPage titleKey={titleKey} /> });
 
 export const routes = [
   { path: "/welcome", element: <WelcomePage />, errorElement: <CrashPage /> },
@@ -123,9 +121,18 @@ export const routes = [
                 path: "blood/donor",
                 lazy: page(() => import("./features/blood/DonorProfilePage.jsx"), ["blood"]),
               },
-              { path: "sahayak", ...soon("modules.sahayak") },
-              { path: "sahayak/:sessionId", ...soon("modules.sahayak") },
-              { path: "sahayak/:sessionId/letter/:messageId", ...soon("modules.sahayak") },
+              {
+                path: "sahayak",
+                lazy: page(() => import("./features/sahayak/SahayakHomePage.jsx"), ["sahayak"]),
+              },
+              {
+                path: "sahayak/:sessionId",
+                lazy: page(() => import("./features/sahayak/ChatPage.jsx"), ["sahayak"]),
+              },
+              {
+                path: "sahayak/:sessionId/letter/:messageId",
+                lazy: page(() => import("./features/sahayak/LetterPage.jsx"), ["sahayak"]),
+              },
               {
                 path: "notifications",
                 lazy: page(

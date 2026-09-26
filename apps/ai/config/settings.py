@@ -25,6 +25,13 @@ ALLOWED_HOSTS = [h.strip() for h in _hosts.split(",") if h.strip()]
 
 AI_INTERNAL_KEY = os.environ.get("AI_INTERNAL_KEY", "")
 LLM_PROVIDER = os.environ.get("LLM_PROVIDER", "gemini")
+LLM_API_KEY = os.environ.get("LLM_API_KEY", "")
+LLM_MODEL = os.environ.get("LLM_MODEL", "")  # empty → the provider's default Flash-tier model
+# The Node API waits 15 s for a reply; keep the LLM call well under that.
+LLM_TIMEOUT_S = float(os.environ.get("LLM_TIMEOUT_S", "12"))
+# Read-only MongoDB user (schemes only) for Sahayak grounding. The database name comes from
+# the URI path. Empty → Sahayak answers without scheme records (and says so).
+MONGODB_URI_READONLY = os.environ.get("MONGODB_URI_READONLY", "")
 MODEL_PATH = os.environ.get("MODEL_PATH", str(BASE_DIR / "models" / "civic_cnn_v1.tflite"))
 # Hosts the classifier may download photos from (SSRF guard). Production: Cloudinary only.
 _image_hosts = os.environ.get("AI_ALLOWED_IMAGE_HOSTS", "res.cloudinary.com")
