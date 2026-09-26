@@ -62,9 +62,9 @@ export const routes = [
               import("./features/info/InfoPages.jsx").then((m) => ({ Component: m.PrivacyPage })),
           },
 
+          { path: "fake-call", lazy: page(() => import("./features/sos/FakeCallPage.jsx")) },
+
           // Public modules (later phases).
-          { path: "sos", ...soon("modules.sos") },
-          { path: "fake-call", ...soon("modules.fakeCall") },
           { path: "emergency", ...soon("modules.emergency") },
           { path: "schemes", ...soon("modules.schemes") },
           { path: "schemes/check", ...soon("modules.check") },
@@ -79,8 +79,7 @@ export const routes = [
                 path: "profile/contacts",
                 lazy: page(() => import("./features/profile/ContactsPage.jsx")),
               },
-              { path: "sos/:id", ...soon("modules.sos") },
-              { path: "sos/:id/done", ...soon("modules.sos") },
+              { path: "sos/:id/done", lazy: page(() => import("./features/sos/SosDonePage.jsx")) },
               { path: "complaints", ...soon("modules.myComplaints") },
               { path: "complaints/new", handle: { focus: true }, ...soon("modules.report") },
               { path: "complaints/new/success", ...soon("modules.report") },
@@ -104,6 +103,20 @@ export const routes = [
               ]
             : []),
           { path: "*", element: <NotFoundPage /> },
+        ],
+      },
+      // SOS screens are full screen, outside the citizen shell (docs/03 S-06, S-07).
+      {
+        path: "sos",
+        lazy: page(() => import("./features/sos/SosLayout.jsx")),
+        children: [
+          { index: true, lazy: page(() => import("./features/sos/SosPage.jsx")) },
+          {
+            element: <RequireCitizen />,
+            children: [
+              { path: ":id", lazy: page(() => import("./features/sos/SosActivePage.jsx")) },
+            ],
+          },
         ],
       },
       {
@@ -142,10 +155,10 @@ export const routes = [
       },
     ],
   },
-  // S-30 public live-location page: no app chrome, no language gate (built in task 4A.7).
+  // S-30 public live-location page: no app chrome and no language gate (contacts open it).
   {
     path: "/track/:token",
-    ...soon("modules.track"),
+    lazy: page(() => import("./features/sos/TrackPage.jsx")),
     errorElement: <CrashPage />,
     HydrateFallback: RouteSkeleton,
   },

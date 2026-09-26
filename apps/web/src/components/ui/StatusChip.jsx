@@ -23,6 +23,9 @@ const STYLES = {
   SOS_ACTIVE: { bg: "#C62828", fg: "#FFFFFF", Icon: EmergencyIcon },
   SOS_ACKNOWLEDGED: { bg: "#FFF8E1", fg: "#B45309", Icon: VisibilityRounded },
   SOS_RESOLVED: { bg: "#E6F4E6", fg: "#0B6E0B", Icon: VerifiedUserRounded },
+  SOS_FALSE_ALARM: { bg: "#F4F6FA", fg: "#4B5563", Icon: VerifiedUserRounded },
+  SOS_CLOSED_BY_AUTHORITY: { bg: "#E6F4E6", fg: "#0B6E0B", Icon: VerifiedUserRounded },
+  SOS_AUTO_CLOSED: { bg: "#F4F6FA", fg: "#4B5563", Icon: BlockRounded },
 };
 
 /** @param status complaint status, or SOS_ACTIVE / SOS_ACKNOWLEDGED / SOS_RESOLVED */

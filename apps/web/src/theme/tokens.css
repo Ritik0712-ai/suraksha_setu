@@ -90,3 +90,33 @@ body {
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+/* SOS pulse (docs/04 §13) — disabled by the reduced-motion rule above. */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(255, 255, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+  }
+}
+.pulse-dot {
+  animation: pulse 1.5s infinite;
+}
+.pulse-dot-red {
+  animation: pulse-red 1.5s infinite;
+}
+@keyframes pulse-red {
+  0% {
+    box-shadow: 0 0 0 0 rgba(198, 40, 40, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(198, 40, 40, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(198, 40, 40, 0);
+  }
+}

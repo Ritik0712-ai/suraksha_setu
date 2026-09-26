@@ -8,9 +8,11 @@ import {
   PhotoCameraRounded,
   VolunteerActivismRounded,
 } from "@mui/icons-material";
+import { useQuery } from "@tanstack/react-query";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useSession } from "../../stores/session.js";
+import { sosApi } from "../../api/endpoints.js";
+import { isSignedIn, useSession } from "../../stores/session.js";
 import { SahayakIcon } from "../../components/icons/index.jsx";
 import { ModuleTile } from "../../components/ui/ModuleTile.jsx";
 import { Notice } from "../../components/ui/Notice.jsx";
@@ -93,9 +95,15 @@ export default function HomePage() {
   const navigate = useNavigate();
   const status = useSession((s) => s.status);
   const user = useSession((s) => s.user);
-  const authed = status === "authed";
+  const authed = isSignedIn(status);
   const tiles = authed ? CITIZEN_TILES : GUEST_TILES;
   const firstName = user?.name?.split(/\s+/)[0];
+  const isCitizen = status === "authed" && user?.role === "citizen";
+  const openSos = useQuery({
+    queryKey: ["sos", "mine", "open"],
+    queryFn: () => sosApi.mine({ open: 1 }),
+    enabled: isCitizen,
+  }).data?.[0];
 
   return (
     <Stack spacing={3}>
@@ -116,6 +124,45 @@ export default function HomePage() {
             </Button>
           }
         />
+      )}
+
+      {openSos && (
+        <Box
+          role="alert"
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            p: 2,
+            borderRadius: 2,
+            bgcolor: "error.light",
+            border: "2px solid",
+            borderColor: "error.main",
+          }}
+        >
+          <Box
+            aria-hidden
+            className="pulse-dot-red"
+            sx={{
+              width: 14,
+              height: 14,
+              borderRadius: "50%",
+              bgcolor: "error.main",
+              flexShrink: 0,
+            }}
+          />
+          <Typography sx={{ flex: 1, fontWeight: 700, color: "error.main" }}>
+            {t("banner.title", { ns: "sos" })}
+          </Typography>
+          <Button
+            variant="contained"
+            color="error"
+            component={RouterLink}
+            to={`/sos/${openSos.id}`}
+          >
+            {t("banner.open", { ns: "sos" })}
+          </Button>
+        </Box>
       )}
 
       <SosCard />

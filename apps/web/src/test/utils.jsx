@@ -13,6 +13,7 @@ import { useToast } from "../stores/toast.js";
 export function resetStores() {
   try {
     localStorage.clear();
+    sessionStorage.clear(); // e.g. the last GPS fix, used as an SOS fallback
   } catch {
     // ignore
   }

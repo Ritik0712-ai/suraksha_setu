@@ -30,3 +30,16 @@ export const jurisdictionsApi = {
 export const healthApi = {
   get: () => api.get("/health", { validateStatus: () => true }).then((r) => r.data),
 };
+
+export const sosApi = {
+  trigger: (body) => data(api.post("/sos", body)),
+  get: (id) => data(api.get(`/sos/${id}`)),
+  mine: (params) => data(api.get("/sos/mine", { params })),
+  location: (id, body) => data(api.post(`/sos/${id}/location`, body)),
+  resolve: (id) => data(api.post(`/sos/${id}/resolve`)),
+};
+
+// Public, no login needed (S-30). A 404 means the link is wrong or has expired.
+export const trackApi = {
+  get: (token) => data(api.get(`/track/${encodeURIComponent(token)}`)),
+};

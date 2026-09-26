@@ -129,23 +129,33 @@ A pre-commit hook (husky + lint-staged) runs ESLint and Prettier on staged JS/JS
 
 All routes are under `/api/v1`. Responses use `{ data }` on success and `{ error: { code, message, details? } }` on failure (doc 02 §7.1). Error messages come back in Hindi by default, or English with `Accept-Language: en`.
 
-| Method | Path                                            | Access                |
-| ------ | ----------------------------------------------- | --------------------- |
-| GET    | `/health`                                       | Public                |
-| POST   | `/auth/register`, `/auth/login`                 | Public (rate-limited) |
-| POST   | `/auth/refresh`                                 | Refresh cookie        |
-| POST   | `/auth/logout`, `/auth/logout-all`              | Auth                  |
-| POST   | `/auth/password/forgot`, `/auth/password/reset` | Public (rate-limited) |
-| GET    | `/auth/me`                                      | Auth                  |
-| PATCH  | `/users/me`                                     | Auth                  |
-| PUT    | `/users/me/password`                            | Auth                  |
-| DELETE | `/users/me` (password required, doc 05 §10)     | Auth                  |
-| GET    | `/users/me/contacts`                            | Citizen               |
-| POST   | `/users/me/contacts` (max 5)                    | Citizen               |
-| PATCH  | `/users/me/contacts/:contactId`                 | Citizen               |
-| DELETE | `/users/me/contacts/:contactId`                 | Citizen               |
-| POST   | `/admin/users/:id/reset-code`                   | Admin (audited)       |
-| GET    | `/jurisdictions?type=&q=`                       | Public                |
+| Method | Path                                            | Access                 |
+| ------ | ----------------------------------------------- | ---------------------- |
+| GET    | `/health`                                       | Public                 |
+| POST   | `/auth/register`, `/auth/login`                 | Public (rate-limited)  |
+| POST   | `/auth/refresh`                                 | Refresh cookie         |
+| POST   | `/auth/logout`, `/auth/logout-all`              | Auth                   |
+| POST   | `/auth/password/forgot`, `/auth/password/reset` | Public (rate-limited)  |
+| GET    | `/auth/me`                                      | Auth                   |
+| PATCH  | `/users/me`                                     | Auth                   |
+| PUT    | `/users/me/password`                            | Auth                   |
+| DELETE | `/users/me` (password required, doc 05 §10)     | Auth                   |
+| GET    | `/users/me/contacts`                            | Citizen                |
+| POST   | `/users/me/contacts` (max 5)                    | Citizen                |
+| PATCH  | `/users/me/contacts/:contactId`                 | Citizen                |
+| DELETE | `/users/me/contacts/:contactId`                 | Citizen                |
+| POST   | `/admin/users/:id/reset-code`                   | Admin (audited)        |
+| GET    | `/jurisdictions?type=&q=`                       | Public                 |
+| POST   | `/sos` (never rate-limited)                     | Citizen                |
+| GET    | `/sos/mine?open=1`                              | Citizen                |
+| POST   | `/sos/:id/location`, `/sos/:id/resolve`         | Owner                  |
+| GET    | `/sos/:id`                                      | Owner / in-scope staff |
+| GET    | `/sos/active?window=24h`                        | Authority, Admin       |
+| POST   | `/sos/:id/acknowledge`, `/sos/:id/close`        | In scope (audited)     |
+| POST   | `/sos/:id/reveal-phone`                         | In scope (audited)     |
+| GET    | `/track/:token`                                 | Public                 |
+
+Real-time events use Socket.IO on the API server (`/socket.io`, access token in the handshake): `sos:new`, `sos:location`, `sos:updated` to officers in scope and admins; `sos:acknowledged`, `notification:new` to the user (doc 02 §7.4). A job closes SOS alerts with no update for 6 hours.
 
 Access tokens last 15 minutes and are kept in memory by the client. The refresh token is an httpOnly cookie on `/api/v1/auth`, rotated on every use. Reusing an old one logs out that whole login (doc 02 §6.2, doc 05 §7).
 
@@ -168,7 +178,16 @@ Test a restore into a scratch database once before the pilot (doc 06 task 7.7).
 - ✅ Phase 1 — authentication (tasks 1.1–1.10)
 - ✅ Phase 2 — database: all 19 models, migrations setup, seeds, jurisdiction resolver, department routing, complaint numbers, nightly backups (tasks 2.1–2.7)
 - ✅ Phase 3 — core UI: design system, citizen + portal shells, auth/profile/contacts screens, system screens, route guards, PWA (tasks 3.1–3.10)
-- ⏭ Phase 4A — Women's SOS — see doc 06 §4
+- ✅ Phase 4A — Women's SOS: trigger + countdown, SMS/email/real-time alerts, live tracking page, "I am safe", auto-close, fake call (tasks 4A.1–4A.10)
+- ⏭ Phase 4B — AI civic complaints — see doc 06 §4 (the minimal authority dashboard, 4E.1, can come any time)
+
+## SOS notes
+
+- **The SMS app needs a tap.** Browsers only open `sms:` links from a user gesture, so after the countdown auto-sends (or on a phone with no SIM) S-07 shows a big red "Send SMS to contacts" button — one tap opens the SMS app with the message ready. Emails and the authority alert go out regardless.
+- **Offline:** if the server can't be reached, the SMS still opens with the contacts cached on the phone, and S-07 retries every 10 s for 2 minutes. A known citizen who opens the app while the server is down still gets the full SOS (name, role and contacts are cached on the device; logout clears them).
+- **Tracking link** (`/track/<token>`): shows only the first name, location and status; the token is derived from the SOS id with an HMAC (only its hash is stored), so the owner can reopen their link; location is never shown after the SOS ends.
+- **Maps:** set `VITE_GOOGLE_MAPS_KEY` to show Google Maps; without it (or offline) a location card with coordinates and an "Open in Google Maps" link is shown.
+- In production the web app needs `VITE_SOCKET_URL` pointing at the Render API (Vercel can't proxy WebSockets). Locally, Vite proxies `/socket.io`.
 
 ## Frontend notes
 

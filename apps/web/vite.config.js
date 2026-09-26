@@ -63,7 +63,10 @@ export default defineConfig({
     // workspace — otherwise the dev server refuses to serve the font files.
     fs: { allow: [searchForWorkspaceRoot(process.cwd())] },
     // Same-origin /api like the Vercel rewrite in production (docs/02 §6.2)
-    proxy: { "/api": "http://localhost:5000" },
+    proxy: {
+      "/api": "http://localhost:5000",
+      "/socket.io": { target: "http://localhost:5000", ws: true },
+    },
   },
   test: {
     environment: "jsdom",

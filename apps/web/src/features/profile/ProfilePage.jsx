@@ -23,6 +23,7 @@ import {
   ContactPhoneRounded,
   DeleteForeverRounded,
   DevicesRounded,
+  HistoryRounded,
   InfoRounded,
   LockRounded,
   LogoutRounded,
@@ -54,6 +55,7 @@ import {
 } from "../auth/schemas.js";
 import { clearClientSession } from "../auth/session.js";
 import { useLogout } from "../auth/useLogout.js";
+import { SosHistoryDialog } from "../sos/SosHistoryDialog.jsx";
 import { useVillages } from "../auth/useVillages.js";
 import { VillageAutocomplete } from "../auth/VillageAutocomplete.jsx";
 
@@ -421,6 +423,11 @@ export default function ProfilePage() {
             secondary={t("contactsCount", { count: user.emergencyContactCount })}
             to="/profile/contacts"
           />
+          <Row
+            icon={HistoryRounded}
+            primary={t("history.title", { ns: "sos" })}
+            onClick={() => setDialog("sosHistory")}
+          />
         </List>
       </Section>
 
@@ -532,6 +539,7 @@ export default function ProfilePage() {
         onCancel={() => setDialog(null)}
       />
       <DeleteAccountDialog open={dialog === "delete"} onClose={() => setDialog(null)} />
+      <SosHistoryDialog open={dialog === "sosHistory"} onClose={() => setDialog(null)} />
     </Stack>
   );
 }

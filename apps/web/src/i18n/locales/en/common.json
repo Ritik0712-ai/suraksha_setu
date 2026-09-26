@@ -88,7 +88,10 @@
     "REJECTED": "Rejected",
     "SOS_ACTIVE": "SOS active",
     "SOS_ACKNOWLEDGED": "Acknowledged",
-    "SOS_RESOLVED": "Safe"
+    "SOS_RESOLVED": "Safe",
+    "SOS_FALSE_ALARM": "False alarm",
+    "SOS_AUTO_CLOSED": "Closed automatically",
+    "SOS_CLOSED_BY_AUTHORITY": "Closed by authority"
   },
   "modules": {
     "report": "Report a problem",

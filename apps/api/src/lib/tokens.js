@@ -1,4 +1,4 @@
-import { createHash, randomBytes, randomInt } from "node:crypto";
+import { createHash, createHmac, randomBytes, randomInt } from "node:crypto";
 import jwt from "jsonwebtoken";
 import { AppError } from "./errors.js";
 
@@ -45,3 +45,11 @@ export const randomCode = () => String(randomInt(0, 1_000_000)).padStart(6, "0")
 /** SHA-256 of secret + pepper, hex. Stored instead of the raw token/code. */
 export const hashSecret = (secret, pepper) =>
   createHash("sha256").update(`${secret}${pepper}`).digest("hex");
+
+/**
+ * Public SOS tracking token (docs/01 FR-SOS-06). Derived from the SOS id with an HMAC keyed by
+ * the server secret, so the owner can always get their link back (e.g. reopening S-07 on
+ * another device) while nobody without the secret can guess it. Only its hash is stored.
+ */
+export const trackTokenFor = (sosId, pepper) =>
+  createHmac("sha256", pepper).update(`sos-track:${sosId}`).digest("base64url");

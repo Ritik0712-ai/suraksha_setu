@@ -88,7 +88,10 @@
     "REJECTED": "अस्वीकार",
     "SOS_ACTIVE": "SOS चालू",
     "SOS_ACKNOWLEDGED": "देख लिया गया",
-    "SOS_RESOLVED": "सुरक्षित"
+    "SOS_RESOLVED": "सुरक्षित",
+    "SOS_FALSE_ALARM": "गलती से",
+    "SOS_AUTO_CLOSED": "अपने-आप बंद",
+    "SOS_CLOSED_BY_AUTHORITY": "अधिकारी ने बंद किया"
   },
   "modules": {
     "report": "शिकायत करें",

@@ -1,0 +1,123 @@
+{
+  "idle": {
+    "caption": "Pressing starts a 5-second countdown, then alerts your contacts",
+    "close": "Close"
+  },
+  "call112": "Call 112",
+  "countdown": {
+    "sending": "Sending SOS…",
+    "inSeconds": "Sending SOS in {{n}}…",
+    "cancel": "Cancel",
+    "sendNow": "Send now"
+  },
+  "cancelled": "SOS cancelled",
+  "sendingNow": "Sending your SOS…",
+  "guest": {
+    "title": "Emergency help",
+    "locating": "Finding your location…",
+    "location": "Your location: {{coords}} (±{{accuracy}} m)",
+    "noLocation": "Couldn't get your location. Turn on Location and try again.",
+    "share": "Share my location",
+    "shareText": "I need help. My location: {{link}}",
+    "loginHint": "Log in to alert your family automatically."
+  },
+  "offlineSms": "{{name}} needs help! My location: {{link}} — Suraksha Setu",
+  "offlineSmsNoLocation": "{{name}} needs help! Please call me. — Suraksha Setu",
+  "active": {
+    "title": "SOS is active",
+    "started": "Started {{ago}}",
+    "checklist": "What has happened",
+    "locationShared": "Location shared",
+    "locationApprox": "Approximate location shared",
+    "permissionOff": "Location permission is off. Your village was shared instead. Turn on Location in your phone's settings.",
+    "authorityAlerted": "Authority alerted",
+    "authorityPending": "Authority alert pending — will retry",
+    "acknowledgedBy": "Acknowledged by {{name}}",
+    "smsStep": "SMS to contacts: tap Send in your SMS app",
+    "smsOpened": "SMS app opened — make sure you tapped Send",
+    "openSms": "Open SMS again",
+    "noContacts": "No contacts to alert.",
+    "addContacts": "Add contacts",
+    "emailSending": "Sending email to contacts…",
+    "emailSent_one": "Email sent to {{count}} contact",
+    "emailSent_other": "Email sent to {{count}} contacts",
+    "updated": "Updated {{ago}}",
+    "callContact": "Call {{name}}",
+    "more": "More contacts",
+    "whatsapp": "Share location on WhatsApp",
+    "copy": "Copy message",
+    "copied": "Message copied",
+    "smsFailed": "Tap “Send SMS to contacts” — your SMS app opens with the message ready. Then tap Send.",
+    "safe": "I am safe",
+    "safeConfirmTitle": "Are you safe now?",
+    "safeConfirmBody": "We will tell your contacts.",
+    "safeYes": "Yes, I'm safe",
+    "safeNo": "No, keep SOS on",
+    "closedByAuthorityTitle": "The authority marked this SOS as closed",
+    "closedByAuthorityBody": "Are you safe?",
+    "stillNeedHelp": "No, I still need help",
+    "ended": "This SOS has ended.",
+    "sendSmsNow": "Send SMS to contacts",
+    "smsFailedStill": "If the SMS app still doesn't open, copy the message or share it on WhatsApp."
+  },
+  "done": {
+    "title": "Glad you are safe",
+    "contactsTold": "Your contacts have been told.",
+    "tellContacts": "Please tell your contacts you're safe.",
+    "sendSms": "Send SMS",
+    "safeSms": "I'm safe now. — {{name}}",
+    "falseAlarm": "If this was a mistake, no problem."
+  },
+  "history": {
+    "title": "My SOS history",
+    "empty": "No SOS sent yet.",
+    "duration": "Lasted {{minutes}} min"
+  },
+  "banner": {
+    "title": "Your SOS is active",
+    "open": "Open"
+  },
+  "track": {
+    "needsHelp": "{{name}} needs help",
+    "lastUpdated": "Last updated {{ago}}",
+    "approximate": "Approximate location",
+    "safe": "{{name}} has marked themselves safe",
+    "safeAt": "At {{time}}",
+    "closed": "This SOS has been closed.",
+    "expired": "This link has expired.",
+    "refreshFailed": "Couldn't refresh — retrying",
+    "directions": "Open in Google Maps"
+  },
+  "map": {
+    "label": "Map",
+    "noKey": "Location",
+    "accuracy": "Accurate to about {{m}} m"
+  },
+  "fake": {
+    "title": "Fake call",
+    "intro": "Your phone will show an incoming call so you can leave a situation.",
+    "caller": "Caller name",
+    "presets": {
+      "mom": "Mom",
+      "papa": "Papa",
+      "bhaiya": "Bhaiya",
+      "office": "Office"
+    },
+    "when": "When",
+    "now": "Now",
+    "in10": "In 10 s",
+    "in30": "In 30 s",
+    "start": "Start",
+    "waiting": "Call coming in {{n}} s…",
+    "mobile": "Mobile",
+    "incoming": "Incoming call",
+    "answer": "Answer",
+    "decline": "Decline",
+    "swipe": "Swipe up to answer",
+    "mute": "Mute",
+    "speaker": "Speaker",
+    "keypad": "Keypad",
+    "end": "End call",
+    "voice": "Haan, kahan ho? Jaldi ghar aao."
+  }
+}

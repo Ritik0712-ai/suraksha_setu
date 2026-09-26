@@ -7,10 +7,11 @@ import {
 } from "@mui/icons-material";
 import { Link as RouterLink, NavLink, Outlet, useLocation, useMatches } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useSession } from "../../stores/session.js";
+import { isSignedIn, useSession } from "../../stores/session.js";
 import { LogoMark, SahayakIcon } from "../icons/index.jsx";
 import { SessionExpiredDialog } from "../../features/system/SessionExpiredDialog.jsx";
 import { MaintenanceGate } from "../../features/system/Maintenance.jsx";
+import { useContactsCache } from "../../features/profile/useContactsCache.js";
 import { Toaster } from "../ui/Toaster.jsx";
 import { LanguageToggle, NotificationBell, TextSizeControl } from "./HeaderControls.jsx";
 import { OfflineBanner } from "./OfflineBanner.jsx";
@@ -249,8 +250,9 @@ export function CitizenShell() {
   const status = useSession((s) => s.status);
   const role = useSession((s) => s.user?.role);
   const handle = Object.assign({}, ...matches.map((m) => m.handle ?? {}));
-  const authed = status === "authed";
+  const authed = isSignedIn(status);
   const showBottomNav = authed && role === "citizen" && !handle.focus;
+  useContactsCache();
 
   return (
     <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>

@@ -58,7 +58,7 @@ export function ResponsiveDialog({
           <Box
             sx={{
               display: "flex",
-              flexDirection: "column-reverse",
+              flexDirection: "column", // actions come secondary-first, so the primary ends up at the bottom
               gap: 1,
               mt: 3,
               "& > *": { width: "100%" },

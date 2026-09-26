@@ -13,17 +13,29 @@ import { authRouter } from "./modules/auth/routes.js";
 import { usersRouter } from "./modules/users/routes.js";
 import { adminRouter } from "./modules/admin/routes.js";
 import { jurisdictionsRouter } from "./modules/jurisdictions/routes.js";
+import { createSosService } from "./modules/sos/service.js";
+import { sosRouter, trackRouter } from "./modules/sos/routes.js";
+import { noopRealtime } from "./lib/realtime.js";
 import { healthRouter } from "./routes/health.js";
 
 /**
  * @param deps.env         parsed env (config/env.js)
  * @param deps.fetchImpl   injectable fetch (health check)
  * @param deps.mailer      injectable mailer ({ send(to, subject, text) })
+ * @param deps.realtime    Socket.IO emitter (lib/realtime.js); a no-op when omitted
  * @param deps.rateLimits  false disables auth rate limits (tests of other behaviour)
  */
-export function createApp({ env, fetchImpl, mailer, rateLimits = true } = {}) {
+export function createApp({
+  env,
+  fetchImpl,
+  mailer,
+  realtime = noopRealtime,
+  rateLimits = true,
+} = {}) {
   const app = express();
-  const auth = createAuthService({ env, mailer: mailer ?? createMailer(env) });
+  const mail = mailer ?? createMailer(env);
+  const auth = createAuthService({ env, mailer: mail });
+  const sos = createSosService({ env, mailer: mail, realtime });
   const limiters = createAuthLimiters(rateLimits);
 
   app.disable("x-powered-by");
@@ -46,6 +58,8 @@ export function createApp({ env, fetchImpl, mailer, rateLimits = true } = {}) {
   v1.use("/users", usersRouter({ env, auth }));
   v1.use("/admin", adminRouter({ env, auth }));
   v1.use("/jurisdictions", jurisdictionsRouter());
+  v1.use("/sos", sosRouter({ env, sos }));
+  v1.use("/track", trackRouter({ sos, limiter: limiters.track }));
   app.use("/api/v1", v1);
 
   app.use(notFound);

@@ -11,7 +11,8 @@ export function invalidateUser(userId) {
   cache.delete(String(userId));
 }
 
-async function loadUser(id) {
+/** Cached user lookup shared by REST auth and the Socket.IO handshake. */
+export async function loadUser(id) {
   const hit = cache.get(id);
   if (hit && hit.expires > Date.now()) return hit.user;
   const user = await User.findById(id)

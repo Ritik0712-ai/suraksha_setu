@@ -21,7 +21,13 @@ const passthrough = (_req, _res, next) => next();
 
 /** @param enabled  false turns every limiter into a no-op (used by tests of other behaviour). */
 export function createAuthLimiters(enabled = true) {
-  if (!enabled) return { login: passthrough, register: passthrough, passwordReset: passthrough };
+  if (!enabled)
+    return {
+      login: passthrough,
+      register: passthrough,
+      passwordReset: passthrough,
+      track: passthrough,
+    };
   return {
     // 5 failed logins per 15 min per phone + IP
     login: limiter({
@@ -34,5 +40,7 @@ export function createAuthLimiters(enabled = true) {
     register: limiter({ windowMs: 60 * MIN, limit: 5 }),
     // 3 password-reset requests per hour per IP
     passwordReset: limiter({ windowMs: 60 * MIN, limit: 3 }),
+    // Public SOS tracking page refreshes every 30 s; this only stops token guessing.
+    track: limiter({ windowMs: MIN, limit: 60 }),
   };
 }

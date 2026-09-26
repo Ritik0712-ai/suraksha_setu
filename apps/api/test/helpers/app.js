@@ -1,4 +1,5 @@
 import request from "supertest";
+import { createRealtimeRecorder } from "../../src/lib/realtime.js";
 import { createApp } from "../../src/app.js";
 import { loadEnv } from "../../src/config/env.js";
 import { Jurisdiction } from "../../src/models/Jurisdiction.js";
@@ -36,8 +37,17 @@ export function fakeMailer() {
 
 export function makeApp({ rateLimits = false, env = testEnv() } = {}) {
   const mailer = fakeMailer();
-  const app = createApp({ env, mailer, rateLimits });
-  return { app, mailer, env, api: () => request(app) };
+  const realtime = createRealtimeRecorder();
+  const app = createApp({ env, mailer, realtime, rateLimits });
+  return { app, mailer, realtime, env, api: () => request(app) };
+}
+
+/** Logs in and returns an authenticated request builder: as("post", "/sos").send(...) */
+export async function loginAs(api, phone, password = PASSWORD) {
+  const res = await api().post("/api/v1/auth/login").send({ phone, password });
+  if (res.status !== 200) throw new Error(`login failed for ${phone}: ${res.status}`);
+  const token = res.body.data.accessToken;
+  return (method, path) => api()[method](`/api/v1${path}`).set("Authorization", `Bearer ${token}`);
 }
 
 /** Minimal pilot tree: MP → Sehore district → Sehore block → Mahodiya GP → Mahodiya village. */

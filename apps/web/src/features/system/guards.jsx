@@ -35,6 +35,7 @@ export function RequireCitizen() {
   const location = useLocation();
   if (status === "loading") return <ListSkeleton />;
   if (status === "guest" && endedByUser) return <Navigate to="/" replace />;
+  if (status === "offline") return <Outlet />; // known citizen, server unreachable
   if (status !== "authed")
     return <Navigate to={`/login?next=${encodeURIComponent(here(location))}`} replace />;
   if (isStaff(user)) return <RedirectStaffToPortal />;
@@ -66,7 +67,7 @@ export function GuestOnly() {
   const statusOnArrival = useRef(null);
   if (statusOnArrival.current === null && status !== "loading") statusOnArrival.current = status;
   if (status === "loading") return <ListSkeleton />;
-  if (statusOnArrival.current === "authed")
+  if (statusOnArrival.current === "authed" || statusOnArrival.current === "offline")
     return <Navigate to={isStaff(user) ? "/portal" : "/"} replace />;
   return <Outlet />;
 }
