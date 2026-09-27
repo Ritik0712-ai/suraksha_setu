@@ -1,5 +1,22 @@
+import { promises as dns } from "node:dns";
+import { isIP } from "node:net";
 import nodemailer from "nodemailer";
 import { logger } from "./logger.js";
+
+/**
+ * The server's IPv4 address. Render's free instances have no IPv6 route, but nodemailer picks a
+ * random address from the A and AAAA records, so some sends failed with ENETUNREACH. We connect
+ * to an IPv4 address and still verify TLS against the real host name (servername).
+ */
+async function ipv4Of(host, resolve4) {
+  if (isIP(host)) return host;
+  try {
+    const [addr] = await resolve4(host);
+    return addr || host;
+  } catch {
+    return host; // let nodemailer resolve it as before
+  }
+}
 
 /**
  * Email sender (docs/02 §4.1: Nodemailer via SMTP — Gmail app password, Brevo as backup).
@@ -13,7 +30,10 @@ import { logger } from "./logger.js";
  * Without any SMTP settings, emails are logged (subject only) and dropped, so local development
  * and tests work without a mail account.
  */
-export function createMailer(env, { createTransport = nodemailer.createTransport } = {}) {
+export function createMailer(
+  env,
+  { createTransport = nodemailer.createTransport, resolve4 = (h) => dns.resolve4(h) } = {},
+) {
   const servers = [
     {
       name: "primary",
@@ -34,16 +54,21 @@ export function createMailer(env, { createTransport = nodemailer.createTransport
     .map((s) => ({
       name: s.name,
       from: env.MAIL_FROM || s.user,
-      transport: createTransport({
-        host: s.host,
-        port: s.port,
-        secure: s.port === 465,
-        auth: { user: s.user, pass: s.pass },
-        // Fail fast so the fallback gets a chance while the SOS is still fresh.
-        connectionTimeout: 10_000,
-        greetingTimeout: 10_000,
-        socketTimeout: 20_000,
-      }),
+      // A transport per send, pointed at a freshly resolved IPv4 address (low volume: SOS and
+      // password emails), so a changed DNS record never sticks.
+      async transport() {
+        return createTransport({
+          host: await ipv4Of(s.host, resolve4),
+          port: s.port,
+          secure: s.port === 465,
+          tls: { servername: s.host },
+          auth: { user: s.user, pass: s.pass },
+          // Fail fast so the fallback gets a chance while the SOS is still fresh.
+          connectionTimeout: 10_000,
+          greetingTimeout: 10_000,
+          socketTimeout: 20_000,
+        });
+      },
     }));
 
   if (!servers.length) {
@@ -62,7 +87,9 @@ export function createMailer(env, { createTransport = nodemailer.createTransport
     async send(to, subject, text) {
       for (const s of servers) {
         try {
-          await s.transport.sendMail({ from: s.from, to, subject, text });
+          const transport = await s.transport();
+          await transport.sendMail({ from: s.from, to, subject, text });
+          transport.close?.();
           if (s.name !== "primary") logger.warn({ subject }, "email sent via the fallback SMTP");
           return true;
         } catch (err) {

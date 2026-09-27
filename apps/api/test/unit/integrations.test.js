@@ -13,14 +13,19 @@ function fakeTransports(behaviour) {
       opts,
       sent: [],
       async sendMail(msg) {
-        if (behaviour[opts.host] === "fail") throw new Error("SMTP 421");
+        if (behaviour[opts.tls?.servername ?? opts.host] === "fail") throw new Error("SMTP 421");
         t.sent.push(msg);
       },
     };
     made.push(t);
     return t;
   };
-  return { made, createTransport };
+  // IPv4 lookups: Gmail resolves, Brevo's lookup fails (then the host name is used as is).
+  const resolve4 = async (host) => {
+    if (host === "smtp.gmail.com") return ["142.250.4.109"];
+    throw new Error("ENOTFOUND");
+  };
+  return { made, createTransport, resolve4 };
 }
 
 const smtp = {
@@ -43,8 +48,24 @@ describe("SMTP with a Brevo fallback (task 5.3)", () => {
     expect(m.servers).toEqual(["primary", "fallback"]);
     expect(await m.send("a@x.in", "SOS", "help")).toBe(true);
     expect(t.made[0].sent).toHaveLength(1);
-    expect(t.made[1].sent).toHaveLength(0);
-    expect(t.made[0].opts).toMatchObject({ host: "smtp.gmail.com", port: 587, secure: false });
+    expect(t.made).toHaveLength(1); // the fallback is never contacted
+    // Connects to the IPv4 address (Render has no IPv6 route) but checks TLS for the real name.
+    expect(t.made[0].opts).toMatchObject({
+      host: "142.250.4.109",
+      port: 587,
+      secure: false,
+      tls: { servername: "smtp.gmail.com" },
+    });
+  });
+
+  it("uses the host name when there is no IPv4 record", async () => {
+    const t = fakeTransports({ "smtp.gmail.com": "fail" });
+    const m = createMailer(testEnv({ ...smtp, ...brevo }), t);
+    expect(await m.send("a@x.in", "SOS", "help")).toBe(true);
+    expect(t.made[1].opts).toMatchObject({
+      host: "smtp-relay.brevo.com",
+      tls: { servername: "smtp-relay.brevo.com" },
+    });
   });
 
   it("falls back when the primary fails, and reports failure when both fail", async () => {
