@@ -442,15 +442,21 @@ def test_gemini_rate_limit_also_falls_back(monkeypatch):
 def test_gemini_bad_key_is_not_retried(monkeypatch):
     calls = _fake_gemini(monkeypatch, {"main": _api_error(403), "lite": "{}"})
     p = llm.GeminiProvider(api_key="g", model="main", timeout_s=5, fallbacks=("lite",))
-    with pytest.raises(llm.LLMUnavailable, match="ClientError"):
+    with pytest.raises(llm.LLMUnavailable, match="ClientError 403"):
         p.complete("SYS", [Turn("user", "a")])
     assert calls == ["main"]
+
+
+def test_gemini_model_specific_400_falls_back(monkeypatch):
+    calls = _fake_gemini(monkeypatch, {"main": _api_error(400), "lite": "{}"})
+    p = llm.GeminiProvider(api_key="g", model="main", timeout_s=5, fallbacks=("lite",))
+    assert p.complete("SYS", [Turn("user", "a")]).model == "lite" and calls == ["main", "lite"]
 
 
 def test_gemini_all_busy_is_unavailable(monkeypatch):
     calls = _fake_gemini(monkeypatch, {"main": _api_error(503), "lite": _api_error(504)})
     p = llm.GeminiProvider(api_key="g", model="main", timeout_s=5, fallbacks=("lite",))
-    with pytest.raises(llm.LLMUnavailable, match="ServerError"):
+    with pytest.raises(llm.LLMUnavailable, match="ServerError 504"):
         p.complete("SYS", [Turn("user", "a")])
     assert calls == ["main", "lite"]
 

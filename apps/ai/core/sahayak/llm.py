@@ -15,6 +15,7 @@ text only ever travels as a ``user`` turn (docs/02 SEC-16). The model has no too
 from __future__ import annotations
 
 import json
+import logging
 import time
 import urllib.error
 import urllib.request
@@ -22,6 +23,7 @@ from dataclasses import dataclass, field
 
 from django.conf import settings
 
+logger = logging.getLogger(__name__)
 MAX_OUTPUT_TOKENS = 800  # docs/02 §7.5 cost control
 
 
@@ -68,20 +70,27 @@ class Provider:
 
 class GeminiProvider(Provider):
     """Gemini via ``google-genai``. On the free tier Google sheds load per model ("503: this model
-    is experiencing high demand", 429 quota), so when a model is busy the same request goes to the
-    next model in ``fallbacks`` within one shared time budget (``timeout_s``). A bad key or a bad
-    request (other 4xx) is not retried."""
+    is experiencing high demand", 429 quota), so when a call fails the same request goes to the
+    next model in ``fallbacks`` within one shared time budget (``timeout_s``). Only a rejected key
+    (401/403) stops at once. Each failure is logged with its code."""
 
     name = "gemini"
     default_model = "gemini-flash-latest"
     default_fallbacks = ("gemini-3.5-flash-lite",)
 
     @staticmethod
-    def _busy(err: Exception) -> bool:
+    def _worth_retrying(err: Exception) -> bool:
+        """Anything but a rejected key: busy (503/504), rate limit (429), timeouts, and model-
+        specific 400/404s can all succeed on the next model."""
+        return getattr(err, "code", None) not in (401, 403)
+
+    @staticmethod
+    def _describe(err: Exception | None) -> str:
+        if err is None:
+            return "no time left"
         code = getattr(err, "code", None)
-        if code in (429, 500, 502, 503, 504):
-            return True
-        return "timeout" in type(err).__name__.lower() or "deadline" in str(err).lower()
+        status = getattr(err, "status", None)
+        return " ".join(str(x) for x in (type(err).__name__, code, status) if x)
 
     def complete(self, system: str, turns: list[Turn]) -> Completion:
         try:
@@ -119,7 +128,8 @@ class GeminiProvider(Provider):
                 resp = client.models.generate_content(model=model, contents=contents, config=config)
             except Exception as err:  # SDK raises several error types; all mean "no reply"
                 last = err
-                if self._busy(err):
+                logger.info("gemini %s failed: %s", model, self._describe(err))
+                if self._worth_retrying(err):
                     continue
                 break
             usage = getattr(resp, "usage_metadata", None)
@@ -131,9 +141,7 @@ class GeminiProvider(Provider):
                 tokens_out=getattr(usage, "candidates_token_count", None),
                 latency_ms=int((time.monotonic() - started) * 1000),
             )
-        raise LLMUnavailable(
-            f"gemini call failed: {type(last).__name__ if last else 'no time left'}"
-        ) from last
+        raise LLMUnavailable(f"gemini call failed: {self._describe(last)}") from last
 
 
 class AnthropicProvider(Provider):
