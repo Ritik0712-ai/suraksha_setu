@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createMailer } from "../../src/lib/mailer.js";
+import { createMailer, parseFrom } from "../../src/lib/mailer.js";
 import { createPlacesBudget } from "../../src/modules/emergency/places.js";
 import { createStorage } from "../../src/lib/storage.js";
 import { testEnv } from "../helpers/app.js";
@@ -85,6 +85,51 @@ describe("SMTP with a Brevo fallback (task 5.3)", () => {
     const none = createMailer(testEnv(), fakeTransports({}));
     expect(none.configured).toBe(false);
     expect(await none.send("a@x.in", "s", "t")).toBe(false);
+  });
+});
+
+describe("Brevo HTTPS API first (Render's free plan blocks SMTP ports)", () => {
+  const brevoKey = { BREVO_API_KEY: "xkeysib-test" };
+  const fakeFetch = (status) => {
+    const calls = [];
+    const fetchImpl = async (url, init) => {
+      calls.push({ url, init, body: JSON.parse(init.body) });
+      return new Response(status === 201 ? '{"messageId":"m1"}' : '{"code":"unauthorized"}', {
+        status,
+      });
+    };
+    return { calls, fetchImpl };
+  };
+
+  it("sends through the API when BREVO_API_KEY is set, never touching SMTP", async () => {
+    const t = fakeTransports({});
+    const f = fakeFetch(201);
+    const m = createMailer(testEnv({ ...smtp, ...brevoKey }), { ...t, fetchImpl: f.fetchImpl });
+    expect(m.servers).toEqual(["brevo-api", "primary"]);
+    expect(await m.send("a@x.in", "SOS", "help")).toBe(true);
+    expect(f.calls[0].url).toBe("https://api.brevo.com/v3/smtp/email");
+    expect(f.calls[0].init.headers["api-key"]).toBe("xkeysib-test");
+    expect(f.calls[0].body).toEqual({
+      sender: parseFrom(smtp.MAIL_FROM),
+      to: [{ email: "a@x.in" }],
+      subject: "SOS",
+      textContent: "help",
+    });
+    expect(t.made).toHaveLength(0);
+  });
+
+  it("falls back to SMTP when the API refuses", async () => {
+    const t = fakeTransports({});
+    const f = fakeFetch(401);
+    const m = createMailer(testEnv({ ...smtp, ...brevoKey }), { ...t, fetchImpl: f.fetchImpl });
+    expect(await m.send("a@x.in", "SOS", "help")).toBe(true);
+    expect(t.made[0].sent).toHaveLength(1);
+  });
+
+  it("parses the sender", () => {
+    expect(parseFrom("Suraksha Setu <a@b.in>")).toEqual({ name: "Suraksha Setu", email: "a@b.in" });
+    expect(parseFrom('"Team" <t@x.in>')).toEqual({ name: "Team", email: "t@x.in" });
+    expect(parseFrom("plain@x.in")).toEqual({ email: "plain@x.in" });
   });
 });
 

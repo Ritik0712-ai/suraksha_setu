@@ -47,6 +47,10 @@ services:
         value: https://suraksha-setu-ai.onrender.com
       - key: CLOUDINARY_URL
         sync: false
+      # Render's free plan blocks outbound SMTP ports, so emails go through Brevo's HTTPS API
+      # (free, 300/day). The SMTP settings below are only a backup for other hosts.
+      - key: BREVO_API_KEY
+        sync: false
       - key: SMTP_HOST
         value: smtp.gmail.com
       - key: SMTP_PORT

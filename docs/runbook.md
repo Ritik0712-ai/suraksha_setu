@@ -37,11 +37,15 @@ If the team ever gets a sponsored billing account, the keys drop in without code
 browser key restricted to the Vercel domain and the Maps JavaScript API; server key restricted to
 Places API (New) on Render; a daily quota of ~300 and a budget alert.
 
-### 1.3 Email — Gmail + Brevo (task 5.3)
+### 1.3 Email — Brevo HTTPS API, Gmail as backup (task 5.3)
 
-1. **Primary (Gmail):** turn on 2-step verification on the team Gmail account → Security → App passwords → create one for "Suraksha Setu". Set on the API: `SMTP_HOST=smtp.gmail.com`, `SMTP_PORT=587`, `SMTP_USER=<gmail address>`, `SMTP_PASS=<app password>`, `MAIL_FROM="Suraksha Setu <gmail address>"`.
-2. **Backup (Brevo, free tier):** create an account, verify the sender address, SMTP & API → SMTP → generate a key. Set `SMTP_FALLBACK_HOST=smtp-relay.brevo.com`, `SMTP_FALLBACK_PORT=587`, `SMTP_FALLBACK_USER=<Brevo login>`, `SMTP_FALLBACK_PASS=<SMTP key>`.
-3. **Check:** trigger a test SOS with a contact that has an email, and a password-reset email. Both must arrive in the inbox, not spam. If they land in spam, mark "Not spam" once and add the sender to contacts; for production consider a custom domain with SPF/DKIM in Brevo.
+**Render's free plan blocks outbound SMTP ports** (25/465/587 — [Render changelog](https://render.com/changelog/free-web-services-will-no-longer-allow-outbound-traffic-to-smtp-ports)),
+so on Render emails go through **Brevo's HTTPS API** (port 443). Free: 300 emails/day, no card.
+
+1. brevo.com → sign up (free) → **Senders, domains & dedicated IPs → Senders** → add the address in `MAIL_FROM` and confirm the email Brevo sends to it.
+2. **SMTP & API → API keys → Generate a new API key** → set it as `BREVO_API_KEY` on the API. The mailer tries it first.
+3. Gmail SMTP stays configured as the backup (`SMTP_HOST=smtp.gmail.com`, `SMTP_USER`, `SMTP_PASS` = a Google **app password** from https://myaccount.google.com/apppasswords, `MAIL_FROM="Suraksha Setu <address>"`). It works locally and on hosts that allow SMTP; on Render it just times out and is skipped.
+4. **Check:** trigger a password-reset email for an account that has an email (and a drill SOS with a contact that has one). Both must arrive in the inbox, not spam. Sending "from" a Gmail address through Brevo can land in spam at first — mark "Not spam" once; a project domain with SPF/DKIM in Brevo fixes it for good (needs a domain, so not in the free setup).
 
 ### 1.4 Node ↔ AI service (task 5.4)
 

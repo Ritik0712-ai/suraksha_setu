@@ -35,6 +35,9 @@ const schema = z.object({
   SMTP_FALLBACK_PORT: z.coerce.number().int().positive().default(587),
   SMTP_FALLBACK_USER: optional,
   SMTP_FALLBACK_PASS: optional,
+  // Brevo's HTTPS email API (free: 300 emails/day). Tried first when set: Render's free plan
+  // blocks outbound SMTP ports, so SMTP only works locally or on other hosts.
+  BREVO_API_KEY: optional,
   AI_BASE_URL: optional,
   AI_INTERNAL_KEY: optional,
   GOOGLE_PLACES_KEY: optional,

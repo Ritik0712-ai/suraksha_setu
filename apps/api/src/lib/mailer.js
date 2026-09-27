@@ -23,6 +23,7 @@ async function ipv4Of(host, resolve4) {
  * Returns { configured, send(to, subject, text) }; send never throws and resolves to true when
  * one of the SMTP servers accepted the message.
  *
+ * - BREVO_API_KEY: Brevo's HTTPS API, tried first when set (Render's free plan blocks SMTP ports)
  * - Primary:  SMTP_HOST / SMTP_PORT / SMTP_USER / SMTP_PASS
  * - Fallback: SMTP_FALLBACK_HOST / _PORT / _USER / _PASS (e.g. Brevo), tried only when the
  *   primary fails — so an SOS email still goes out if Gmail throttles or rejects us.
@@ -30,11 +31,50 @@ async function ipv4Of(host, resolve4) {
  * Without any SMTP settings, emails are logged (subject only) and dropped, so local development
  * and tests work without a mail account.
  */
+/** "Suraksha Setu <a@b.in>" → { name, email } for Brevo's API. */
+export function parseFrom(from) {
+  const m = /^\s*"?([^"<]*?)"?\s*<([^>]+)>\s*$/.exec(from ?? "");
+  if (m) return { name: m[1].trim() || undefined, email: m[2].trim() };
+  return { email: (from ?? "").trim() };
+}
+
+/** Brevo transactional email over HTTPS (port 443) — works where SMTP ports are blocked. */
+function brevoApi(env, fetchImpl) {
+  return {
+    name: "brevo-api",
+    async send({ to, subject, text }) {
+      const res = await fetchImpl("https://api.brevo.com/v3/smtp/email", {
+        method: "POST",
+        headers: {
+          "api-key": env.BREVO_API_KEY,
+          "content-type": "application/json",
+          accept: "application/json",
+        },
+        body: JSON.stringify({
+          sender: parseFrom(env.MAIL_FROM || env.SMTP_USER),
+          to: [{ email: to }],
+          subject,
+          textContent: text,
+        }),
+        signal: AbortSignal.timeout(15_000),
+      });
+      if (!res.ok) {
+        const detail = await res.text().catch(() => "");
+        throw new Error(`Brevo API ${res.status} ${detail.slice(0, 200)}`);
+      }
+    },
+  };
+}
+
 export function createMailer(
   env,
-  { createTransport = nodemailer.createTransport, resolve4 = (h) => dns.resolve4(h) } = {},
+  {
+    createTransport = nodemailer.createTransport,
+    resolve4 = (h) => dns.resolve4(h),
+    fetchImpl = fetch,
+  } = {},
 ) {
-  const servers = [
+  const smtpServers = [
     {
       name: "primary",
       host: env.SMTP_HOST,
@@ -56,6 +96,11 @@ export function createMailer(
       from: env.MAIL_FROM || s.user,
       // A transport per send, pointed at a freshly resolved IPv4 address (low volume: SOS and
       // password emails), so a changed DNS record never sticks.
+      async send({ to, subject, text }) {
+        const transport = await this.transport();
+        await transport.sendMail({ from: this.from, to, subject, text });
+        transport.close?.();
+      },
       async transport() {
         return createTransport({
           host: await ipv4Of(s.host, resolve4),
@@ -70,6 +115,7 @@ export function createMailer(
         });
       },
     }));
+  const servers = [...(env.BREVO_API_KEY ? [brevoApi(env, fetchImpl)] : []), ...smtpServers];
 
   if (!servers.length) {
     return {
@@ -87,10 +133,8 @@ export function createMailer(
     async send(to, subject, text) {
       for (const s of servers) {
         try {
-          const transport = await s.transport();
-          await transport.sendMail({ from: s.from, to, subject, text });
-          transport.close?.();
-          if (s.name !== "primary") logger.warn({ subject }, "email sent via the fallback SMTP");
+          await s.send({ to, subject, text });
+          if (s !== servers[0]) logger.warn({ subject, via: s.name }, "email sent via a backup");
           return true;
         } catch (err) {
           logger.error({ err: err?.message, subject, server: s.name }, "email send failed");
