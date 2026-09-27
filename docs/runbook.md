@@ -151,6 +151,15 @@ Redeploy the API after changing its variables (Render does this automatically) a
 
 ### 2.5 First-time database setup (task 7.4)
 
+**On Render (no shell on the free plan) — the way it was done:** on `suraksha-setu-api` set
+`DB_BOOTSTRAP=1` and `BOOTSTRAP_ADMINS=[{"name":"…","phone":"9XXXXXXXXX"}]` (one entry per team
+admin) → it redeploys and `apps/api/src/scripts/bootstrap.js` runs migrations, indexes,
+jurisdictions + departments, admins (temporary passwords appear once in that deploy's log) and the
+20 draft schemes before the server starts → then **delete both variables** (the phones shouldn't
+stay in the dashboard). Every step skips what already exists, so a second run changes nothing.
+
+**Or from a laptop:**
+
 Run from a laptop, with the **prod** connection string only in your shell for these commands (never in `.env` files you might commit, never in chat):
 
 ```bash
