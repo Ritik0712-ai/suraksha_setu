@@ -46,7 +46,7 @@ export default [
   },
   {
     // Playwright tests run in Node but pass small functions into the browser page.
-    files: ["e2e/**/*.js"],
+    files: ["e2e/**/*.js", ".husky/**/*.mjs"],
     languageOptions: { globals: { ...globals.node, ...globals.browser } },
   },
   {

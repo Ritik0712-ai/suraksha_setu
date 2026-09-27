@@ -19,7 +19,7 @@
     "test": "npm run test --workspaces --if-present",
     "build": "npm run build --workspaces --if-present",
     "i18n:check": "npm run i18n:check -w apps/web",
-    "prepare": "husky",
+    "prepare": "node .husky/install.mjs",
     "e2e": "playwright test -c e2e/playwright.config.js"
   },
   "lint-staged": {

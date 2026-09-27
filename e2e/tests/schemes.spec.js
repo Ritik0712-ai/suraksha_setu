@@ -1,5 +1,4 @@
-import { expect, test } from "@playwright/test";
-import { expectAccessible } from "./helpers.js";
+import { expect, expectAccessible, test } from "./helpers.js";
 
 // Schemes browse + detail + eligibility checker (docs/03 S-14…S-17; docs/01 US-13…US-15).
 test("browse schemes, open one with its source and last-checked date", async ({ page }) => {

@@ -1,6 +1,28 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect } from "@playwright/test";
+import { expect, test as base } from "@playwright/test";
 import { ACCOUNTS, CONTEXT, PASSWORD, WEB_PORT, local } from "../accounts.js";
+
+// Every page runs under the production Content-Security-Policy (vite preview sends the headers
+// from apps/web/vercel.json). A blocked script, style, image or request fails the test.
+const cspViolations = [];
+
+/** Records CSP violations reported by the browser on this page. */
+export function watchCsp(page) {
+  page.on("console", (msg) => {
+    if (msg.type() === "error" && /Content Security Policy/i.test(msg.text()))
+      cspViolations.push(`${page.url()} — ${msg.text()}`);
+  });
+}
+
+export const test = base.extend({
+  page: async ({ page }, use) => {
+    cspViolations.length = 0;
+    watchCsp(page);
+    await use(page);
+    expect(cspViolations, "Content-Security-Policy violations").toEqual([]);
+  },
+});
+export { expect };
 
 /** Logs in through the real S-03 form (Hindi UI). */
 export async function login(page, who = "citizen") {
@@ -31,5 +53,7 @@ export const RED_PHOTO = new URL("../fixtures/red-road.jpg", import.meta.url).pa
 /** A second person on another phone (e.g. the officer while the citizen stays logged in). */
 export async function newPhone(browser) {
   const context = await browser.newContext({ ...CONTEXT, baseURL: `http://localhost:${WEB_PORT}` });
-  return context.newPage();
+  const page = await context.newPage();
+  watchCsp(page);
+  return page;
 }

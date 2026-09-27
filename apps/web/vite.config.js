@@ -1,11 +1,38 @@
 import { defineConfig, searchForWorkspaceRoot } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
+import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const shared = fileURLToPath(new URL("../../shared", import.meta.url));
 // Where /api and /socket.io go in `vite dev` and `vite preview` (the E2E tests use another port).
 const apiTarget = process.env.VITE_PROXY_TARGET || "http://localhost:5000";
+
+/**
+ * `vite preview` sends the same security headers as Vercel (vercel.json), so the E2E tests run
+ * under the production Content-Security-Policy. Locally the API is plain http on another port
+ * (photos stored on disk come from there), so localhost is allowed and https upgrades are off.
+ */
+function previewHeaders() {
+  const vercel = JSON.parse(readFileSync(new URL("./vercel.json", import.meta.url), "utf8"));
+  const all = vercel.headers.find((h) => h.source === "/(.*)").headers;
+  return Object.fromEntries(
+    all.map(({ key, value }) => {
+      if (key === "Strict-Transport-Security") return [key, "max-age=0"];
+      if (key !== "Content-Security-Policy") return [key, value];
+      const local = value
+        .split("; ")
+        .filter((d) => d !== "upgrade-insecure-requests")
+        .map((d) =>
+          d.startsWith("img-src") || d.startsWith("connect-src")
+            ? `${d} http://localhost:* ws://localhost:*`
+            : d,
+        )
+        .join("; ");
+      return [key, local];
+    }),
+  );
+}
 
 export default defineConfig({
   plugins: [
@@ -70,6 +97,7 @@ export default defineConfig({
       "/socket.io": { target: apiTarget, ws: true },
     },
   },
+  preview: { headers: previewHeaders() },
   test: {
     environment: "jsdom",
     globals: true,

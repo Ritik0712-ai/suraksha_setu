@@ -37,7 +37,9 @@ suraksha-setu/
 ├── shared/
 │   └── constants.json  # every enum, helplines, blood compatibility — read by all 3 apps
 ├── ml/                 # complaint-photo CNN training (Colab) → .tflite release asset
-├── docs/               # docs 01–06
+├── docs/               # docs 01–06, runbook.md (setup, deploy, rollback), test-plan.md
+├── e2e/                # Playwright end-to-end tests
+├── render.yaml         # Render Blueprint: API + AI service
 └── .github/workflows/  # CI
 ```
 
@@ -220,6 +222,7 @@ Test a restore into a scratch database once before the pilot (doc 06 task 7.7).
 - ✅ Phase 4G — Sahayak: LLM provider adapter (Gemini default, Anthropic, offline `fake`), grounding on published schemes, emergency pre-check, chat API with limits, S-24/S-25/S-26 with letters (edit, copy, WhatsApp, print), 50-question evaluation set (tasks 4G.1–4G.7)
 - ✅ Phase 5 — integrations: SMTP fallback, Places daily budget, Cloudinary folders per environment, uptime endpoints, LLM cost in analytics; account setup in [docs/runbook.md](docs/runbook.md) §1 (tasks 5.1–5.7)
 - ✅ Phase 6 — testing: Playwright E2E for every core flow with axe accessibility scans, permissions-matrix tests, API coverage gate, `pip-audit` and Dependabot; manual device, field and SOS-drill plans in [docs/test-plan.md](docs/test-plan.md)
+- 🟡 Phase 7 — deployment: Render Blueprint (`render.yaml`), Vercel config with security headers and a CSP checked in E2E, full runbook ([docs/runbook.md](docs/runbook.md) §2). **Live services not created yet** — needs the team's accounts and secrets (tasks 7.1–7.8)
 
 ## SOS notes
 

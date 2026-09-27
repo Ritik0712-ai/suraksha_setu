@@ -1,5 +1,4 @@
-import { expect, test } from "@playwright/test";
-import { RED_PHOTO, expectAccessible, login, newPhone } from "./helpers.js";
+import { expect, expectAccessible, login, newPhone, RED_PHOTO, test } from "./helpers.js";
 
 // Complaint with and without AI, then the authority takes it to RESOLVED and the citizen sees
 // it (docs/03 S-10…S-13, A-02/A-03; docs/01 FR-CMP-01…07).

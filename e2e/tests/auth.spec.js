@@ -1,6 +1,5 @@
-import { expect, test } from "@playwright/test";
 import { ACCOUNTS, local } from "../accounts.js";
-import { expectAccessible, login } from "./helpers.js";
+import { expect, expectAccessible, login, test } from "./helpers.js";
 
 // Login / refresh (docs/03 S-03, §2.7; docs/06 Phase 6 E2E list).
 test.describe("login and session", () => {
