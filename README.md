@@ -223,6 +223,7 @@ Test a restore into a scratch database once before the pilot (doc 06 task 7.7).
 - ✅ Phase 5 — integrations: SMTP fallback, Places daily budget, Cloudinary folders per environment, uptime endpoints, LLM cost in analytics; account setup in [docs/runbook.md](docs/runbook.md) §1 (tasks 5.1–5.7)
 - ✅ Phase 6 — testing: Playwright E2E for every core flow with axe accessibility scans, permissions-matrix tests, API coverage gate and `pip-audit`; manual device, field and SOS-drill plans in [docs/test-plan.md](docs/test-plan.md)
 - 🟡 Phase 7 — deployment: Render Blueprint (`render.yaml`), Vercel config with security headers and a CSP checked in E2E, full runbook ([docs/runbook.md](docs/runbook.md) §2). **Live services not created yet** — needs the team's accounts and secrets (tasks 7.1–7.8)
+- 🟡 Phase 8 — polish: faster first load (socket.io after login, Schemes list fetched alongside its code), A+ text-size and offline checks in E2E, Hindi review sheet (`npm run i18n:sheet -w apps/web`), report screenshots (`npm run screenshots`), [demo script](docs/demo-script.md), [report material](docs/report-material.md). **Left for the team:** native Hindi review (8.1), re-verifying schemes and the emergency directory (8.6), the backup demo video (8.7) and pilot results
 
 ## SOS notes
 

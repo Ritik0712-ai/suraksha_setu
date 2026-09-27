@@ -6,39 +6,23 @@ import { Link as RouterLink, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import C from "../../config/constants.js";
 import { apiError } from "../../api/client.js";
-import { schemesApi } from "../../api/endpoints.js";
 import { FilterChips } from "../../components/ui/FilterChips.jsx";
 import { HighlightCard, Notice } from "../../components/ui/Notice.jsx";
 import { PageTitle } from "../../components/ui/PageTitle.jsx";
 import { EmptyState, ErrorCard, ListSkeleton } from "../../components/ui/States.jsx";
-import { cachedList, cacheList, isNetworkError } from "./cache.js";
+import { listParams, schemesListQuery } from "./listQuery.js";
 import { CATEGORY_ICONS } from "./icons.js";
 import { SchemeCard } from "./SchemeCard.jsx";
 import { useSaveScheme } from "./useSaveScheme.js";
 
 const DEBOUNCE_MS = 300; // docs/03 S-14
 
-/** Client-side filter, used for the offline copy (same rules as the API: names + tags). */
-function filterOffline(list, { category, q }) {
-  const words = (q ?? "").toLowerCase().split(/\s+/).filter(Boolean);
-  return list.filter((s) => {
-    if (category && !s.categories.includes(category)) return false;
-    const hay = [s.name.hi, s.name.en, s.benefitShort.hi, s.benefitShort.en]
-      .join(" ")
-      .toLowerCase();
-    return words.every((w) => hay.includes(w));
-  });
-}
-
 /** S-14 Schemes list (docs/03). */
 export default function SchemesPage() {
   const { t } = useTranslation("schemes");
   const [params, setParams] = useSearchParams();
-  const category = C.schemeCategories.includes(params.get("category"))
-    ? params.get("category")
-    : "";
-  const [text, setText] = useState(params.get("q") ?? "");
-  const q = params.get("q") ?? "";
+  const { category, q } = listParams(params);
+  const [text, setText] = useState(q);
   const { isSaved, onToggle } = useSaveScheme();
 
   // Debounced search into the URL (shareable, back-button safe).
@@ -53,24 +37,7 @@ export default function SchemesPage() {
     return () => clearTimeout(id);
   }, [text, q, params, setParams]);
 
-  const list = useQuery({
-    queryKey: ["schemes", category, q],
-    queryFn: async () => {
-      try {
-        const items = await schemesApi.list({
-          ...(category ? { category } : {}),
-          ...(q ? { q } : {}),
-        });
-        if (!category && !q) cacheList(items);
-        return { items, offline: false };
-      } catch (err) {
-        const cached = cachedList();
-        if (isNetworkError(err) && cached)
-          return { items: filterOffline(cached, { category, q }), offline: true };
-        throw err;
-      }
-    },
-  });
+  const list = useQuery(schemesListQuery({ category, q }));
 
   const setCategory = (v) => {
     const next = new URLSearchParams(params);

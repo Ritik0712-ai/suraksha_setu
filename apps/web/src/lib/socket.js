@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import { io } from "socket.io-client";
 import { create } from "zustand";
 import { useSession } from "../stores/session.js";
 
@@ -13,6 +12,10 @@ const setStatus = (status) => useSocketStatus.setState({ status });
 
 const handlers = new Map(); // event → Set<fn>
 let socket = null;
+// socket.io-client (~40 KB) is only needed once someone is logged in, so it isn't part of the
+// first download (doc 06 task 8.3); it loads the first time a screen subscribes to an event.
+let loading = null;
+let wantedToken = null; // the token to connect with once the library has loaded; null = logged out
 
 export function dispatchSocketEvent(event, payload) {
   handlers.get(event)?.forEach((fn) => fn(payload));
@@ -20,27 +23,41 @@ export function dispatchSocketEvent(event, payload) {
 
 function connect(token) {
   if (import.meta.env.MODE === "test") return;
-  const url = import.meta.env.VITE_SOCKET_URL || undefined; // same origin in dev (Vite proxy)
+  wantedToken = token;
   if (!socket) {
-    socket = io(url, { auth: { token }, transports: ["websocket", "polling"] });
-    socket.onAny((event, payload) => dispatchSocketEvent(event, payload));
-    socket.on("connect", () => {
-      const wasDown = useSocketStatus.getState().status === "reconnecting";
-      setStatus("live");
-      // Events may have been missed while offline: let screens refetch (docs/03 A-04).
-      if (wasDown) dispatchSocketEvent("socket:reconnected", {});
-    });
-    socket.on("disconnect", () => setStatus("reconnecting"));
-    socket.on("connect_error", (err) => {
-      if (err?.message === "TOKEN_EXPIRED") socket.disconnect(); // reconnects after refresh
-    });
-  } else {
-    socket.auth = { token };
-    socket.disconnect().connect();
+    if (!loading)
+      loading = import("socket.io-client")
+        .then(({ io }) => {
+          loading = null;
+          if (wantedToken && !socket) open(io, wantedToken);
+        })
+        .catch(() => {
+          loading = null; // e.g. offline before the chunk was cached; the next token change retries
+        });
+    return;
   }
+  socket.auth = { token };
+  socket.disconnect().connect();
+}
+
+function open(io, token) {
+  const url = import.meta.env.VITE_SOCKET_URL || undefined; // same origin in dev (Vite proxy)
+  socket = io(url, { auth: { token }, transports: ["websocket", "polling"] });
+  socket.onAny((event, payload) => dispatchSocketEvent(event, payload));
+  socket.on("connect", () => {
+    const wasDown = useSocketStatus.getState().status === "reconnecting";
+    setStatus("live");
+    // Events may have been missed while offline: let screens refetch (docs/03 A-04).
+    if (wasDown) dispatchSocketEvent("socket:reconnected", {});
+  });
+  socket.on("disconnect", () => setStatus("reconnecting"));
+  socket.on("connect_error", (err) => {
+    if (err?.message === "TOKEN_EXPIRED") socket.disconnect(); // reconnects after refresh
+  });
 }
 
 function disconnect() {
+  wantedToken = null;
   socket?.disconnect();
   socket = null;
   setStatus("idle");

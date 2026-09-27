@@ -43,3 +43,9 @@ test-results/
 playwright-report/
 e2e/test-results/
 e2e/playwright-report/
+
+# Hindi review sheet (npm run i18n:sheet)
+i18n-review.csv
+
+# Report screenshots (npm run screenshots)
+e2e/screenshots-out/

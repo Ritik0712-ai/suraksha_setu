@@ -12,6 +12,8 @@ import {
 import { NotFoundPage } from "./features/system/SystemPages.jsx";
 import { RouteSkeleton } from "./components/ui/States.jsx";
 import { loadNamespaces } from "./i18n/index.js";
+import { queryClient } from "./lib/queryClient.js";
+import { listParams, schemesListQuery } from "./features/schemes/listQuery.js";
 
 // Route map from docs/03 §1. Screens other than Home load on demand, so citizens never download
 // portal or dev code.
@@ -67,8 +69,22 @@ export const routes = [
             lazy: page(() => import("./features/emergency/EmergencyPage.jsx"), ["emergency"]),
           },
           {
-            path: "schemes",
-            lazy: page(() => import("./features/schemes/SchemesPage.jsx"), ["schemes"]),
+            // Starts S-14's list request alongside the page's code download instead of after it
+            // (doc 06 task 8.3). A parent route with no `lazy` runs its loader at once; it never
+            // blocks the page. (The object form of `lazy` would do this too, but React Router
+            // empties that object after first use, which breaks every router built after it.)
+            loader: ({ request }) => {
+              queryClient.prefetchQuery(
+                schemesListQuery(listParams(new URL(request.url).searchParams)),
+              );
+              return null;
+            },
+            children: [
+              {
+                path: "schemes",
+                lazy: page(() => import("./features/schemes/SchemesPage.jsx"), ["schemes"]),
+              },
+            ],
           },
           {
             path: "schemes/check",

@@ -31,6 +31,13 @@ Everything so far — not yet tagged or deployed.
   coverage gate, `pip-audit`.
 - **Phase 7 — deployment config:** Render Blueprint (`render.yaml`), Vercel headers with a
   Content-Security-Policy checked by the E2E run, deployment runbook.
+- **Phase 8 — polish:** E2E checks for text size A+ at 360 px and offline use; Hindi review
+  sheet export; report screenshots; demo script and report-material guide.
+
+### Changed
+
+- The citizen app's first download is ~13 KB smaller (socket.io loads after login), and the
+  Schemes list is requested alongside the page's code (Schemes LCP 4.18 s → 3.77 s, slow 4G).
 
 ### Fixed
 

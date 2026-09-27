@@ -16,7 +16,7 @@
 | Unit + integration — API | Vitest + Supertest + mongodb-memory-server | `apps/api/test/` | Every endpoint in docs/02 §7.2 incl. permission denials, eligibility engine, routing, transitions, compatibility, jurisdiction resolver, limits | All green; coverage gate in CI (`npm run test:coverage -w apps/api`): lines ≥ 85%, branches ≥ 75% (doc 06 asks ≥ 60%; measured 96% lines on 27 Sep 2026) |
 | Permissions matrix | Supertest | `apps/api/test/integration/permissions.test.js` | Every row of docs/05 §8 (who may call what) | Every row has a test |
 | Unit — AI | pytest | `apps/ai/core/tests/` | Classifier contract, SSRF guard, internal key, Sahayak prompt/grounding/parsing, providers, evaluation-set shape | All green |
-| End-to-end | Playwright (Chromium, 360 × 640, Hindi) | `e2e/` | SOS, complaint with and without AI, authority resolve, schemes + checker, login/refresh, Sahayak Q&A + letter + emergency | All green |
+| End-to-end | Playwright (Chromium, 360 × 640, Hindi) | `e2e/` | SOS, complaint with and without AI, authority resolve, schemes + checker, login/refresh, Sahayak Q&A + letter + emergency; text size A+ with no sideways scroll; offline shell/helplines/fake call; every page under the production CSP | All green |
 | Accessibility | axe-core inside the E2E run | `e2e/tests/*.spec.js` | Home, login, emergency, schemes, S-06, S-10 review, S-15, S-17, S-24, S-26, fake call, portal overview/complaints/SOS/analytics | 0 serious or critical WCAG 2.1 A/AA issues |
 | Localisation | `npm run i18n:check` | CI | Every key exists in `hi` and `en` | 100% |
 | Dependencies | `npm audit` (high+), `pip-audit`, Dependabot alerts (no PRs) | CI + GitHub | Production dependencies of web/api and the AI service | 0 high/critical; 0 known (pip) |
@@ -27,10 +27,10 @@ Run before each review and paste the results here.
 
 | Check | How | Target | Latest result |
 |---|---|---|---|
-| Lighthouse — Home (mobile, simulated slow 4G) | `CHROME_PATH=… npx lighthouse http://localhost:4173/` on `vite preview` | LCP < 3 s, a11y ≥ 90 | 27 Sep 2026: LCP 2.9 s, performance 89, accessibility 100 |
-| Lighthouse — Schemes list | same, `/schemes` | LCP < 3 s, a11y ≥ 90 | 27 Sep 2026: LCP 3.9 s ⚠, performance 74, accessibility 100 (Phase 8 perf work) |
+| Lighthouse — Home (mobile, simulated slow 4G) | `CHROME_PATH=… npx lighthouse http://localhost:4173/` on `vite preview`, with `ss_lang` already saved (otherwise it measures S-01) — median of 5 runs | LCP < 3 s, a11y ≥ 90 | 27 Sep 2026 (after Phase 8): LCP 2.75 s (was 2.89 s), accessibility 100 |
+| Lighthouse — Schemes list | same, `/schemes` | LCP < 3 s, a11y ≥ 90 | 27 Sep 2026 (after Phase 8): LCP 3.77 s ⚠ (was 4.18 s), blocking time 281 ms (was 604 ms), accessibility 100. First visit only — later visits load from the service-worker cache |
 | Lighthouse — Login | same, `/login` | a11y ≥ 90 | 27 Sep 2026: LCP 3.5 s, accessibility 100 |
-| Citizen first download | `npm run build -w apps/web` → size of `index-*.js` (gzip) | ≤ 250 KB | 236.5 KB |
+| Citizen first download | `npm run build -w apps/web` → size of the `index-*.js` that `index.html` loads (gzip) | ≤ 250 KB | 222.8 KB (socket.io now loads after login) |
 | SOS → authority list | E2E `sos.spec.js` annotation `sos-to-portal-ms` (local) and a real phone on 4G | < 5 s (p95) | Local: < 1 s. Real 4G: _field visit 2_ |
 | SOS → SMS app open | Stopwatch on a real phone | < 3 s | _field visit 2_ |
 | CNN accuracy / inference | `ml/` evaluation on Colab | ≥ 87% top-1, < 300 ms | _CNN v1 report_ |

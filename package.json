@@ -20,7 +20,8 @@
     "build": "npm run build --workspaces --if-present",
     "i18n:check": "npm run i18n:check -w apps/web",
     "prepare": "node .husky/install.mjs",
-    "e2e": "playwright test -c e2e/playwright.config.js"
+    "e2e": "playwright test -c e2e/playwright.config.js",
+    "screenshots": "playwright test -c e2e/screenshots.config.js"
   },
   "lint-staged": {
     "*.{js,jsx,mjs,cjs}": [

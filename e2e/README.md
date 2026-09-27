@@ -9,7 +9,14 @@ viewport in Hindi — the way a villager uses the app.
 | `sos.spec.js`       | SOS countdown → sent → the SMS link is pre-filled for the contact with the tracking link → the officer's live list shows it within 5 s → acknowledge → "I am safe"; cancel sends nothing; fake call         |
 | `complaint.spec.js` | Photo → AI suggests "road damage" → submit → the officer verifies, assigns, starts and resolves → the citizen sees the public note; also a complaint without a photo                                        |
 | `schemes.spec.js`   | Search → scheme detail with source, last-checked date and disclaimer; the eligibility checker to grouped results                                                                                            |
+| `polish.spec.js`    | Text size A+ on 360 px: no main screen scrolls sideways; after one visit the app shell, helplines and fake call work offline (service worker)                                                               |
 | `sahayak.spec.js`   | A scheme question gets grounded scheme cards; the Panchayat letter flow ends in a printable letter; "bachao" shows the SOS card                                                                             |
+
+Every test also fails on a **Content-Security-Policy violation**: `vite preview` sends the headers
+from `apps/web/vercel.json`, and `tests/helpers.js` watches the browser console.
+
+`npm run screenshots` (config `screenshots.config.js`) uses the same stack to save key screens in
+Hindi and English at phone and desktop sizes into `e2e/screenshots-out/` for the reports.
 
 ## How it runs
 
