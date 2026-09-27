@@ -51,7 +51,7 @@ export function PrivacyPage() {
     <Stack spacing={3} sx={{ maxWidth: 760 }}>
       <PageTitle subtitle={t("privacy.intro")}>{t("privacy.title")}</PageTitle>
       <Section title={t("privacy.collectTitle")} items={list("privacy.collect", 4)} />
-      <Section title={t("privacy.seeTitle")} items={list("privacy.see", 3)} />
+      <Section title={t("privacy.seeTitle")} items={list("privacy.see", 4)} />
       <Section title={t("privacy.keepTitle")} items={list("privacy.keep", 4)} />
       <Box>
         <Typography variant="h2" sx={{ mb: 1.5 }}>

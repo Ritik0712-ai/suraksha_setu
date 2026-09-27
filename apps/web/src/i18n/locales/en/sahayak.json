@@ -12,7 +12,7 @@
       "emergency": "Emergency numbers"
     },
     "recent": "Recent chats",
-    "disclaimer": "Sahayak can make mistakes. Check important information at the office.",
+    "disclaimer": "Sahayak can make mistakes. Check important information at the office. Messages go to Google's AI service — don't type private details.",
     "startFailed": "Couldn't start the chat. Try again."
   },
   "input": {

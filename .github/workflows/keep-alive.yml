@@ -1,0 +1,40 @@
+name: Keep API awake + health check (daytime)
+
+# Render's free web services sleep after 15 minutes without traffic, and the first request then
+# waits about a minute. This pings the API every 10 minutes from ~06:30 to ~23:20 IST so villagers
+# rarely hit a cold start. Free: GitHub Actions minutes are free for public repositories.
+#
+# Budget: ~17 h/day × 31 days ≈ 530 of Render's 750 free instance hours per workspace per month,
+# leaving the rest for the AI service (it sleeps and wakes when the complaint wizard or Sahayak
+# opens). Don't widen the window to 24 h — that would use up the free hours and Render would
+# suspend both services until the next month.
+#
+# At night the API sleeps; an SOS still works on the phone (SMS app + 112) and reaches the
+# server as soon as it wakes (the app retries for 2 minutes).
+#
+# It is also the uptime monitor (docs/06 task 5.7): a run fails when /health isn't 200 (e.g. the
+# database is unreachable), and GitHub emails the repository owner about failed scheduled runs.
+# (UptimeRobot would ping around the clock and use up the free hours, so it isn't used.)
+#
+# Note: GitHub pauses scheduled workflows in a repository with no commits for 60 days — re-enable
+# it from the Actions tab if that happens (e.g. during the pilot).
+
+on:
+  schedule:
+    - cron: "*/10 1-17 * * *" # UTC → 06:30–23:20 IST
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Ping /api/v1/health
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 120 \
+            https://suraksha-setu-api-jrcl.onrender.com/api/v1/health || true)
+          echo "health: $code"
+          test "$code" = "200"

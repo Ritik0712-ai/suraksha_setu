@@ -21,6 +21,7 @@
     "see1": "Your SOS location: you, the people you send the link to (until it expires), and the officer for your area.",
     "see2": "Your complaints: you and the officers handling them.",
     "see3": "Blood donors' phone numbers are hidden until someone asks, and every request is recorded.",
+    "see4": "Sahayak messages are answered by Google's AI service (Gemini, free tier), which may use them to improve its products. Only what you type is sent (never your phone number) — don't type private details.",
     "keepTitle": "How long we keep it",
     "keep1": "SOS location trail: 90 days after the SOS ends.",
     "keep2": "Complaints: 3 years.",

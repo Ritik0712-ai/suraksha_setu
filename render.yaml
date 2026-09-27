@@ -1,11 +1,13 @@
-# Render Blueprint (docs/02 §9.2, docs/06 task 7.2) — the Node API and the Django AI service.
-# Render → New → Blueprint → pick this repo. Values marked `sync: false` are asked for once in the
-# dashboard and never stored in git. Full steps, checks and rollback: docs/runbook.md §2.
+# Render setup (docs/02 §9.2, docs/06 task 7.2) — the Node API and the Django AI service, both on
+# Render's **free** plan (the project must cost nothing). Live since 27 Sep 2026 in the "Ritik"
+# workspace (its own 750 free instance hours/month):
+#   API https://suraksha-setu-api-jrcl.onrender.com   AI https://suraksha-setu-ai.onrender.com
+# This file records that setup so it can be recreated (Render → New → Blueprint). Values marked
+# `sync: false` are entered once in the dashboard and never stored in git. Steps: docs/runbook.md §2.
 #
 # Both services build from the repo root because they read shared/constants.json.
-# Plans: `free` while developing (sleeps after 15 min; UptimeRobot keeps it awake). Switch the
-# API (and, if the budget allows, the AI service) to `starter` for the pilot and demo weeks
-# (docs/06 task 7.6) — change `plan` here and re-sync the Blueprint.
+# Free instances sleep after 15 min without traffic; .github/workflows/keep-alive.yml keeps the API
+# awake in the daytime within the free hours. Never change `plan` — paid plans are out of scope.
 
 services:
   - type: web
@@ -41,8 +43,8 @@ services:
         sync: false
       - key: PUBLIC_APP_URL # https://<app>.vercel.app (links in SOS SMS/email)
         sync: false
-      - key: AI_BASE_URL # https://suraksha-setu-ai.onrender.com (no trailing slash)
-        sync: false
+      - key: AI_BASE_URL
+        value: https://suraksha-setu-ai.onrender.com
       - key: CLOUDINARY_URL
         sync: false
       - key: SMTP_HOST
@@ -63,10 +65,10 @@ services:
         sync: false
       - key: SMTP_FALLBACK_PASS
         sync: false
-      - key: GOOGLE_PLACES_KEY
-        sync: false
+      # Google Places needs a billing account, so it is off (0 calls); nearby services come from
+      # the curated directory only.
       - key: PLACES_DAILY_LIMIT
-        value: "300"
+        value: "0"
 
   - type: web
     name: suraksha-setu-ai
@@ -77,7 +79,8 @@ services:
     autoDeploy: true
     # The model is a GitHub Release asset, downloaded at build time (docs/02 §9.2).
     buildCommand: pip install -r apps/ai/requirements.txt && cd apps/ai && python scripts/fetch_model.py
-    startCommand: cd apps/ai && gunicorn config.wsgi -w 2 -b 0.0.0.0:$PORT --timeout 30
+    # 1 process × 4 threads fits the free plan's 512 MB (the classifier is guarded by a lock)
+    startCommand: cd apps/ai && gunicorn config.wsgi -w 1 --threads 4 -b 0.0.0.0:$PORT --timeout 30
     healthCheckPath: /health
     envVars:
       - key: PYTHON_VERSION
@@ -87,7 +90,7 @@ services:
       - key: DJANGO_SECRET_KEY
         generateValue: true
       - key: ALLOWED_HOSTS
-        value: suraksha-setu-ai.onrender.com
+        value: .onrender.com
       - key: AI_INTERNAL_KEY
         fromService:
           type: web
@@ -97,7 +100,7 @@ services:
         sync: false
       - key: LLM_PROVIDER
         value: gemini
-      - key: LLM_API_KEY
+      - key: LLM_API_KEY # free Gemini key from Google AI Studio (no billing account)
         sync: false
       - key: LLM_MODEL
         value: "" # empty = provider default
