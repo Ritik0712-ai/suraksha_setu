@@ -75,8 +75,12 @@ class GeminiProvider(Provider):
     (401/403) stops at once. Each failure is logged with its code."""
 
     name = "gemini"
-    default_model = "gemini-flash-latest"
-    default_fallbacks = ("gemini-3.5-flash-lite",)
+    # Free tier, measured 27 Sep 2026: flash-lite answered every time in 1–4 s; flash-latest is
+    # often 503/504 under load. Google also rejects a per-request deadline under 10 s, so a
+    # fallback is only tried while ≥ 10 s of the budget are left.
+    default_model = "gemini-3.5-flash-lite"
+    default_fallbacks = ("gemini-flash-latest",)
+    MIN_DEADLINE_S = 10
 
     @staticmethod
     def _worth_retrying(err: Exception) -> bool:
@@ -118,7 +122,7 @@ class GeminiProvider(Provider):
         last: Exception | None = None
         for model in models:
             left = deadline - time.monotonic()
-            if left < 1:
+            if left < self.MIN_DEADLINE_S:
                 break
             client = genai.Client(
                 api_key=self.api_key,

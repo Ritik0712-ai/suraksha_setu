@@ -383,7 +383,7 @@ def test_gemini_provider(monkeypatch):
             self.models = FakeModels()
 
     monkeypatch.setattr(genai, "Client", FakeClient)
-    p = llm.GeminiProvider(api_key="g", model="gemini-x", timeout_s=3)
+    p = llm.GeminiProvider(api_key="g", model="gemini-x", timeout_s=12)
     out = p.complete("SYS", [Turn("user", "a"), Turn("assistant", "b"), Turn("user", "c")])
     assert captured["model"] == "gemini-x" and captured["key"] == "g"
     assert [c.role for c in captured["contents"]] == ["user", "model", "user"]
@@ -428,34 +428,45 @@ def _api_error(code):
 
 def test_gemini_busy_model_falls_back(monkeypatch):
     calls = _fake_gemini(monkeypatch, {"main": _api_error(503), "lite": '{"intent":"answer"}'})
-    p = llm.GeminiProvider(api_key="g", model="main", timeout_s=5, fallbacks=("lite",))
+    p = llm.GeminiProvider(api_key="g", model="main", timeout_s=30, fallbacks=("lite",))
     out = p.complete("SYS", [Turn("user", "a")])
     assert calls == ["main", "lite"] and out.model == "lite" and out.text == '{"intent":"answer"}'
 
 
 def test_gemini_rate_limit_also_falls_back(monkeypatch):
     calls = _fake_gemini(monkeypatch, {"main": _api_error(429), "lite": "{}"})
-    p = llm.GeminiProvider(api_key="g", model="main", timeout_s=5, fallbacks=("lite",))
+    p = llm.GeminiProvider(api_key="g", model="main", timeout_s=30, fallbacks=("lite",))
     assert p.complete("SYS", [Turn("user", "a")]).model == "lite" and calls == ["main", "lite"]
 
 
 def test_gemini_bad_key_is_not_retried(monkeypatch):
     calls = _fake_gemini(monkeypatch, {"main": _api_error(403), "lite": "{}"})
-    p = llm.GeminiProvider(api_key="g", model="main", timeout_s=5, fallbacks=("lite",))
+    p = llm.GeminiProvider(api_key="g", model="main", timeout_s=30, fallbacks=("lite",))
     with pytest.raises(llm.LLMUnavailable, match="ClientError 403"):
+        p.complete("SYS", [Turn("user", "a")])
+    assert calls == ["main"]
+
+
+def test_gemini_no_fallback_without_10s_left(monkeypatch):
+    # Google rejects per-request deadlines under 10 s, so the fallback is skipped instead.
+    calls = _fake_gemini(monkeypatch, {"main": _api_error(503), "lite": "{}"})
+    p = llm.GeminiProvider(api_key="g", model="main", timeout_s=12, fallbacks=("lite",))
+    clock = iter([100.0, 100.0, 103.0, 103.0])
+    monkeypatch.setattr(llm.time, "monotonic", lambda: next(clock, 103.0))
+    with pytest.raises(llm.LLMUnavailable, match="ServerError 503"):
         p.complete("SYS", [Turn("user", "a")])
     assert calls == ["main"]
 
 
 def test_gemini_model_specific_400_falls_back(monkeypatch):
     calls = _fake_gemini(monkeypatch, {"main": _api_error(400), "lite": "{}"})
-    p = llm.GeminiProvider(api_key="g", model="main", timeout_s=5, fallbacks=("lite",))
+    p = llm.GeminiProvider(api_key="g", model="main", timeout_s=30, fallbacks=("lite",))
     assert p.complete("SYS", [Turn("user", "a")]).model == "lite" and calls == ["main", "lite"]
 
 
 def test_gemini_all_busy_is_unavailable(monkeypatch):
     calls = _fake_gemini(monkeypatch, {"main": _api_error(503), "lite": _api_error(504)})
-    p = llm.GeminiProvider(api_key="g", model="main", timeout_s=5, fallbacks=("lite",))
+    p = llm.GeminiProvider(api_key="g", model="main", timeout_s=30, fallbacks=("lite",))
     with pytest.raises(llm.LLMUnavailable, match="ServerError 504"):
         p.complete("SYS", [Turn("user", "a")])
     assert calls == ["main", "lite"]
@@ -465,7 +476,7 @@ def test_gemini_fallbacks_from_settings(settings):
     settings.LLM_PROVIDER, settings.LLM_API_KEY = "gemini", "k"
     settings.LLM_MODEL, settings.LLM_FALLBACK_MODELS = "", ""
     p = llm.get_provider()
-    assert p.model == "gemini-flash-latest" and p.fallbacks == ("gemini-3.5-flash-lite",)
+    assert p.model == "gemini-3.5-flash-lite" and p.fallbacks == ("gemini-flash-latest",)
     settings.LLM_MODEL, settings.LLM_FALLBACK_MODELS = "a", "b, a ,c"
     p = llm.get_provider()
     assert p.model == "a" and p.fallbacks == ("b", "c")
