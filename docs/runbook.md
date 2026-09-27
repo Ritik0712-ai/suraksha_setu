@@ -91,7 +91,7 @@ Browser ──HTTPS──▶ Vercel (web, apps/web) ──/api/* rewrite──�
 
 **Live setup (27 Sep 2026), all free:** Render workspace "Ritik" → `suraksha-setu-api`
 (https://suraksha-setu-api-jrcl.onrender.com) and `suraksha-setu-ai`
-(https://suraksha-setu-ai.onrender.com); Vercel project `suraksha-setu`; Atlas M0.
+(https://suraksha-setu-ai.onrender.com); Vercel project `suraksha-setu` → **https://suraksha-setu-zeta.vercel.app**; Atlas M0.
 
 To rebuild from scratch: **Atlas → Render → Vercel → wire the URLs → set up the database → smoke
 test.** If Render gives the API a different URL, use it everywhere
