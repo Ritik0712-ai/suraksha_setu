@@ -2,7 +2,8 @@
 
 One small interface, several providers, chosen by the LLM_PROVIDER env var:
 
-- ``gemini`` (default) — Google Gemini Flash-tier via the ``google-genai`` SDK.
+- ``gemini`` (default) — Google Gemini Flash-tier via the ``google-genai`` SDK, with a fallback
+  model when the free tier says the model is busy.
 - ``anthropic`` — Anthropic Messages API over plain HTTPS (no extra SDK).
 - ``fake`` — deterministic offline replies for local development and end-to-end tests.
   Never use it in production.
@@ -51,19 +52,36 @@ class Completion:
 
 class Provider:
     name = "base"
+    default_fallbacks: tuple[str, ...] = ()
 
-    def __init__(self, *, api_key: str, model: str, timeout_s: float):
+    def __init__(
+        self, *, api_key: str, model: str, timeout_s: float, fallbacks: tuple[str, ...] = ()
+    ):
         self.api_key = api_key
         self.model = model
         self.timeout_s = timeout_s
+        self.fallbacks = tuple(m for m in fallbacks if m and m != model)
 
     def complete(self, system: str, turns: list[Turn]) -> Completion:  # pragma: no cover
         raise NotImplementedError
 
 
 class GeminiProvider(Provider):
+    """Gemini via ``google-genai``. On the free tier Google sheds load per model ("503: this model
+    is experiencing high demand", 429 quota), so when a model is busy the same request goes to the
+    next model in ``fallbacks`` within one shared time budget (``timeout_s``). A bad key or a bad
+    request (other 4xx) is not retried."""
+
     name = "gemini"
-    default_model = "gemini-3.5-flash"
+    default_model = "gemini-flash-latest"
+    default_fallbacks = ("gemini-3.5-flash-lite",)
+
+    @staticmethod
+    def _busy(err: Exception) -> bool:
+        code = getattr(err, "code", None)
+        if code in (429, 500, 502, 503, 504):
+            return True
+        return "timeout" in type(err).__name__.lower() or "deadline" in str(err).lower()
 
     def complete(self, system: str, turns: list[Turn]) -> Completion:
         try:
@@ -72,10 +90,6 @@ class GeminiProvider(Provider):
         except ImportError as err:  # pragma: no cover - dependency is in requirements.txt
             raise LLMUnavailable("google-genai is not installed", configured=False) from err
 
-        client = genai.Client(
-            api_key=self.api_key,
-            http_options=types.HttpOptions(timeout=int(self.timeout_s * 1000)),
-        )
         contents = [
             types.Content(
                 role="model" if t.role == "assistant" else "user",
@@ -83,29 +97,43 @@ class GeminiProvider(Provider):
             )
             for t in turns
         ]
-        started = time.monotonic()
-        try:
-            resp = client.models.generate_content(
-                model=self.model,
-                contents=contents,
-                config=types.GenerateContentConfig(
-                    system_instruction=system,
-                    max_output_tokens=MAX_OUTPUT_TOKENS,
-                    temperature=0.3,
-                    response_mime_type="application/json",
-                ),
-            )
-        except Exception as err:  # SDK raises several error types; all mean "no reply"
-            raise LLMUnavailable(f"gemini call failed: {type(err).__name__}") from err
-        usage = getattr(resp, "usage_metadata", None)
-        return Completion(
-            text=resp.text or "",
-            provider=self.name,
-            model=self.model,
-            tokens_in=getattr(usage, "prompt_token_count", None),
-            tokens_out=getattr(usage, "candidates_token_count", None),
-            latency_ms=int((time.monotonic() - started) * 1000),
+        config = types.GenerateContentConfig(
+            system_instruction=system,
+            max_output_tokens=MAX_OUTPUT_TOKENS,
+            temperature=0.3,
+            response_mime_type="application/json",
         )
+        started = time.monotonic()
+        deadline = started + self.timeout_s
+        models = (self.model, *self.fallbacks)
+        last: Exception | None = None
+        for model in models:
+            left = deadline - time.monotonic()
+            if left < 1:
+                break
+            client = genai.Client(
+                api_key=self.api_key,
+                http_options=types.HttpOptions(timeout=int(left * 1000)),
+            )
+            try:
+                resp = client.models.generate_content(model=model, contents=contents, config=config)
+            except Exception as err:  # SDK raises several error types; all mean "no reply"
+                last = err
+                if self._busy(err):
+                    continue
+                break
+            usage = getattr(resp, "usage_metadata", None)
+            return Completion(
+                text=resp.text or "",
+                provider=self.name,
+                model=model,
+                tokens_in=getattr(usage, "prompt_token_count", None),
+                tokens_out=getattr(usage, "candidates_token_count", None),
+                latency_ms=int((time.monotonic() - started) * 1000),
+            )
+        raise LLMUnavailable(
+            f"gemini call failed: {type(last).__name__ if last else 'no time left'}"
+        ) from last
 
 
 class AnthropicProvider(Provider):
@@ -230,8 +258,10 @@ def get_provider() -> Provider:
         raise LLMUnavailable(f"unknown LLM_PROVIDER {name!r}", configured=False)
     if cls is not FakeProvider and not settings.LLM_API_KEY:
         raise LLMUnavailable("LLM_API_KEY is not set", configured=False)
+    fallbacks = [m.strip() for m in (settings.LLM_FALLBACK_MODELS or "").split(",") if m.strip()]
     return cls(
         api_key=settings.LLM_API_KEY,
         model=settings.LLM_MODEL or cls.default_model,
         timeout_s=settings.LLM_TIMEOUT_S,
+        fallbacks=tuple(fallbacks) if fallbacks else cls.default_fallbacks,
     )

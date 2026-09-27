@@ -27,6 +27,8 @@ AI_INTERNAL_KEY = os.environ.get("AI_INTERNAL_KEY", "")
 LLM_PROVIDER = os.environ.get("LLM_PROVIDER", "gemini")
 LLM_API_KEY = os.environ.get("LLM_API_KEY", "")
 LLM_MODEL = os.environ.get("LLM_MODEL", "")  # empty → the provider's default Flash-tier model
+# Comma-separated models to try when LLM_MODEL is busy (free tier); empty → the provider's default
+LLM_FALLBACK_MODELS = os.environ.get("LLM_FALLBACK_MODELS", "")
 # The Node API waits 15 s for a reply; keep the LLM call well under that.
 LLM_TIMEOUT_S = float(os.environ.get("LLM_TIMEOUT_S", "12"))
 # Read-only MongoDB user (schemes only) for Sahayak grounding. The database name comes from

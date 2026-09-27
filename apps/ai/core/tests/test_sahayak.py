@@ -392,6 +392,79 @@ def test_gemini_provider(monkeypatch):
     assert (out.tokens_in, out.tokens_out) == (7, 2)
 
 
+def _fake_gemini(monkeypatch, outcomes):
+    """genai.Client whose generate_content answers per model: an Exception to raise, or text."""
+    from google import genai
+
+    calls = []
+
+    class FakeModels:
+        def generate_content(self, model, contents, config):
+            calls.append(model)
+            out = outcomes[model]
+            if isinstance(out, Exception):
+                raise out
+
+            class R:
+                text = out
+                usage_metadata = None
+
+            return R()
+
+    class FakeClient:
+        def __init__(self, api_key, http_options):
+            self.models = FakeModels()
+
+    monkeypatch.setattr(genai, "Client", FakeClient)
+    return calls
+
+
+def _api_error(code):
+    from google.genai import errors
+
+    cls = errors.ServerError if code >= 500 else errors.ClientError
+    return cls(code, {"error": {"code": code, "message": "x", "status": "X"}})
+
+
+def test_gemini_busy_model_falls_back(monkeypatch):
+    calls = _fake_gemini(monkeypatch, {"main": _api_error(503), "lite": '{"intent":"answer"}'})
+    p = llm.GeminiProvider(api_key="g", model="main", timeout_s=5, fallbacks=("lite",))
+    out = p.complete("SYS", [Turn("user", "a")])
+    assert calls == ["main", "lite"] and out.model == "lite" and out.text == '{"intent":"answer"}'
+
+
+def test_gemini_rate_limit_also_falls_back(monkeypatch):
+    calls = _fake_gemini(monkeypatch, {"main": _api_error(429), "lite": "{}"})
+    p = llm.GeminiProvider(api_key="g", model="main", timeout_s=5, fallbacks=("lite",))
+    assert p.complete("SYS", [Turn("user", "a")]).model == "lite" and calls == ["main", "lite"]
+
+
+def test_gemini_bad_key_is_not_retried(monkeypatch):
+    calls = _fake_gemini(monkeypatch, {"main": _api_error(403), "lite": "{}"})
+    p = llm.GeminiProvider(api_key="g", model="main", timeout_s=5, fallbacks=("lite",))
+    with pytest.raises(llm.LLMUnavailable, match="ClientError"):
+        p.complete("SYS", [Turn("user", "a")])
+    assert calls == ["main"]
+
+
+def test_gemini_all_busy_is_unavailable(monkeypatch):
+    calls = _fake_gemini(monkeypatch, {"main": _api_error(503), "lite": _api_error(504)})
+    p = llm.GeminiProvider(api_key="g", model="main", timeout_s=5, fallbacks=("lite",))
+    with pytest.raises(llm.LLMUnavailable, match="ServerError"):
+        p.complete("SYS", [Turn("user", "a")])
+    assert calls == ["main", "lite"]
+
+
+def test_gemini_fallbacks_from_settings(settings):
+    settings.LLM_PROVIDER, settings.LLM_API_KEY = "gemini", "k"
+    settings.LLM_MODEL, settings.LLM_FALLBACK_MODELS = "", ""
+    p = llm.get_provider()
+    assert p.model == "gemini-flash-latest" and p.fallbacks == ("gemini-3.5-flash-lite",)
+    settings.LLM_MODEL, settings.LLM_FALLBACK_MODELS = "a", "b, a ,c"
+    p = llm.get_provider()
+    assert p.model == "a" and p.fallbacks == ("b", "c")
+
+
 def test_health_reports_llm(client, settings):
     res = client.get("/internal/health", headers={"X-Internal-Key": KEY})
     assert res.json()["llmProvider"] == "fake" and res.json()["llmConfigured"] is True

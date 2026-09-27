@@ -57,7 +57,7 @@ Places API (New) on Render; a daily quota of ~300 and a budget alert.
 ### 1.6 LLM for Sahayak (task 5.6)
 
 1. Google AI Studio (aistudio.google.com) → **Get API key** → create a key in a new project. Don't link a billing account: the key then stays on the **free tier** (rate-limited per minute and per day, never charged).
-2. On the AI service set `LLM_PROVIDER=gemini`, `LLM_API_KEY=<key>`, and optionally `LLM_MODEL` (default `gemini-3.5-flash`). Replies are capped at 800 output tokens.
+2. On the AI service set `LLM_PROVIDER=gemini` and `LLM_API_KEY=<key>`. Default model `gemini-flash-latest`, falling back to `gemini-3.5-flash-lite` when Google says the model is busy (503) or rate-limited (429) — the free tier often sheds load per model. Override with `LLM_MODEL` / `LLM_FALLBACK_MODELS` (comma-separated). Replies are capped at 800 output tokens; the whole call has `LLM_TIMEOUT_S` (12 s), inside the API's 15 s.
 3. Free-tier limits: if Google's daily limit is reached, Sahayak shows "resting" and the rest of the app works. Our own limit (30 messages per user per day) keeps usage low.
 4. **Privacy on the free tier:** Google may use free-tier prompts to improve its products. The prompt holds only what the user types (a letter includes the name they enter) plus our scheme data and village name — never their phone number. The Privacy page (S-32) and Sahayak's disclaimer tell users this and ask them not to type private details.
 5. Grounding: create a **read-only** MongoDB user limited to the `schemes` collection (Atlas → Database Access → custom role with `find` on `<db>.schemes`) and set `MONGODB_URI_READONLY=mongodb+srv://<ro-user>:<pass>@<cluster>/<db>` on the AI service.
