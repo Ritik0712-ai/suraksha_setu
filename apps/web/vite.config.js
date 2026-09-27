@@ -4,6 +4,8 @@ import { VitePWA } from "vite-plugin-pwa";
 import { fileURLToPath } from "node:url";
 
 const shared = fileURLToPath(new URL("../../shared", import.meta.url));
+// Where /api and /socket.io go in `vite dev` and `vite preview` (the E2E tests use another port).
+const apiTarget = process.env.VITE_PROXY_TARGET || "http://localhost:5000";
 
 export default defineConfig({
   plugins: [
@@ -64,8 +66,8 @@ export default defineConfig({
     fs: { allow: [searchForWorkspaceRoot(process.cwd())] },
     // Same-origin /api like the Vercel rewrite in production (docs/02 §6.2)
     proxy: {
-      "/api": "http://localhost:5000",
-      "/socket.io": { target: "http://localhost:5000", ws: true },
+      "/api": apiTarget,
+      "/socket.io": { target: apiTarget, ws: true },
     },
   },
   test: {

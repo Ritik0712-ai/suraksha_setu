@@ -1,0 +1,17 @@
+# docs/02 SEC-17 — weekly dependency updates. Security fixes come as soon as GitHub knows about them.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule: { interval: weekly, day: monday }
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+  - package-ecosystem: pip
+    directory: /apps/ai
+    schedule: { interval: weekly, day: monday }
+    open-pull-requests-limit: 3
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: monthly }

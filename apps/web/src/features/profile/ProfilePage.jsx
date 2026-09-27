@@ -6,6 +6,7 @@ import {
   Divider,
   FormControlLabel,
   List,
+  ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
@@ -73,24 +74,27 @@ function Section({ title, children }) {
 }
 
 function Row({ icon: Icon, primary, secondary, to, onClick, danger }) {
+  // Inside an <li>: a <ul> may only hold list items (WCAG 1.3.1, axe "list").
   return (
-    <ListItemButton
-      component={to ? RouterLink : "button"}
-      to={to}
-      onClick={onClick}
-      sx={{
-        minHeight: 56,
-        width: "100%",
-        textAlign: "left",
-        color: danger ? "error.main" : undefined,
-      }}
-    >
-      <ListItemIcon sx={{ color: danger ? "error.main" : "primary.main" }}>
-        <Icon />
-      </ListItemIcon>
-      <ListItemText primary={primary} secondary={secondary} />
-      {to && <ChevronRightRounded color="action" />}
-    </ListItemButton>
+    <ListItem disablePadding>
+      <ListItemButton
+        component={to ? RouterLink : "button"}
+        to={to}
+        onClick={onClick}
+        sx={{
+          minHeight: 56,
+          width: "100%",
+          textAlign: "left",
+          color: danger ? "error.main" : undefined,
+        }}
+      >
+        <ListItemIcon sx={{ color: danger ? "error.main" : "primary.main" }}>
+          <Icon />
+        </ListItemIcon>
+        <ListItemText primary={primary} secondary={secondary} />
+        {to && <ChevronRightRounded color="action" />}
+      </ListItemButton>
+    </ListItem>
   );
 }
 

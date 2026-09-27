@@ -3,6 +3,7 @@ import {
   Box,
   Chip,
   List,
+  ListItem,
   ListItemButton,
   ListItemText,
   Paper,
@@ -111,19 +112,19 @@ export default function SahayakHomePage() {
           <Paper variant="outlined">
             <List disablePadding>
               {sessions.map((s, i) => (
-                <ListItemButton
-                  key={s.id}
-                  divider={i < sessions.length - 1}
-                  onClick={() => navigate(`/sahayak/${s.id}`)}
-                  sx={{ minHeight: 56 }}
-                >
-                  <ListItemText
-                    primary={s.title}
-                    secondary={formatDate(s.lastMessageAt)}
-                    primaryTypographyProps={{ noWrap: true }}
-                  />
-                  <ChevronRightRounded color="action" />
-                </ListItemButton>
+                <ListItem key={s.id} disablePadding divider={i < sessions.length - 1}>
+                  <ListItemButton
+                    onClick={() => navigate(`/sahayak/${s.id}`)}
+                    sx={{ minHeight: 56 }}
+                  >
+                    <ListItemText
+                      primary={s.title}
+                      secondary={formatDate(s.lastMessageAt)}
+                      primaryTypographyProps={{ noWrap: true }}
+                    />
+                    <ChevronRightRounded color="action" />
+                  </ListItemButton>
+                </ListItem>
               ))}
             </List>
           </Paper>

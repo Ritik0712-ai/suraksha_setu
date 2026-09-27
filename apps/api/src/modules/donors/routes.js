@@ -2,6 +2,7 @@ import { Router } from "express";
 import { z } from "zod";
 import C from "../../config/constants.js";
 import { toLatLng, toPoint } from "../../lib/distance.js";
+import { audit } from "../../lib/audit.js";
 import { AppError } from "../../lib/errors.js";
 import { istDayStart } from "../../lib/time.js";
 import { requireAuth, requireRole } from "../../middleware/auth.js";
@@ -53,10 +54,17 @@ async function homeCentroid(userId) {
   return { jurisdictionId: u.jurisdictionId, point: toLatLng(j.centroid) };
 }
 
-/** /api/v1/donors (docs/02 §7.2 "Blood donors (M4)"). Citizens only. */
+/**
+ * /api/v1/donors (docs/02 §7.2 "Blood donors (M4)"). The donor profile (/me) is the citizen's
+ * own; search and reveal are for citizens and admins; admins can also remove a profile that is
+ * being abused (docs/05 §8).
+ */
 export function donorsRouter({ env }) {
   const router = Router();
-  router.use(requireAuth(env), requireRole("citizen"));
+  const citizen = requireRole("citizen");
+  const searcher = requireRole("citizen", "admin");
+  router.use(requireAuth(env));
+  router.use("/me", citizen);
 
   router.get(
     "/me",
@@ -119,6 +127,7 @@ export function donorsRouter({ env }) {
   // $geoNear with compatibility, availability and the 90-day gap; phones stay masked.
   router.get(
     "/search",
+    searcher,
     validate({ query: searchQuery }),
     wrap(async (req, res) => {
       const { bloodGroup, lat, lng, radiusKm, includeCompatible } = req.validatedQuery;
@@ -170,6 +179,7 @@ export function donorsRouter({ env }) {
   // 10 reveals per IST day, each logged (docs/01 FR-BLD-04, docs/05 §5.12).
   router.post(
     "/:donorId/reveal",
+    searcher,
     validate({ params: z.object({ donorId: objectId }), body: revealBody }),
     wrap(async (req, res) => {
       const d = await BloodDonor.findOne({
@@ -206,6 +216,24 @@ export function donorsRouter({ env }) {
           revealsLeftToday: Math.max(0, DONOR_REVEALS_PER_DAY - today - (again ? 0 : 1)),
         },
       });
+    }),
+  );
+
+  // Admin: remove a donor profile that is being misused (docs/05 §8), audited.
+  router.delete(
+    "/:donorId",
+    requireRole("admin"),
+    validate({ params: z.object({ donorId: objectId }) }),
+    wrap(async (req, res) => {
+      const d = await BloodDonor.findByIdAndDelete(req.params.donorId).lean();
+      if (!d) throw new AppError("NOT_FOUND", "donor_not_found");
+      await audit(req, {
+        action: "donor.removed",
+        targetType: "blood_donors",
+        targetId: d._id,
+        changes: { bloodGroup: d.bloodGroup },
+      });
+      res.json({ data: { removed: true } });
     }),
   );
 

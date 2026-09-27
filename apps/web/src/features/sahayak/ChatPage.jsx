@@ -71,7 +71,7 @@ export default function ChatPage() {
     staleTime: seeded ? 30_000 : 0,
     retry: (n, err) => apiError(err).status !== 404 && n < 2,
   });
-  const [pending, setPending] = useState(null); // { text, emergency }
+  const [pending, setPending] = useState(null); // { text, emergency, base }
   const [failure, setFailure] = useState(null); // { kind, text }
   const [menu, setMenu] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -80,7 +80,8 @@ export default function ChatPage() {
 
   const send = async (text, { skip = false } = {}) => {
     setFailure(null);
-    setPending({ text, emergency: !skip && isEmergencyMessage(text, C.sahayak) });
+    const base = qc.getQueryData(key)?.messages?.length ?? 0;
+    setPending({ text, emergency: !skip && isEmergencyMessage(text, C.sahayak), base });
     try {
       const res = await chatApi.send(sessionId, { text, skipEmergencyCheck: skip });
       qc.setQueryData(key, (old) => ({
@@ -90,9 +91,10 @@ export default function ChatPage() {
         remainingToday: res.remainingToday,
       }));
       qc.invalidateQueries({ queryKey: ["chat-sessions"] });
+      // `pending` is cleared by the effect below once the reply is in the list, so the screen
+      // never shows the local bubble and the server's copy together (or neither).
     } catch (err) {
       setFailure({ kind: failureOf(err), text });
-    } finally {
       setPending(null);
     }
   };
@@ -109,6 +111,12 @@ export default function ChatPage() {
   }, []);
 
   const messages = q.data?.messages ?? [];
+  // The local bubble (and its instant emergency card) stays until the server's messages are in
+  // the list; from that render on it is hidden, whichever state update React applies first.
+  const waiting = pending && messages.length <= pending.base ? pending : null;
+  useEffect(() => {
+    if (pending && messages.length > pending.base) setPending(null);
+  }, [pending, messages.length]);
   useEffect(() => {
     endRef.current?.scrollIntoView?.({ block: "end" });
   }, [messages.length, pending, failure]);
@@ -196,7 +204,7 @@ export default function ChatPage() {
             );
           if (m.intent === "emergency") {
             const asked = messages[i - 1]?.role === "user" ? messages[i - 1].text : null;
-            const isLast = i === messages.length - 1 && !pending;
+            const isLast = i === messages.length - 1 && !waiting;
             return (
               <EmergencyCard
                 key={m.id}
@@ -218,19 +226,19 @@ export default function ChatPage() {
             </Bubble>
           );
         })}
-        {last?.role === "assistant" && !pending && !failure && (
+        {last?.role === "assistant" && !waiting && !failure && (
           <QuickReplies chips={last.chips} onPick={(c) => send(c)} disabled={busy} />
         )}
 
-        {pending && (
+        {waiting && (
           <>
             <Bubble mine label={t("chat.you")}>
               <Typography sx={{ whiteSpace: "pre-line", overflowWrap: "anywhere" }}>
-                {pending.text}
+                {waiting.text}
               </Typography>
             </Bubble>
             {/* The emergency card shows at once from the local check, before the server answers. */}
-            {pending.emergency ? <EmergencyCard /> : <Typing />}
+            {waiting.emergency ? <EmergencyCard /> : <Typing />}
           </>
         )}
 

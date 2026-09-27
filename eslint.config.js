@@ -6,7 +6,16 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import prettier from "eslint-config-prettier";
 
 export default [
-  { ignores: ["**/node_modules/**", "**/dist/**", "**/coverage/**", "apps/ai/**"] },
+  {
+    ignores: [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/coverage/**",
+      "apps/ai/**",
+      "**/test-results/**",
+      "**/playwright-report/**",
+    ],
+  },
   js.configs.recommended,
   {
     files: ["**/*.{js,mjs,cjs,jsx}"],
@@ -34,6 +43,11 @@ export default [
       "react/prop-types": "off",
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
     },
+  },
+  {
+    // Playwright tests run in Node but pass small functions into the browser page.
+    files: ["e2e/**/*.js"],
+    languageOptions: { globals: { ...globals.node, ...globals.browser } },
   },
   {
     files: ["**/*.test.{js,jsx}", "**/test/**/*.{js,jsx}"],

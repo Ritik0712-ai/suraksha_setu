@@ -241,6 +241,20 @@ class TestParseReply:
         )
         assert service.parse_reply(raw, set())["letter"]["includeMobile"] is False
 
+    def test_repeated_salutation_is_trimmed(self):
+        for opening in ("महोदय, ", "Sir/Madam,\n", "Respected Sir, "):
+            letter = {
+                "to": "a",
+                "subject": "b",
+                "body": opening + "निवेदन है",
+                "applicantName": "d",
+            }
+            raw = json.dumps({"intent": "letter_ready", "text": "t", "letter": letter})
+            assert service.parse_reply(raw, set())["letter"]["body"] == "निवेदन है"
+        letter = {"to": "a", "subject": "b", "body": "Sirsa road is broken", "applicantName": "d"}
+        raw = json.dumps({"intent": "letter_ready", "text": "t", "letter": letter})
+        assert service.parse_reply(raw, set())["letter"]["body"] == "Sirsa road is broken"
+
     def test_emergency_intent_passes_through(self):
         out = service.parse_reply('{"intent":"emergency","text":"112 पर कॉल करें"}', set())
         assert out["intent"] == "emergency"

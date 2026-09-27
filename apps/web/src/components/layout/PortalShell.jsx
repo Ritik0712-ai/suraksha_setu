@@ -152,7 +152,8 @@ function Sidebar({ mini, onNavigate }) {
         )}
       </List>
       <Divider sx={{ borderColor: "rgba(255,255,255,0.2)" }} />
-      <List sx={{ py: 0 }}>
+      {/* A plain group (not a <ul>): it holds a name block and buttons, not list items. */}
+      <List component="div" sx={{ py: 0 }}>
         <NavItem
           item={{ to: "/portal/profile", key: "nav.profile", Icon: PersonRounded }}
           mini={mini}

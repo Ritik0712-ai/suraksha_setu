@@ -19,7 +19,8 @@
     "test": "npm run test --workspaces --if-present",
     "build": "npm run build --workspaces --if-present",
     "i18n:check": "npm run i18n:check -w apps/web",
-    "prepare": "husky"
+    "prepare": "husky",
+    "e2e": "playwright test -c e2e/playwright.config.js"
   },
   "lint-staged": {
     "*.{js,jsx,mjs,cjs}": [
@@ -31,7 +32,9 @@
     ]
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@eslint/js": "^9.39.5",
+    "@playwright/test": "^1.63.0",
     "eslint": "^9.39.5",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react": "^7.37.5",

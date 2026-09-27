@@ -206,10 +206,20 @@ describe("S-25 Chat", () => {
       "href",
       "tel:112",
     );
+    // When the server's copy arrives, the local card is swapped for it — never two at once.
+    const cards = () =>
+      [...document.querySelectorAll('[role="alert"]')].filter((el) =>
+        el.textContent.includes("क्या आप खतरे में हैं?"),
+      ).length;
+    let most = cards();
+    const watch = new MutationObserver(() => (most = Math.max(most, cards())));
+    watch.observe(document.body, { childList: true, subtree: true });
     release();
     await userEvent.click(
       await screen.findByRole("button", { name: /नहीं, मैं खतरे में नहीं हूँ/ }),
     );
+    watch.disconnect();
+    expect(most).toBe(1);
     expect(await screen.findByText("बीमा योजना की जानकारी")).toBeInTheDocument();
     expect(state.sent.at(-1)).toEqual({ text: "bachao", skipEmergencyCheck: true });
   });

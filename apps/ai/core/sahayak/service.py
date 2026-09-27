@@ -46,6 +46,12 @@ def _turns(history: list[dict], message: str) -> list[Turn]:
 
 
 _FENCE = re.compile(r"^```(?:json)?\s*|\s*```$", re.IGNORECASE)
+# The app prints the salutation itself (docs/03 S-26), so a model that repeats it is trimmed.
+_SALUTATION = re.compile(
+    r"^\s*(?:आदरणीय\s+)?(?:महोदय|महोदया|श्रीमान\s*जी|respected\s+sir|sir\s*/\s*madam|dear\s+sir"
+    r"|sir|madam)(?![\w\u0900-\u097F])\s*[,।:!]?\s*",
+    re.IGNORECASE,
+)
 
 
 def parse_reply(raw: str, allowed_slugs: set[str]) -> dict:
@@ -86,7 +92,7 @@ def parse_reply(raw: str, allowed_slugs: set[str]) -> dict:
         clean = {
             "to": _clip(letter.get("to"), 300),
             "subject": _clip(letter.get("subject"), 200),
-            "body": _clip(letter.get("body"), 3000),
+            "body": _SALUTATION.sub("", _clip(letter.get("body"), 3000), count=1).strip(),
             "applicantName": _clip(letter.get("applicantName"), 120),
             "includeMobile": letter.get("includeMobile") is True,
         }

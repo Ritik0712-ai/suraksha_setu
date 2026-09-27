@@ -37,3 +37,9 @@ apps/api/seed/admins.local.json
 
 # Local-dev complaint photos (production uses Cloudinary)
 apps/api/.uploads/
+
+# Playwright output
+test-results/
+playwright-report/
+e2e/test-results/
+e2e/playwright-report/

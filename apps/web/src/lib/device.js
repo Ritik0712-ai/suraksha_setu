@@ -1,7 +1,14 @@
 // Thin wrappers over device features so they can be stubbed in tests and never throw.
 
-/** Opens sms:, tel:, wa.me … links. */
+/**
+ * Opens sms:, tel:, wa.me … links. End-to-end tests set `window.__ssExternalLinks` to an array
+ * to record the link instead (a desktop test browser can't hand sms: to an SMS app).
+ */
 export function openExternal(href) {
+  if (Array.isArray(window.__ssExternalLinks)) {
+    window.__ssExternalLinks.push(href);
+    return;
+  }
   window.location.href = href;
 }
 

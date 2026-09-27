@@ -111,9 +111,12 @@ npm run lint            # ESLint (web + api)
 npm run format:check    # Prettier
 npm run i18n:check      # every key exists in both hi and en
 npm test                # Vitest (web + api; API integration tests start an in-memory MongoDB)
+npm run test:coverage -w apps/api   # API tests + coverage gate (lines ≥ 85%, branches ≥ 75%)
 npm run build -w apps/web
+npm audit --omit=dev --audit-level=high
+npm run e2e             # Playwright, 360 × 640, Hindi — see e2e/README.md
 
-cd apps/ai && ruff check . && black --check . && pytest -q
+cd apps/ai && ruff check . && black --check . && pytest -q && pip-audit -r requirements.txt
 ruff check ../../ml && black --check ../../ml
 ```
 
@@ -215,6 +218,8 @@ Test a restore into a scratch database once before the pilot (doc 06 task 7.7).
 - ✅ Phase 4E — authority portal: overview, complaints table + management (every transition from doc 05 §5.6.1), live SOS map + drawer, analytics + CSV, users, schemes editor with rules builder, emergency directory, departments + routing gaps, areas tree, audit log, citizen notifications + status emails (tasks 4E.1–4E.7)
 - ✅ Phase 4F — blood donors: donor profile (consent, 90-day gap, availability), compatible nearby search with masked phones, reveal with a 10/day limit and a log (tasks 4F.1–4F.4)
 - ✅ Phase 4G — Sahayak: LLM provider adapter (Gemini default, Anthropic, offline `fake`), grounding on published schemes, emergency pre-check, chat API with limits, S-24/S-25/S-26 with letters (edit, copy, WhatsApp, print), 50-question evaluation set (tasks 4G.1–4G.7)
+- ✅ Phase 5 — integrations: SMTP fallback, Places daily budget, Cloudinary folders per environment, uptime endpoints, LLM cost in analytics; account setup in [docs/runbook.md](docs/runbook.md) §1 (tasks 5.1–5.7)
+- ✅ Phase 6 — testing: Playwright E2E for every core flow with axe accessibility scans, permissions-matrix tests, API coverage gate, `pip-audit` and Dependabot; manual device, field and SOS-drill plans in [docs/test-plan.md](docs/test-plan.md)
 
 ## SOS notes
 
