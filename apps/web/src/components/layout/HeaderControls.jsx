@@ -2,20 +2,31 @@ import { useState } from "react";
 import {
   Badge,
   Button,
+  Divider,
   IconButton,
+  ListItemIcon,
+  Menu,
+  MenuItem,
   Popover,
   Stack,
   ToggleButton,
   ToggleButtonGroup,
   Typography,
 } from "@mui/material";
-import { NotificationsRounded, TextFieldsRounded } from "@mui/icons-material";
+import {
+  AccountCircleRounded,
+  LogoutRounded,
+  NotificationsRounded,
+  PersonRounded,
+  TextFieldsRounded,
+} from "@mui/icons-material";
 import { Link as RouterLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { usersApi } from "../../api/endpoints.js";
 import { usePrefs } from "../../stores/prefs.js";
 import { useSession } from "../../stores/session.js";
 import { useUnreadCount } from "../../features/notifications/useUnread.js";
+import { useLogout } from "../../features/auth/useLogout.js";
 
 /** Saves a preference to the profile in the background when logged in (docs/03 §2.3). */
 function syncToProfile(patch) {
@@ -132,5 +143,73 @@ export function NotificationBell({ color = "primary", to = "/notifications" }) {
         <NotificationsRounded />
       </Badge>
     </IconButton>
+  );
+}
+
+/**
+ * Account menu in the header (logged in only): who is logged in, a link to the profile and
+ * Log out — so switching accounts never needs a hunt through the profile page.
+ */
+export function AccountMenu({ color = "primary", profileTo = "/profile" }) {
+  const { t } = useTranslation();
+  const user = useSession((s) => s.user);
+  const logout = useLogout();
+  const [anchor, setAnchor] = useState(null);
+  if (!user) return null;
+  const close = () => setAnchor(null);
+  return (
+    <>
+      <IconButton
+        color={color}
+        id="account-button"
+        aria-label={t("header.account")}
+        aria-haspopup="menu"
+        aria-controls={anchor ? "account-menu" : undefined}
+        aria-expanded={Boolean(anchor)}
+        onClick={(e) => setAnchor(e.currentTarget)}
+        sx={{ width: 48, height: 48 }}
+      >
+        <AccountCircleRounded />
+      </IconButton>
+      <Menu
+        id="account-menu"
+        anchorEl={anchor}
+        open={Boolean(anchor)}
+        onClose={close}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        transformOrigin={{ vertical: "top", horizontal: "right" }}
+        MenuListProps={{ "aria-labelledby": "account-button" }}
+      >
+        <Stack sx={{ px: 2, py: 1, maxWidth: 260 }} aria-hidden>
+          <Typography sx={{ fontWeight: 700 }} noWrap>
+            {user.name}
+          </Typography>
+          {user.phone && (
+            <Typography variant="body2" color="text.secondary">
+              {user.phone}
+            </Typography>
+          )}
+        </Stack>
+        <Divider />
+        <MenuItem component={RouterLink} to={profileTo} onClick={close} sx={{ minHeight: 48 }}>
+          <ListItemIcon>
+            <PersonRounded />
+          </ListItemIcon>
+          {t("header.profile")}
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            close();
+            logout();
+          }}
+          sx={{ minHeight: 48, color: "error.main" }}
+        >
+          <ListItemIcon sx={{ color: "inherit" }}>
+            <LogoutRounded />
+          </ListItemIcon>
+          {t("header.logout")}
+        </MenuItem>
+      </Menu>
+    </>
   );
 }

@@ -25,7 +25,10 @@
     "sizeSm": "छोटे अक्षर",
     "sizeMd": "सामान्य अक्षर",
     "sizeLg": "बड़े अक्षर",
-    "notifications": "सूचनाएं"
+    "notifications": "सूचनाएं",
+    "account": "खाता",
+    "profile": "मेरी प्रोफ़ाइल",
+    "logout": "लॉग आउट"
   },
   "actions": {
     "retry": "फिर से कोशिश करें",

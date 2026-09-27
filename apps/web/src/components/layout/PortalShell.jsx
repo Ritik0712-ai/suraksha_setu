@@ -38,7 +38,7 @@ import { ForceChangePassword } from "../../features/portal/ForceChangePassword.j
 import { SessionExpiredDialog } from "../../features/system/SessionExpiredDialog.jsx";
 import { EmergencyIcon, LogoMark } from "../icons/index.jsx";
 import { Toaster } from "../ui/Toaster.jsx";
-import { LanguageToggle, NotificationBell } from "./HeaderControls.jsx";
+import { AccountMenu, LanguageToggle, NotificationBell } from "./HeaderControls.jsx";
 import { OfflineBanner } from "./OfflineBanner.jsx";
 import { SkipLink, TricolourStrip } from "./CitizenShell.jsx";
 
@@ -245,6 +245,7 @@ export function PortalShell({ title }) {
             </Typography>
             <LanguageToggle />
             <NotificationBell to="/portal/notifications" />
+            <AccountMenu profileTo="/portal/profile" />
           </Toolbar>
         </AppBar>
         <OfflineBanner />

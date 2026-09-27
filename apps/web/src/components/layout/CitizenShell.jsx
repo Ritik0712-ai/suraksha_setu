@@ -13,7 +13,12 @@ import { SessionExpiredDialog } from "../../features/system/SessionExpiredDialog
 import { MaintenanceGate } from "../../features/system/Maintenance.jsx";
 import { useContactsCache } from "../../features/profile/useContactsCache.js";
 import { Toaster } from "../ui/Toaster.jsx";
-import { LanguageToggle, NotificationBell, TextSizeControl } from "./HeaderControls.jsx";
+import {
+  AccountMenu,
+  LanguageToggle,
+  NotificationBell,
+  TextSizeControl,
+} from "./HeaderControls.jsx";
 import { OfflineBanner } from "./OfflineBanner.jsx";
 
 export function SkipLink() {
@@ -105,10 +110,24 @@ function Header({ authed }) {
           to="/"
           underline="none"
           aria-label={t("header.home")}
-          sx={{ display: "flex", alignItems: "center", gap: 1, mr: "auto", minHeight: 48, pl: 1 }}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            mr: "auto",
+            minHeight: 48,
+            pl: 1,
+            minWidth: 0,
+          }}
         >
           <LogoMark size={32} />
-          <Typography component="span" variant="h3" color="primary" sx={{ fontWeight: 700 }}>
+          <Typography
+            component="span"
+            variant="h3"
+            color="primary"
+            noWrap
+            sx={{ fontWeight: 700, minWidth: 0 }}
+          >
             {t("appName")}
           </Typography>
         </Link>
@@ -146,6 +165,7 @@ function Header({ authed }) {
         <LanguageToggle />
         <TextSizeControl />
         {authed && <NotificationBell />}
+        {authed && <AccountMenu />}
       </Container>
     </Box>
   );

@@ -163,4 +163,20 @@ describe("S-27 profile", () => {
     expect(await screen.findByText("लॉग आउट हो गए")).toBeInTheDocument();
     expect(await screen.findByRole("link", { name: "रजिस्टर करें" })).toBeInTheDocument();
   });
+
+  it("logs out from the account menu in the header, from any page", async () => {
+    loggedInAs(citizen());
+    server.use(http.post("*/api/v1/auth/logout", () => HttpResponse.json({ data: { ok: true } })));
+    const { router } = renderApp("/schemes");
+    await userEvent.click(await screen.findByRole("button", { name: "खाता" }));
+    const menu = await screen.findByRole("menu");
+    expect(within(menu).getByRole("menuitem", { name: "मेरी प्रोफ़ाइल" })).toHaveAttribute(
+      "href",
+      "/profile",
+    );
+    await userEvent.click(within(menu).getByRole("menuitem", { name: "लॉग आउट" }));
+    await waitFor(() => expect(router.state.location.pathname).toBe("/"));
+    expect(await screen.findByText("लॉग आउट हो गए")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "खाता" })).not.toBeInTheDocument();
+  });
 });

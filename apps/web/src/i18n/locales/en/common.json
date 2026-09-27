@@ -25,7 +25,10 @@
     "sizeSm": "Smaller text",
     "sizeMd": "Normal text",
     "sizeLg": "Larger text",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "account": "Account",
+    "profile": "My profile",
+    "logout": "Log out"
   },
   "actions": {
     "retry": "Try again",
