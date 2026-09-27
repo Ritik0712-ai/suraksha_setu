@@ -28,7 +28,7 @@ Everything so far — not yet tagged or deployed.
 - **Phase 5 — integrations:** SMTP fallback, Places daily budget, Cloudinary folders per
   environment, uptime endpoints, LLM cost in analytics.
 - **Phase 6 — testing:** Playwright E2E with accessibility scans, permissions-matrix tests,
-  coverage gate, `pip-audit`, Dependabot.
+  coverage gate, `pip-audit`.
 - **Phase 7 — deployment config:** Render Blueprint (`render.yaml`), Vercel headers with a
   Content-Security-Policy checked by the E2E run, deployment runbook.
 

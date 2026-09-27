@@ -1,17 +1,19 @@
-# docs/02 SEC-17 — weekly dependency updates. Security fixes come as soon as GitHub knows about them.
+# docs/02 SEC-17 — dependency checks without pull requests. The team works directly on `main`
+# (no branches or PRs), so Dependabot's version-update PRs are switched off
+# (open-pull-requests-limit: 0). Known vulnerabilities are caught instead by `npm audit` and
+# `pip-audit` in CI on every push, and by Dependabot alerts (Settings → Code security).
+# Upgrade dependencies on purpose, one at a time, with the full checks (README "Checks").
 version: 2
 updates:
   - package-ecosystem: npm
     directory: /
-    schedule: { interval: weekly, day: monday }
-    open-pull-requests-limit: 5
-    groups:
-      minor-and-patch:
-        update-types: [minor, patch]
+    schedule: { interval: weekly }
+    open-pull-requests-limit: 0
   - package-ecosystem: pip
     directory: /apps/ai
-    schedule: { interval: weekly, day: monday }
-    open-pull-requests-limit: 3
+    schedule: { interval: weekly }
+    open-pull-requests-limit: 0
   - package-ecosystem: github-actions
     directory: /
     schedule: { interval: monthly }
+    open-pull-requests-limit: 0

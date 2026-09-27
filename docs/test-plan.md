@@ -19,7 +19,7 @@
 | End-to-end | Playwright (Chromium, 360 × 640, Hindi) | `e2e/` | SOS, complaint with and without AI, authority resolve, schemes + checker, login/refresh, Sahayak Q&A + letter + emergency | All green |
 | Accessibility | axe-core inside the E2E run | `e2e/tests/*.spec.js` | Home, login, emergency, schemes, S-06, S-10 review, S-15, S-17, S-24, S-26, fake call, portal overview/complaints/SOS/analytics | 0 serious or critical WCAG 2.1 A/AA issues |
 | Localisation | `npm run i18n:check` | CI | Every key exists in `hi` and `en` | 100% |
-| Dependencies | `npm audit` (high+), `pip-audit`, Dependabot (weekly PRs) | CI + GitHub | Production dependencies of web/api and the AI service | 0 high/critical; 0 known (pip) |
+| Dependencies | `npm audit` (high+), `pip-audit`, Dependabot alerts (no PRs) | CI + GitHub | Production dependencies of web/api and the AI service | 0 high/critical; 0 known (pip) |
 
 ## 2. Measured (record the numbers in the Phase II report)
 
