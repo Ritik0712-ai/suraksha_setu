@@ -189,7 +189,6 @@
     "started": "Started {{ago}}",
     "accuracy": "±{{m}} m",
     "approximate": "Approximate location",
-    "noKey": "Map needs a Google Maps key — the list works without it.",
     "detail": {
       "title": "SOS detail",
       "callCitizen": "Call citizen",

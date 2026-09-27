@@ -4,12 +4,11 @@ import { LocationOnRounded } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 import { mapsLink } from "../../lib/geo.js";
 
-const KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY;
-// Google Maps loads only when a key is configured and a map is actually shown (docs/04 §6.7:
-// lists first, maps are lazy). Without a key, or offline, the location card below is used.
-const GoogleMapView = lazy(() => import("./GoogleMapView.jsx"));
+// The map (Leaflet + OpenStreetMap, free, no key) loads only when one is actually shown
+// (docs/04 §6.7: lists first, maps are lazy). Offline, the location card below is used.
+const LeafletMapView = lazy(() => import("./maps/LeafletMapView.jsx"));
 
-/** Location card: works with no key, no network and on the cheapest phones. */
+/** Location card: works with no network and on the cheapest phones. */
 export function LocationCard({ center, accuracyM, approximate, height, showLink = true }) {
   const { t } = useTranslation("sos");
   return (
@@ -69,7 +68,7 @@ export function MapView({
   const { t } = useTranslation("sos");
   if (!center) return null;
   const offline = typeof navigator !== "undefined" && navigator.onLine === false;
-  if (!KEY || offline)
+  if (offline)
     return (
       <LocationCard
         center={center}
@@ -80,35 +79,48 @@ export function MapView({
       />
     );
   return (
-    <Box
-      role="region"
-      aria-label={t("map.label")}
-      sx={{
-        height,
-        borderRadius: 2,
-        overflow: "hidden",
-        border: "1px solid",
-        borderColor: "divider",
-      }}
-    >
-      <Suspense
-        fallback={
-          <LocationCard
+    <Stack spacing={0.5}>
+      <Box
+        role="region"
+        aria-label={t("map.label")}
+        sx={{
+          height,
+          borderRadius: 2,
+          overflow: "hidden",
+          border: "1px solid",
+          borderColor: "divider",
+          position: "relative",
+          zIndex: 0,
+        }}
+      >
+        <Suspense
+          fallback={
+            <LocationCard
+              center={center}
+              accuracyM={accuracyM}
+              approximate={approximate}
+              height={height}
+            />
+          }
+        >
+          <LeafletMapView
             center={center}
             accuracyM={accuracyM}
             approximate={approximate}
-            height={height}
+            trail={trail}
           />
-        }
-      >
-        <GoogleMapView
-          apiKey={KEY}
-          center={center}
-          accuracyM={accuracyM}
-          approximate={approximate}
-          trail={trail}
-        />
-      </Suspense>
-    </Box>
+        </Suspense>
+      </Box>
+      {showLink && (
+        <Link
+          href={mapsLink(center)}
+          target="_blank"
+          rel="noopener"
+          sx={{ fontWeight: 500, py: 0.5, alignSelf: "flex-start" }}
+        >
+          {t("track.directions")}
+        </Link>
+      )}
+    </Stack>
   );
 }

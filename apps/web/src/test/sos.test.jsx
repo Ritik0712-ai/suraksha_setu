@@ -343,7 +343,8 @@ describe("S-30 public tracking page", () => {
     });
     renderApp("/track/abcdefghijklmnopqrstuvwxyz");
     expect(await screen.findByRole("heading", { name: "Pooja को मदद चाहिए" })).toBeInTheDocument();
-    expect(screen.getByText("23.20050, 77.08050")).toBeInTheDocument();
+    // Online: a free OpenStreetMap map (no key needed), plus the Google Maps link.
+    expect(screen.getByRole("region", { name: "मैप" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "112 पर कॉल करें" })).toHaveAttribute(
       "href",
       "tel:112",

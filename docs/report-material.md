@@ -65,7 +65,7 @@ Details and the manual plans (devices, screen reader, SOS drills, usability): do
 - **Not yet verified in the field:** jurisdiction names, departments/routing, the emergency directory and all 20 schemes are placeholders or drafts until R4 verifies them.
 - **Hindi copy** needs a native-speaker review (`npm run i18n:sheet -w apps/web` exports every string, UI and API, to a CSV with a "reviewed Hindi" column) and testing with villagers.
 - **Schemes page first visit** is ~3.8 s LCP on simulated slow 4G (target 3 s); repeat visits load from the service-worker cache.
-- **Free hosting:** Render free instances sleep at night (≈1 min first request; SOS still works on the phone); no Google Maps (needs billing) — location cards instead; M0 has no snapshots (nightly dump instead).
-- **Maps CSP** needs `'unsafe-inline'`/`'unsafe-eval'` for Google Maps (docs/runbook.md §2.3).
+- **Free hosting:** Render free instances sleep at night (≈1 min first request; SOS still works on the phone); OpenStreetMap maps instead of Google Maps (which needs billing); M0 has no snapshots (nightly dump instead).
+- **Map tiles** come from OpenStreetMap's free public server, which is meant for light use — fine for the pilot; a larger rollout would need its own or another free tile host.
 - **v1 by design (docs/01 §9):** no SMS OTP, no server-sent SMS, no background location, no native app, no voice SOS — each with the reason and the v2 path.
 - **AI:** CNN accuracy on real village photos is unknown until field data; Sahayak runs on the Gemini free tier (rate limits; Google may use free-tier prompts to improve its products — disclosed to users) and needs the evaluation run before the pilot.

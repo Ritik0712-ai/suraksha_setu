@@ -42,8 +42,7 @@ import { ErrorCard, ListSkeleton } from "../../components/ui/States.jsx";
 import { StatusChip } from "../../components/ui/StatusChip.jsx";
 import { SubmitButton } from "../../components/ui/fields.jsx";
 
-const KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY;
-const GooglePinsMap = lazy(() => import("../../components/ui/GooglePinsMap.jsx"));
+const LeafletPinsMap = lazy(() => import("../../components/ui/maps/LeafletPinsMap.jsx"));
 const OPEN = C.sosOpenStatus;
 const PIN = { ACTIVE: "#C62828", ACKNOWLEDGED: "#C2410C" };
 
@@ -371,20 +370,13 @@ export default function LiveSosPage() {
           alignItems: "start",
         }}
       >
-        <Paper variant="outlined" sx={{ height: { xs: 280, md: 560 }, overflow: "hidden" }}>
-          {KEY ? (
-            <Suspense fallback={<Skeleton variant="rectangular" height="100%" />}>
-              <GooglePinsMap apiKey={KEY} pins={pins} onPin={openDetail} />
-            </Suspense>
-          ) : (
-            <Stack
-              alignItems="center"
-              justifyContent="center"
-              sx={{ height: "100%", p: 3, textAlign: "center" }}
-            >
-              <Typography color="text.secondary">{t("liveSos.noKey")}</Typography>
-            </Stack>
-          )}
+        <Paper
+          variant="outlined"
+          sx={{ height: { xs: 280, md: 560 }, overflow: "hidden", position: "relative", zIndex: 0 }}
+        >
+          <Suspense fallback={<Skeleton variant="rectangular" height="100%" />}>
+            <LeafletPinsMap pins={pins} onPin={openDetail} />
+          </Suspense>
         </Paper>
         <Paper variant="outlined" sx={{ p: 1.5 }}>
           <Tabs value={tab} onChange={(_e, v) => setTab(v)} sx={{ mb: 1 }}>

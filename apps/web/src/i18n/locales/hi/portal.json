@@ -189,7 +189,6 @@
     "started": "{{ago}} शुरू हुआ",
     "accuracy": "±{{m}} मी.",
     "approximate": "अनुमानित जगह",
-    "noKey": "मैप के लिए Google Maps key चाहिए — सूची इसके बिना भी काम करती है।",
     "detail": {
       "title": "SOS जानकारी",
       "callCitizen": "नागरिक को कॉल करें",

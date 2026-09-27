@@ -134,5 +134,11 @@
   "languages": {
     "hi": "हिन्दी",
     "en": "English"
+  },
+  "map": {
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "pin": "Selected place",
+    "you": "You are here"
   }
 }

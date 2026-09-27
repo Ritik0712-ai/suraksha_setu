@@ -1,8 +1,7 @@
 import { lazy, Suspense } from "react";
 import { Box, Stack, TextField, Typography } from "@mui/material";
 
-const KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY;
-const GooglePinPicker = lazy(() => import("../../components/ui/GooglePinPicker.jsx"));
+const LeafletPinPicker = lazy(() => import("../../components/ui/maps/LeafletPinPicker.jsx"));
 
 /** Two-language inputs used by the admin forms. */
 export function BiField({ label, value, onChange, id }) {
@@ -26,7 +25,7 @@ export function BiField({ label, value, onChange, id }) {
   );
 }
 
-/** Latitude/longitude inputs, with a pin picker when a Maps key is configured. */
+/** Latitude/longitude inputs, with a map pin picker (OpenStreetMap). */
 export function PointField({ value, onChange, latLabel, lngLabel, hint }) {
   return (
     <Stack spacing={1}>
@@ -50,7 +49,7 @@ export function PointField({ value, onChange, latLabel, lngLabel, hint }) {
           fullWidth
         />
       </Stack>
-      {KEY && Number(value.lat) && Number(value.lng) ? (
+      {Number(value.lat) && Number(value.lng) ? (
         <>
           <Box
             sx={{
@@ -59,11 +58,12 @@ export function PointField({ value, onChange, latLabel, lngLabel, hint }) {
               overflow: "hidden",
               border: "1px solid",
               borderColor: "divider",
+              position: "relative",
+              zIndex: 0,
             }}
           >
             <Suspense fallback={null}>
-              <GooglePinPicker
-                apiKey={KEY}
+              <LeafletPinPicker
                 value={{ lat: Number(value.lat), lng: Number(value.lng) }}
                 onChange={(p) => onChange({ lat: p.lat.toFixed(6), lng: p.lng.toFixed(6) })}
               />

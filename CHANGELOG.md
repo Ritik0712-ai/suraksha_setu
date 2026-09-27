@@ -36,6 +36,9 @@ Everything so far — not yet tagged or deployed.
 
 ### Changed
 
+- Maps are now free OpenStreetMap maps (Leaflet, no key) everywhere Google Maps was planned — SOS,
+  tracking link, complaint pin, emergency map view, portal live SOS, admin pin pickers. The CSP no
+  longer allows inline or eval scripts.
 - The citizen app's first download is ~13 KB smaller (socket.io loads after login), and the
   Schemes list is requested alongside the page's code (Schemes LCP 4.18 s → 3.77 s, slow 4G).
 

@@ -5,18 +5,17 @@ import { useTranslation } from "react-i18next";
 import { LocationCard } from "../../components/ui/MapView.jsx";
 import { Notice } from "../../components/ui/Notice.jsx";
 
-const KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY;
-const GooglePinPicker = lazy(() => import("../../components/ui/GooglePinPicker.jsx"));
+const LeafletPinPicker = lazy(() => import("../../components/ui/maps/LeafletPinPicker.jsx"));
 const HEIGHT = 220; // docs/03 S-10 step 3
 
 /**
- * S-10 step 3 location. With a Maps key: a draggable pin. Without one (or offline): a location
- * card with the coordinates. With no location at all, the home village is used server-side.
+ * S-10 step 3 location. Online: a map with a draggable pin (OpenStreetMap, free). Offline: a
+ * location card with the coordinates. With no location at all, the home village is used server-side.
  */
 export function LocationPicker({ value, source, locating, onChange, onLocate }) {
   const { t } = useTranslation("complaints");
   const offline = typeof navigator !== "undefined" && navigator.onLine === false;
-  const useMap = Boolean(KEY && !offline && value);
+  const useMap = Boolean(!offline && value);
 
   return (
     <Stack spacing={1.5}>
@@ -31,11 +30,12 @@ export function LocationPicker({ value, source, locating, onChange, onLocate }) 
               overflow: "hidden",
               border: "1px solid",
               borderColor: "divider",
+              position: "relative",
+              zIndex: 0,
             }}
           >
             <Suspense fallback={<LocationCard center={value} height={HEIGHT} showLink={false} />}>
-              <GooglePinPicker
-                apiKey={KEY}
+              <LeafletPinPicker
                 value={value}
                 onChange={(p) => onChange({ lat: p.lat, lng: p.lng }, "pin")}
               />

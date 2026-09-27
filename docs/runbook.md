@@ -23,19 +23,21 @@ Create **separate dev and prod credentials** for every service below (docs/02 SE
 3. Nothing else to configure: uploads are signed by the API and limited to 1280 px and re-encoded, which strips EXIF/GPS.
 4. **Check:** file a complaint with a phone photo, download the stored image from the Cloudinary media library and confirm it has no GPS data (e.g. `exiftool photo.jpg | grep -i gps` prints nothing). Delete a test photo from the portal flow and confirm it disappears from the media library.
 
-### 1.2 Google Maps + Places (task 5.2) — not used (needs billing)
+### 1.2 Maps — OpenStreetMap (free); Google Places not used (task 5.2)
 
 Google Maps Platform only works with a billing account (a card), even inside its free monthly
-credit, so the free setup leaves both keys empty:
+credit, so the app uses **Leaflet + OpenStreetMap tiles** instead — no key, no account, no cost:
 
-- No `VITE_GOOGLE_MAPS_KEY` → every map is replaced by a location card with the coordinates and an
-  **Open in Google Maps** link (opens the Maps app on the phone — free).
+- Every map (SOS, tracking page, complaint pin, emergency map view, portal live SOS, admin pin
+  pickers) is drawn with Leaflet from `tile.openstreetmap.org`, loaded only when a map is shown.
+  OSM's [tile policy](https://operations.osmfoundation.org/policies/tiles/) asks for the visible
+  "© OpenStreetMap" credit and a Referer header (both set in `components/ui/maps/leaflet.js`) and
+  no heavy use — fine for a village pilot. If usage ever grows, switch `TILE_URL` to another free
+  tile host.
+- Offline, maps fall back to a location card with the coordinates. Every map keeps an **Open in
+  Google Maps** link (a plain link that opens the Maps app on the phone — free, no API).
 - No `GOOGLE_PLACES_KEY`, `PLACES_DAILY_LIMIT=0` → nearby services come only from the curated,
   phone-verified directory (A-10), which is the better source for Mahodiya anyway (docs/02 ADR-09).
-
-If the team ever gets a sponsored billing account, the keys drop in without code changes:
-browser key restricted to the Vercel domain and the Maps JavaScript API; server key restricted to
-Places API (New) on Render; a daily quota of ~300 and a budget alert.
 
 ### 1.3 Email — Brevo HTTPS API, Gmail as backup (task 5.3)
 
@@ -135,12 +137,11 @@ Notes: the API has no build step (plain Node ESM), so it starts with `npm run st
    |---|---|
    | `VITE_API_BASE` | `/api/v1` |
    | `VITE_SOCKET_URL` | `https://suraksha-setu-api-jrcl.onrender.com` (WebSockets can't go through the rewrite) |
-   | `VITE_GOOGLE_MAPS_KEY` | leave empty (Maps needs billing, §1.2) |
    | `VITE_APP_ENV` | `production` / `preview` |
    | `HUSKY` | `0` |
 
 3. `apps/web/vercel.json` does the rest: `/api/*` → Render (so the refresh cookie is first-party, docs/02 §6.2), SPA fallback, security headers (HSTS, CSP, frame-deny), long-lived caching for hashed `/assets/*` and `no-cache` for the service worker.
-4. **Content-Security-Policy (SEC-09):** allows only our origin, the Render API (https + wss), Cloudinary images, and the Google Maps allowlist from Google's CSP guide. That guide requires `'unsafe-inline'` and `'unsafe-eval'` in `script-src` for Maps; a nonce-based strict CSP would need server rendering, which a static site doesn't have. The E2E tests serve the build with the same headers and fail on any CSP violation, so a new external host has to be added here on purpose.
+4. **Content-Security-Policy (SEC-09):** allows only our origin, the Render API (https + wss), Cloudinary images, OpenStreetMap tiles and Google Fonts. `script-src` is `'self'` only (no inline or eval); `style-src` keeps `'unsafe-inline'` because MUI injects its styles at runtime. The E2E tests serve the build with the same headers and fail on any CSP violation, so a new external host has to be added here on purpose.
 
 ### 2.4 Wire the URLs together
 

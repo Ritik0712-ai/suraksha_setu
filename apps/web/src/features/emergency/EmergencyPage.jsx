@@ -36,8 +36,7 @@ import { PageTitle } from "../../components/ui/PageTitle.jsx";
 import { ResponsiveDialog } from "../../components/ui/ResponsiveDialog.jsx";
 import { ErrorCard } from "../../components/ui/States.jsx";
 
-const KEY = import.meta.env.VITE_GOOGLE_MAPS_KEY;
-const GooglePinsMap = lazy(() => import("../../components/ui/GooglePinsMap.jsx"));
+const LeafletPinsMap = lazy(() => import("../../components/ui/maps/LeafletPinsMap.jsx"));
 
 // docs/03 S-20 tabs.
 const TYPES = [
@@ -230,7 +229,7 @@ export default function EmergencyPage() {
             <Notice kind="warning">{t("deniedGuest")}</Notice>
           )}
 
-        {canQuery && KEY && (
+        {canQuery && (
           <ToggleButtonGroup
             exclusive
             value={view}
@@ -268,7 +267,7 @@ export default function EmergencyPage() {
             }
           />
         )}
-        {q.isSuccess && services.length > 0 && view === "map" && KEY ? (
+        {q.isSuccess && services.length > 0 && view === "map" ? (
           <Box
             sx={{
               height: 360,
@@ -276,11 +275,12 @@ export default function EmergencyPage() {
               overflow: "hidden",
               border: "1px solid",
               borderColor: "divider",
+              position: "relative",
+              zIndex: 0,
             }}
           >
             <Suspense fallback={<Skeleton variant="rectangular" height={360} />}>
-              <GooglePinsMap
-                apiKey={KEY}
+              <LeafletPinsMap
                 pins={services.map((s) => ({
                   id: s.id,
                   lat: s.lat,

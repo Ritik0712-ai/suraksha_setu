@@ -230,7 +230,7 @@ Test a restore into a scratch database once before the pilot (doc 06 task 7.7).
 - **The SMS app needs a tap.** Browsers only open `sms:` links from a user gesture, so after the countdown auto-sends (or on a phone with no SIM) S-07 shows a big red "Send SMS to contacts" button — one tap opens the SMS app with the message ready. Emails and the authority alert go out regardless.
 - **Offline:** if the server can't be reached, the SMS still opens with the contacts cached on the phone, and S-07 retries every 10 s for 2 minutes. A known citizen who opens the app while the server is down still gets the full SOS (name, role and contacts are cached on the device; logout clears them).
 - **Tracking link** (`/track/<token>`): shows only the first name, location and status; the token is derived from the SOS id with an HMAC (only its hash is stored), so the owner can reopen their link; location is never shown after the SOS ends.
-- **Maps:** set `VITE_GOOGLE_MAPS_KEY` to show Google Maps; without it (or offline) a location card with coordinates and an "Open in Google Maps" link is shown.
+- **Maps:** free OpenStreetMap maps via Leaflet (no key); offline, a location card with coordinates and an "Open in Google Maps" link is shown.
 - In production the web app needs `VITE_SOCKET_URL` pointing at the Render API (Vercel can't proxy WebSockets). Locally, Vite proxies `/socket.io`.
 
 ## Complaint notes
