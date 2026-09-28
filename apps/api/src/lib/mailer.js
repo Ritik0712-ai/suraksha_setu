@@ -23,7 +23,9 @@ async function ipv4Of(host, resolve4) {
  * Returns { configured, send(to, subject, text) }; send never throws and resolves to true when
  * one of the SMTP servers accepted the message.
  *
- * - BREVO_API_KEY: Brevo's HTTPS API, tried first when set (Render's free plan blocks SMTP ports)
+ * - MAIL_RELAY_URL + MAIL_RELAY_SECRET: our free Gmail relay (Apps Script) over HTTPS, tried
+ *   first when set — Render's free plan blocks SMTP ports and needs no domain
+ * - BREVO_API_KEY: Brevo's HTTPS API, tried next when set
  * - Primary:  SMTP_HOST / SMTP_PORT / SMTP_USER / SMTP_PASS
  * - Fallback: SMTP_FALLBACK_HOST / _PORT / _USER / _PASS (e.g. Brevo), tried only when the
  *   primary fails — so an SOS email still goes out if Gmail throttles or rejects us.
@@ -61,6 +63,30 @@ function brevoApi(env, fetchImpl) {
       if (!res.ok) {
         const detail = await res.text().catch(() => "");
         throw new Error(`Brevo API ${res.status} ${detail.slice(0, 200)}`);
+      }
+    },
+  };
+}
+
+/**
+ * Our Google Apps Script relay (apps/api/mail-relay/Code.gs) over HTTPS. The script sends from
+ * Google's own servers as the team's Gmail address, so it needs no domain and passes Gmail's
+ * sender checks. Apps Script answers 200 even on errors, so the JSON body decides.
+ */
+function appsScriptRelay(env, fetchImpl) {
+  return {
+    name: "gmail-relay",
+    async send({ to, subject, text }) {
+      const res = await fetchImpl(env.MAIL_RELAY_URL, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ secret: env.MAIL_RELAY_SECRET, to, subject, text }),
+        redirect: "follow", // /exec answers with a redirect to the script's output
+        signal: AbortSignal.timeout(20_000),
+      });
+      const body = await res.json().catch(() => null);
+      if (!res.ok || !body?.ok) {
+        throw new Error(`mail relay ${res.status} ${body?.error ?? "no JSON reply"}`);
       }
     },
   };
@@ -115,7 +141,11 @@ export function createMailer(
         });
       },
     }));
-  const servers = [...(env.BREVO_API_KEY ? [brevoApi(env, fetchImpl)] : []), ...smtpServers];
+  const servers = [
+    ...(env.MAIL_RELAY_URL && env.MAIL_RELAY_SECRET ? [appsScriptRelay(env, fetchImpl)] : []),
+    ...(env.BREVO_API_KEY ? [brevoApi(env, fetchImpl)] : []),
+    ...smtpServers,
+  ];
 
   if (!servers.length) {
     return {

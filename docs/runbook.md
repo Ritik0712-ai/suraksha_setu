@@ -39,15 +39,31 @@ credit, so the app uses **Leaflet + OpenStreetMap tiles** instead — no key, no
 - No `GOOGLE_PLACES_KEY`, `PLACES_DAILY_LIMIT=0` → nearby services come only from the curated,
   phone-verified directory (A-10), which is the better source for Mahodiya anyway (docs/02 ADR-09).
 
-### 1.3 Email — Brevo HTTPS API, Gmail as backup (task 5.3)
+### 1.3 Email — free Gmail relay (Apps Script), Brevo and SMTP as backups (task 5.3)
 
 **Render's free plan blocks outbound SMTP ports** (25/465/587 — [Render changelog](https://render.com/changelog/free-web-services-will-no-longer-allow-outbound-traffic-to-smtp-ports)),
-so on Render emails go through **Brevo's HTTPS API** (port 443). Free: 300 emails/day, no card.
+so on Render emails go over HTTPS. Email services (Brevo and others) now require a domain we
+own for the sender, which costs money. So production uses a **Google Apps Script relay** in the
+team's Google account: it sends from Google's own servers as that Gmail address, so Gmail's
+sender checks pass. Free, no domain, about **100 recipients a day** on a normal Gmail account.
 
-1. brevo.com → sign up (free) → **Senders, domains & dedicated IPs → Senders** → add the address in `MAIL_FROM` and confirm the email Brevo sends to it.
-2. **SMTP & API → API keys → Generate a new API key** → set it as `BREVO_API_KEY` on the API. The mailer tries it first.
-3. Gmail SMTP stays configured as the backup (`SMTP_HOST=smtp.gmail.com`, `SMTP_USER`, `SMTP_PASS` = a Google **app password** from https://myaccount.google.com/apppasswords, `MAIL_FROM="Suraksha Setu <address>"`). It works locally and on hosts that allow SMTP; on Render it just times out and is skipped.
-4. **Check:** trigger a password-reset email for an account that has an email (and a drill SOS with a contact that has one). Both must arrive in the inbox, not spam. Sending "from" a Gmail address through Brevo can land in spam at first — mark "Not spam" once; a project domain with SPF/DKIM in Brevo fixes it for good (needs a domain, so not in the free setup).
+The mailer tries, in order: the relay (`MAIL_RELAY_URL` + `MAIL_RELAY_SECRET`) → Brevo's API
+(`BREVO_API_KEY`) → SMTP. The first that works sends the email.
+
+**Relay set-up (once, about 10 minutes):**
+
+1. Make a secret: `node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"`.
+2. Sign in to the Gmail account that should send the emails → https://script.google.com → **New project** → name it "Suraksha Setu mail relay" → replace the code with `apps/api/mail-relay/Code.gs` → **Save**.
+3. **Project Settings** (gear) → **Script Properties** → **Add** → `RELAY_SECRET` = the secret from step 1 → **Save**.
+4. **Deploy → New deployment** → type **Web app** → *Execute as*: **Me**; *Who has access*: **Anyone** → **Deploy** → **Authorize access** → choose the account → "Google hasn't verified this app" → **Advanced → Go to … (unsafe)** → **Allow**. (It's our own script asking to send email as you; the warning appears for every personal script.)
+5. Copy the **Web app URL** (ends in `/exec`). On the Render API service set `MAIL_RELAY_URL` = that URL and `MAIL_RELAY_SECRET` = the secret. Never put the secret in git.
+6. **Check:** open the URL in a browser → `{"ok":true,"relay":"up"}`. Then trigger a password-reset email for an account with an email address — it must arrive, sent from the Gmail address with the name "Suraksha Setu".
+7. **Changing the script later:** Deploy → Manage deployments → edit → **New version** (keeps the same URL).
+
+Brevo (optional, if an account is approved): Senders → confirm the `MAIL_FROM` address; API keys → set `BREVO_API_KEY`.
+
+Gmail SMTP stays configured as the last backup (`SMTP_HOST=smtp.gmail.com`, `SMTP_USER`, `SMTP_PASS` = a Google **app password** from https://myaccount.google.com/apppasswords, `MAIL_FROM="Suraksha Setu <address>"`). It works locally and on hosts that allow SMTP; on Render it just times out and is skipped.
+**Check before each review:** trigger a password-reset email and a drill SOS with a contact who has an email. Both must arrive in the inbox, not spam. If the relay's daily limit is hit, the mailer moves on to the backups, and SOS itself never depends on email (the SMS goes from the phone).
 
 ### 1.4 Node ↔ AI service (task 5.4)
 

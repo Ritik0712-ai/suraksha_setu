@@ -38,6 +38,10 @@ const schema = z.object({
   // Brevo's HTTPS email API (free: 300 emails/day). Tried first when set: Render's free plan
   // blocks outbound SMTP ports, so SMTP only works locally or on other hosts.
   BREVO_API_KEY: optional,
+  // Free Gmail relay (Google Apps Script web app, apps/api/mail-relay/Code.gs), tried before
+  // Brevo: sends from the team's Gmail over HTTPS, no domain needed. Both must be set.
+  MAIL_RELAY_URL: optional.refine((v) => !v || v.startsWith("https://"), "must be an https URL"),
+  MAIL_RELAY_SECRET: optional.refine((v) => !v || v.length >= 24, "use at least 24 characters"),
   AI_BASE_URL: optional,
   AI_INTERNAL_KEY: optional,
   GOOGLE_PLACES_KEY: optional,

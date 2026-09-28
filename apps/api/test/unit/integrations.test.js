@@ -133,6 +133,76 @@ describe("Brevo HTTPS API first (Render's free plan blocks SMTP ports)", () => {
   });
 });
 
+describe("Free Gmail relay (Apps Script) first — no domain, HTTPS only", () => {
+  const relay = {
+    MAIL_RELAY_URL: "https://script.google.com/macros/s/abc/exec",
+    MAIL_RELAY_SECRET: "a-long-shared-secret-of-32-chars!",
+  };
+  const relayFetch = (replies) => {
+    const calls = [];
+    const fetchImpl = async (url, init) => {
+      calls.push({ url, init, body: JSON.parse(init.body) });
+      const r = replies[url.includes("brevo") ? "brevo" : "relay"];
+      return new Response(r.body, { status: r.status });
+    };
+    return { calls, fetchImpl };
+  };
+
+  it("sends through the relay, before Brevo and SMTP", async () => {
+    const t = fakeTransports({});
+    const f = relayFetch({ relay: { status: 200, body: '{"ok":true}' } });
+    const m = createMailer(testEnv({ ...smtp, ...relay, BREVO_API_KEY: "xkeysib-test" }), {
+      ...t,
+      fetchImpl: f.fetchImpl,
+    });
+    expect(m.servers).toEqual(["gmail-relay", "brevo-api", "primary"]);
+    expect(await m.send("a@x.in", "SOS", "help")).toBe(true);
+    expect(f.calls).toHaveLength(1);
+    expect(f.calls[0].url).toBe(relay.MAIL_RELAY_URL);
+    expect(f.calls[0].init.redirect).toBe("follow");
+    expect(f.calls[0].body).toEqual({
+      secret: relay.MAIL_RELAY_SECRET,
+      to: "a@x.in",
+      subject: "SOS",
+      text: "help",
+    });
+    expect(t.made).toHaveLength(0);
+  });
+
+  it("treats a 200 with ok:false (Apps Script errors) as a failure and falls back", async () => {
+    const t = fakeTransports({});
+    const f = relayFetch({
+      relay: { status: 200, body: '{"ok":false,"error":"quota"}' },
+      brevo: { status: 201, body: '{"messageId":"m1"}' },
+    });
+    const m = createMailer(testEnv({ ...relay, BREVO_API_KEY: "xkeysib-test" }), {
+      ...t,
+      fetchImpl: f.fetchImpl,
+    });
+    expect(await m.send("a@x.in", "SOS", "help")).toBe(true);
+    expect(f.calls.map((c) => c.url)).toEqual([
+      relay.MAIL_RELAY_URL,
+      "https://api.brevo.com/v3/smtp/email",
+    ]);
+  });
+
+  it("fails cleanly on a non-JSON reply, and needs both settings", async () => {
+    const f = relayFetch({ relay: { status: 200, body: "<html>login</html>" } });
+    const m = createMailer(testEnv(relay), { ...fakeTransports({}), fetchImpl: f.fetchImpl });
+    expect(await m.send("a@x.in", "SOS", "help")).toBe(false);
+    const half = createMailer(
+      testEnv({ MAIL_RELAY_URL: relay.MAIL_RELAY_URL }),
+      fakeTransports({}),
+    );
+    expect(half.configured).toBe(false);
+  });
+
+  it("rejects an http URL or a short secret at start-up", () => {
+    expect(() => testEnv({ ...relay, MAIL_RELAY_URL: "http://x.in/exec" })).toThrow(/https/);
+    expect(() => testEnv({ ...relay, MAIL_RELAY_SECRET: "short" })).toThrow(/24/);
+  });
+});
+
 describe("Places daily budget (task 5.2)", () => {
   it("stops at the limit and resets at IST midnight", () => {
     let now = new Date("2026-09-27T10:00:00Z");

@@ -250,7 +250,7 @@ Test a restore into a scratch database once before the pilot (doc 06 task 7.7).
 
 ## Integration notes (Phase 5)
 
-- **Email:** primary SMTP (Gmail app password) with an optional backup (`SMTP_FALLBACK_*`, e.g. Brevo) that is tried only when the primary fails, so SOS emails still go out if Gmail throttles us.
+- **Email:** tried in order until one works — our free Gmail relay over HTTPS (Google Apps Script, `apps/api/mail-relay/Code.gs`, set `MAIL_RELAY_URL` + `MAIL_RELAY_SECRET`), Brevo's HTTPS API (`BREVO_API_KEY`), then SMTP (`SMTP_*`, `SMTP_FALLBACK_*`) for local work. Render's free plan blocks SMTP ports, so production uses the relay (docs/runbook.md §1.3).
 - **Google Places:** server key only (`GOOGLE_PLACES_KEY`), called only when the curated directory has fewer than 3 results, and capped in code at `PLACES_DAILY_LIMIT` calls per IST day (default 300) on top of the Cloud Console quota and budget alert.
 - **Cloudinary:** folders are `suraksha/<APP_ENV>/<purpose>` so development, preview and production never mix.
 - **Uptime:** the API has `GET /api/v1/health` (`{ status, db, ai }`); the AI service has a key-less `GET /health` (`{ status: "ok" }` only) for UptimeRobot and Render.

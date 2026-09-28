@@ -36,6 +36,9 @@ Everything so far — not yet tagged or deployed.
 
 ### Changed
 
+- Email now goes through a free Gmail relay (Google Apps Script) over HTTPS first, then Brevo,
+  then SMTP. Render's free plan blocks SMTP ports, and Brevo requires a domain we don't own.
+
 - Maps are now free OpenStreetMap maps (Leaflet, no key) everywhere Google Maps was planned — SOS,
   tracking link, complaint pin, emergency map view, portal live SOS, admin pin pickers. The CSP no
   longer allows inline or eval scripts.
