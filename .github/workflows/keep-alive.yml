@@ -1,8 +1,11 @@
 name: Keep API awake + health check (daytime)
 
 # Render's free web services sleep after 15 minutes without traffic, and the first request then
-# waits about a minute. This pings the API every 10 minutes from ~06:30 to ~23:20 IST so villagers
-# rarely hit a cold start. Free: GitHub Actions minutes are free for public repositories.
+# waits about a minute. This pings the API every 10 minutes from ~06:30 to ~23:20 IST.
+# GitHub runs schedules on quiet repositories late or skips them (4 runs in 20 hours on 27–28 Sep),
+# so the API also keeps itself awake in the daytime (apps/api/src/jobs/keepAwake.js); this
+# workflow is a backup morning wake-up and the uptime monitor. /api/v1/health doesn't wake the AI
+# service (only ?ai=1 does), so these pings don't use up the AI service's free hours.
 #
 # Budget: ~17 h/day × 31 days ≈ 530 of Render's 750 free instance hours per workspace per month,
 # leaving the rest for the AI service (it sleeps and wakes when the complaint wizard or Sahayak

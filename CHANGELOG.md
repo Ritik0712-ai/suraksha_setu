@@ -36,6 +36,11 @@ Everything so far — not yet tagged or deployed.
 
 ### Changed
 
+- Sahayak no longer fails when the free AI service is asleep: opening Sahayak wakes it, and a
+  message waits for it (up to about a minute, with a "waking up" note) instead of showing
+  "Couldn't get a reply". The API keeps itself awake in the daytime (GitHub's scheduled pings ran
+  only a few times a day), and `/api/v1/health` checks the AI service only with `?ai=1`.
+
 - Email now goes through a free Gmail relay (Google Apps Script) over HTTPS first, then Brevo,
   then SMTP. Render's free plan blocks SMTP ports, and Brevo requires a domain we don't own.
 

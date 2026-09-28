@@ -119,6 +119,19 @@ describe("S-24 Sahayak home", () => {
     expect(screen.getByText(/सहायक से गलती हो सकती है/)).toBeInTheDocument();
   });
 
+  it("wakes the (free, sleeping) AI service as soon as Sahayak opens", async () => {
+    backend({ sessions: [] });
+    let warmups = 0;
+    server.use(
+      http.get("*/api/v1/chat/warmup", () => {
+        warmups += 1;
+        return HttpResponse.json({ data: { ok: true } });
+      }),
+    );
+    renderApp("/sahayak");
+    await waitFor(() => expect(warmups).toBe(1));
+  });
+
   it("a letter chip starts a letter session with Sahayak's first question", async () => {
     const state = backend();
     const { router } = renderApp("/sahayak");

@@ -24,6 +24,9 @@ const schema = z.object({
   PUBLIC_APP_URL: z.string().default("http://localhost:5173"),
   // Public URL of this API. Only used for photo URLs when photos are stored on local disk.
   API_PUBLIC_URL: optional,
+  // Set by Render itself (the service's public https URL). The API pings it in the daytime to
+  // stay awake on the free plan (src/jobs/keepAwake.js); unset locally, so nothing is pinged.
+  RENDER_EXTERNAL_URL: optional,
   CLOUDINARY_URL: optional,
   SMTP_HOST: optional,
   SMTP_PORT: z.coerce.number().int().positive().default(587),

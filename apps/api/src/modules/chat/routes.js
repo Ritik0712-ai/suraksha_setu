@@ -113,6 +113,13 @@ export function chatRouter({ env, ai }) {
   const router = Router();
   router.use(requireAuth(env), requireRole("citizen"));
 
+  // Wakes the (free, sleeping) AI service when Sahayak opens, so it is up by the time the first
+  // question is typed. Answers at once; the wake-up continues in the background.
+  router.get("/warmup", (_req, res) => {
+    ai.health().catch(() => {});
+    res.json({ data: { ok: true } });
+  });
+
   // Start a session. Letter and scheme sessions open with a fixed first question (no LLM call).
   router.post(
     "/sessions",

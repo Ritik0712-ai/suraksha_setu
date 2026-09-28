@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Avatar,
   Box,
@@ -222,14 +222,25 @@ export function QuickReplies({ chips, onPick, disabled }) {
   );
 }
 
+/** "Sahayak is typing…"; after 8 s also explains that the first reply can take a minute. */
 export function Typing() {
   const { t } = useTranslation("sahayak");
+  const [slow, setSlow] = useState(false);
+  useEffect(() => {
+    const id = setTimeout(() => setSlow(true), 8000);
+    return () => clearTimeout(id);
+  }, []);
   return (
     <Bubble>
       <Stack direction="row" spacing={1} alignItems="center">
         <CircularProgress size={16} />
         <Typography>{t("chat.typing")}</Typography>
       </Stack>
+      {slow && (
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+          {t("chat.waking")}
+        </Typography>
+      )}
     </Bubble>
   );
 }

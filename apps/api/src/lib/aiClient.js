@@ -5,6 +5,11 @@ export const CLASSIFY_TIMEOUT_MS = 8000; // docs/02 §8.2
 // Sahayak waits longer than the classifier: an LLM reply takes a few seconds (docs/01 §8.2 p90
 // < 6 s); the AI service gives up on the LLM after 12 s.
 export const SAHAYAK_TIMEOUT_MS = 15000;
+// The AI service runs on Render's free plan and sleeps after 15 idle minutes; waking takes about
+// 30–50 s, during which Render answers 502 or holds the request. A Sahayak message then waits up
+// to this long in total (the web app allows 75 s) instead of failing.
+export const SAHAYAK_WAKE_BUDGET_MS = 60000;
+const WAKE_POLL_MS = 3000;
 
 /**
  * Client for the internal Django AI service (docs/02 §7.3). AI is optional (docs/02 §1.3): every
@@ -16,6 +21,9 @@ export function createAiClient({
   fetchImpl = fetch,
   timeoutMs = CLASSIFY_TIMEOUT_MS,
   sahayakTimeoutMs = SAHAYAK_TIMEOUT_MS,
+  wakeBudgetMs = SAHAYAK_WAKE_BUDGET_MS,
+  wakePollMs = WAKE_POLL_MS,
+  sleep = (ms) => new Promise((r) => setTimeout(r, ms)),
 }) {
   const base = env.AI_BASE_URL?.replace(/\/+$/, "");
   const headers = { "X-Internal-Key": env.AI_INTERNAL_KEY ?? "" };
@@ -71,14 +79,24 @@ export function createAiClient({
     }
   }
 
-  /**
-   * POST /internal/sahayak/reply (docs/02 §7.3). Never throws.
-   * → { ok: true, reply } or { ok: false, reason: "resting" | "failed" }
-   *   "resting": no AI service or no LLM configured; "failed": timeout, 5xx or a bad answer.
-   * No retry: an LLM call costs money and a retry would double the wait.
-   */
-  async function sahayakReply(payload) {
-    if (!configured) return { ok: false, reason: "resting" };
+  /** Polls the AI service's public /health until it answers (it is waking) or the deadline. */
+  async function waitUntilAwake(deadline) {
+    while (Date.now() < deadline) {
+      try {
+        const res = await fetchImpl(`${base}/health`, {
+          signal: AbortSignal.timeout(Math.max(1, Math.min(10_000, deadline - Date.now()))),
+        });
+        if (res.ok) return true;
+      } catch {
+        // still waking
+      }
+      if (deadline - Date.now() <= wakePollMs) break;
+      await sleep(wakePollMs);
+    }
+    return false;
+  }
+
+  async function askSahayak(payload, deadline) {
     try {
       const res = await request(
         "/internal/sahayak/reply",
@@ -87,12 +105,15 @@ export function createAiClient({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         },
-        Date.now() + sahayakTimeoutMs,
+        deadline,
       );
       const body = await res.json().catch(() => null);
       if (!res.ok) {
         const code = body?.error?.code;
         logger.warn({ status: res.status, code }, "Sahayak refused");
+        // No error code from our service = Render's proxy answered (502/503/504 while the
+        // instance wakes up), not the AI service itself.
+        if (!code) return { ok: false, reason: "failed", waking: true };
         return { ok: false, reason: code === "LLM_NOT_CONFIGURED" ? "resting" : "failed" };
       }
       const reply = parseSahayakReply(body);
@@ -102,12 +123,41 @@ export function createAiClient({
       }
       return { ok: true, reply };
     } catch (err) {
+      // A reset connection or no answer at all: a sleeping instance (our service itself gives up
+      // on the LLM after 12 s and answers with an error code).
       logger.warn({ err: err?.message }, "Sahayak call failed");
-      return { ok: false, reason: "failed" };
+      return { ok: false, reason: "failed", waking: true };
     }
   }
 
+  /**
+   * POST /internal/sahayak/reply (docs/02 §7.3). Never throws.
+   * → { ok: true, reply } or { ok: false, reason: "resting" | "failed" }
+   *   "resting": no AI service or no LLM configured; "failed": timeout, 5xx or a bad answer.
+   * If the AI service is asleep (free plan), waits for it to wake and asks once more, all within
+   * wakeBudgetMs. An error from the LLM itself is not retried (it would only double the wait).
+   */
+  async function sahayakReply(payload) {
+    if (!configured) return { ok: false, reason: "resting" };
+    const start = Date.now();
+    const end = start + Math.max(wakeBudgetMs, sahayakTimeoutMs);
+    const first = await askSahayak(payload, start + sahayakTimeoutMs);
+    if (first.ok || !first.waking) return strip(first);
+    // Leave a full reply's time after waking.
+    const awake = await waitUntilAwake(end - sahayakTimeoutMs);
+    if (!awake) {
+      logger.warn("AI service did not wake up in time");
+      return { ok: false, reason: "failed" };
+    }
+    logger.info({ wokeAfterMs: Date.now() - start }, "AI service woke up; asking Sahayak again");
+    return strip(await askSahayak(payload, Math.max(Date.now() + 1000, end)));
+  }
+
   return { configured, classify, health, sahayakReply };
+}
+
+function strip({ waking: _waking, ...result }) {
+  return result;
 }
 
 const str = (v, max) => (typeof v === "string" ? v.trim().slice(0, max) : "");

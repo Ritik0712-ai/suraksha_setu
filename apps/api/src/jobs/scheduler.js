@@ -2,9 +2,10 @@ import cron from "node-cron";
 import { logger } from "../lib/logger.js";
 import { autoCloseStaleSos } from "./sosJobs.js";
 import { cleanupStaleUploads } from "./uploadJobs.js";
+import { keepAwakeTick } from "./keepAwake.js";
 
 /** Background jobs (docs/02 §4.1 node-cron). Runs only in the server process, never in tests. */
-export function startJobs({ realtime, storage }) {
+export function startJobs({ realtime, storage, publicUrl }) {
   const task = cron.schedule("*/10 * * * *", async () => {
     try {
       const closed = await autoCloseStaleSos({ realtime });
@@ -22,8 +23,11 @@ export function startJobs({ realtime, storage }) {
       logger.error({ err }, "uploads cleanup job failed");
     }
   });
+  // Daytime self-ping so Render's free plan doesn't put the API to sleep (keepAwake.js).
+  const awake = cron.schedule("*/10 * * * *", () => keepAwakeTick({ publicUrl }));
   return () => {
     task.stop();
     uploads.stop();
+    awake.stop();
   };
 }

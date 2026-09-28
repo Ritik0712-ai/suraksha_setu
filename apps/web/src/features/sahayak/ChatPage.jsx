@@ -78,6 +78,11 @@ export default function ChatPage() {
   const endRef = useRef(null);
   const autoSent = useRef(false);
 
+  // Wake the free AI service while the user reads and types (it sleeps when idle).
+  useEffect(() => {
+    chatApi.warmup();
+  }, []);
+
   const send = async (text, { skip = false } = {}) => {
     setFailure(null);
     const base = qc.getQueryData(key)?.messages?.length ?? 0;

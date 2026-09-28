@@ -106,7 +106,10 @@ export const chatApi = {
   sessions: () => data(api.get("/chat/sessions")),
   start: (body) => data(api.post("/chat/sessions", body)),
   get: (id) => data(api.get(`/chat/sessions/${id}`)),
-  send: (id, body) => data(api.post(`/chat/sessions/${id}/messages`, body, { timeout: 30000 })),
+  // Up to ~60 s when the free AI service has to wake up first (API waits and retries).
+  send: (id, body) => data(api.post(`/chat/sessions/${id}/messages`, body, { timeout: 75000 })),
+  // Wakes the AI service in the background when Sahayak opens; errors don't matter.
+  warmup: () => api.get("/chat/warmup").catch(() => {}),
   saveLetter: (id, messageId, body) =>
     data(api.put(`/chat/sessions/${id}/messages/${messageId}/letter`, body)),
   remove: (id) => data(api.delete(`/chat/sessions/${id}`)),

@@ -8,7 +8,7 @@ const baseEnv = { NODE_ENV: "test" };
 describe("GET /api/v1/health", () => {
   it("reports db down and ai unconfigured without a database or AI service", async () => {
     const app = createApp({ env: loadEnv(baseEnv) });
-    const res = await request(app).get("/api/v1/health");
+    const res = await request(app).get("/api/v1/health?ai=1");
     expect(res.status).toBe(503);
     expect(res.body).toEqual({ status: "degraded", db: "down", ai: "unconfigured" });
   });
@@ -20,7 +20,7 @@ describe("GET /api/v1/health", () => {
       return { ok: true };
     };
     const env = loadEnv({ ...baseEnv, AI_BASE_URL: "http://ai", AI_INTERNAL_KEY: "k" });
-    const res = await request(createApp({ env, fetchImpl })).get("/api/v1/health");
+    const res = await request(createApp({ env, fetchImpl })).get("/api/v1/health?ai=1");
     expect(res.body.ai).toBe("up");
     expect(seen).toEqual({ url: "http://ai/internal/health", key: "k" });
   });
@@ -30,8 +30,20 @@ describe("GET /api/v1/health", () => {
       throw new Error("ECONNREFUSED");
     };
     const env = loadEnv({ ...baseEnv, AI_BASE_URL: "http://ai" });
-    const res = await request(createApp({ env, fetchImpl })).get("/api/v1/health");
+    const res = await request(createApp({ env, fetchImpl })).get("/api/v1/health?ai=1");
     expect(res.body.ai).toBe("down");
+  });
+
+  it("doesn't touch (and so doesn't wake) the AI service without ?ai=1", async () => {
+    let calls = 0;
+    const fetchImpl = async () => {
+      calls += 1;
+      return { ok: true };
+    };
+    const env = loadEnv({ ...baseEnv, AI_BASE_URL: "http://ai", AI_INTERNAL_KEY: "k" });
+    const res = await request(createApp({ env, fetchImpl })).get("/api/v1/health");
+    expect(res.body.ai).toBe("unchecked");
+    expect(calls).toBe(0);
   });
 });
 

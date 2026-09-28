@@ -88,14 +88,23 @@ Gmail SMTP stays configured as the last backup (`SMTP_HOST=smtp.gmail.com`, `SMT
 
 ### 1.7 Uptime monitoring and keeping the API awake (task 5.7)
 
-`.github/workflows/keep-alive.yml` pings `https://suraksha-setu-api-jrcl.onrender.com/api/v1/health`
-every 10 minutes from about 06:30 to 23:20 IST. It keeps the free API awake in the daytime and is
-the uptime monitor: a run fails when health isn't 200, and GitHub emails the repository owner.
+Render's free services sleep after 15 minutes without traffic; waking takes about a minute.
 
-- **Free hours budget:** Render gives 750 free instance hours per workspace per month. The daytime
-  window uses ≈ 530; the AI service uses the rest while it's awake. Don't make it 24 h and don't
-  add UptimeRobot monitors — either would use up the hours and Render would suspend both services
-  until the next month.
+- **The API keeps itself awake in the daytime:** every 10 minutes from 06:30 to 23:10 IST it calls
+  its own public URL (`src/jobs/keepAwake.js`, using `RENDER_EXTERNAL_URL`, which Render sets).
+  At night it sleeps; the first visitor of the morning wakes it.
+- **`.github/workflows/keep-alive.yml`** also pings `/api/v1/health` every 10 minutes in the daytime
+  and is the uptime monitor (a failed run emails the repository owner). GitHub runs quiet
+  repositories' schedules late or skips them (on 27–28 Sep it ran 4 times in 20 hours), so it is
+  only a backup morning wake-up — never rely on it alone.
+- **The AI service wakes on demand:** opening Sahayak or the complaint wizard sends a warm-up
+  request, and a Sahayak message that finds it asleep waits for it (up to about a minute, with a
+  "Sahayak is waking up" note) and then asks again. `/api/v1/health` does **not** touch the AI
+  service (that would keep it awake all day); use `/api/v1/health?ai=1` to check it.
+- **Free hours budget:** Render gives 750 free instance hours per workspace per month. The API's
+  daytime window uses ≈ 520; the AI service uses the rest while it's awake. Don't make the window
+  24 h and don't add UptimeRobot monitors — either would use up the hours and Render would suspend
+  both services until the next month.
 - At night the API sleeps; the first request then takes about a minute. An SOS still opens the SMS
   app and 112 on the phone immediately, and the app retries the server for 2 minutes.
 - GitHub pauses scheduled workflows after 60 days without commits — re-enable it in Actions.
@@ -140,7 +149,7 @@ Content-Security-Policy), `.github/workflows/keep-alive.yml` and this file.
 2. Fill in every `sync: false` value it asks for (tables in §1 say where each comes from). Leave `AI_BASE_URL`, `CORS_ORIGINS` and `PUBLIC_APP_URL` for step 2.4 if you don't know the URLs yet — the API still boots.
 3. Generated for you: `JWT_ACCESS_SECRET`, `REFRESH_TOKEN_PEPPER`, `AI_INTERNAL_KEY` (copied to the AI service automatically) and `DJANGO_SECRET_KEY`.
 4. **Model:** until CNN v1 is published as a GitHub Release (`ml/README.md`), leave `MODEL_URL` / `MODEL_CARD_URL` empty — the build skips the download and complaints use manual categories. After the release, set both and **Manual Deploy → Clear build cache & deploy**.
-5. Checks: `https://suraksha-setu-api-jrcl.onrender.com/api/v1/health` → `{"status":"ok","db":"up","ai":"up"}`; `https://suraksha-setu-ai.onrender.com/health` → `{"status":"ok"}`; `…/internal/health` without the key → **401**.
+5. Checks: `https://suraksha-setu-api-jrcl.onrender.com/api/v1/health?ai=1` → `{"status":"ok","db":"up","ai":"up"}` (without `?ai=1`, `ai` is `unchecked`); `https://suraksha-setu-ai.onrender.com/health` → `{"status":"ok"}`; `…/internal/health` without the key → **401**.
 
 Notes: the API has no build step (plain Node ESM), so it starts with `npm run start -w apps/api` rather than `node dist/server.js` (docs/02 §9.2). Both services build from the repo root because they read `shared/constants.json`.
 
@@ -242,7 +251,7 @@ If a key was committed to git, rotating it is the fix — rewriting history does
 
 No upgrades: the project stays on the free plans.
 
-- The day before a demo, run **Actions → Keep API awake → Run workflow** once and open both health URLs 10 minutes before you start, so neither service is asleep. During the demo the complaint wizard also wakes the AI service in the background.
+- Ten minutes before a demo, open `https://suraksha-setu-api-jrcl.onrender.com/api/v1/health?ai=1` (wakes both services; wait for `ai: up`) and open Sahayak once. During the demo, opening Sahayak or the complaint wizard also wakes the AI service in the background.
 - For the pilot, the daytime keep-alive covers normal hours; tell the authority user the portal may take a minute to open late at night.
 - Watch the free usage once a week: Render → workspace "Ritik" → Billing shows the free instance hours used this month (must stay under 750); Atlas → M0 storage; Cloudinary → credits; Google AI Studio → usage.
 - Record a backup demo video in case the venue network fails (docs/06 8.7).

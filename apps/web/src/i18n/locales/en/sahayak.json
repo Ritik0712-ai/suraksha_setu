@@ -41,7 +41,8 @@
     "notFound": "This chat isn't available.",
     "log": "Conversation",
     "quickReplies": "Quick replies",
-    "outOfScope": "I can help with schemes, complaints, letters and emergency help."
+    "outOfScope": "I can help with schemes, complaints, letters and emergency help.",
+    "waking": "Sahayak is waking up — the first reply can take up to a minute."
   },
   "emergency": {
     "title": "Are you in danger?",

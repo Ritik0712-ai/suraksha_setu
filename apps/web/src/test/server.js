@@ -43,6 +43,7 @@ export const apiErr = (status, code, message, details) =>
 
 // Default: logged out, healthy API.
 export const handlers = [
+  http.get("*/api/v1/chat/warmup", () => HttpResponse.json({ data: { ok: true } })),
   http.post("*/api/v1/auth/refresh", () => apiErr(401, "UNAUTHENTICATED", "Please log in again.")),
   http.get("*/api/v1/health", () => HttpResponse.json({ status: "ok", db: "up", ai: "up" })),
   http.get("*/api/v1/jurisdictions", () => HttpResponse.json({ data: [VILLAGE] })),

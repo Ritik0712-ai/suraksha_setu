@@ -7,7 +7,7 @@ If anything fails, say so plainly and switch to the backup video — don't debug
 ## Before the review (the day before)
 
 - [ ] Production deploy passed the smoke test (docs/runbook.md §2.6); CI is green on the demo commit; tag it (§2.12).
-- [ ] Wake the free Render services: Actions → "Keep API awake" → Run workflow, then open `/api/v1/health` 10 minutes before → `db: up, ai: up` (free instances sleep; the first request can take a minute).
+- [ ] Wake the free Render services 10 minutes before: open `/api/v1/health?ai=1` until it shows `db: up, ai: up` (free instances sleep; the first request can take a minute), then open Sahayak once.
 - [ ] Phone: logged in as the demo citizen ("Sunita"), text size **A**, language **हिन्दी**, 2 emergency contacts (team members who know a drill is coming), mobile data on, battery > 60%, Do Not Disturb on (except SMS).
 - [ ] Laptop: logged in to the portal as the Mahodiya authority, Live SOS page open, sound allowed (click once on the page).
 - [ ] A second phone (a teammate's) to open the tracking link.

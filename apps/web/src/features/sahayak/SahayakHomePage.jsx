@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Chip,
@@ -34,6 +34,10 @@ const CHIPS = [
 /** S-24 Sahayak home (docs/03). */
 export default function SahayakHomePage() {
   const { t } = useTranslation("sahayak");
+  // Wake the free AI service now, so it is up by the time the first question is sent.
+  useEffect(() => {
+    chatApi.warmup();
+  }, []);
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const [busy, setBusy] = useState(false);

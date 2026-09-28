@@ -98,12 +98,73 @@ describe("Sahayak AI client (docs/02 §7.3)", () => {
     const slow = createAiClient({
       env,
       sahayakTimeoutMs: 20,
+      wakeBudgetMs: 60,
+      wakePollMs: 10,
       fetchImpl: (_u, init) =>
         new Promise((_r, reject) =>
           init.signal.addEventListener("abort", () => reject(init.signal.reason)),
         ),
     });
-    expect((await slow.sahayakReply({})).reason).toBe("failed");
+    expect(await slow.sahayakReply({})).toEqual({ ok: false, reason: "failed" });
+  });
+
+  it("waits for a sleeping AI service to wake (Render 502), then asks once more", async () => {
+    const calls = [];
+    let awake = false;
+    let healthChecks = 0;
+    const ai = createAiClient({
+      env,
+      wakePollMs: 1,
+      sleep: async () => {},
+      fetchImpl: async (url) => {
+        calls.push(url.replace("http://ai.internal:8000", ""));
+        if (url.endsWith("/health")) {
+          healthChecks += 1;
+          awake = healthChecks >= 3; // wakes on the third check
+          return new Response(awake ? '{"status":"ok"}' : "waking", { status: awake ? 200 : 502 });
+        }
+        // Render's proxy answers 502 with an HTML page while the instance is asleep.
+        return awake ? json(GOOD) : new Response("<html>502</html>", { status: 502 });
+      },
+    });
+    const out = await ai.sahayakReply({ language: "hi", mode: "general", message: "hi" });
+    expect(out.ok).toBe(true);
+    expect(out).not.toHaveProperty("waking");
+    expect(calls).toEqual([
+      "/internal/sahayak/reply",
+      "/health",
+      "/health",
+      "/health",
+      "/internal/sahayak/reply",
+    ]);
+  });
+
+  it("doesn't retry an error from the LLM itself (our service answered with a code)", async () => {
+    let n = 0;
+    const ai = createAiClient({
+      env,
+      fetchImpl: async () => {
+        n += 1;
+        return json({ error: { code: "LLM_UNAVAILABLE" } }, 503);
+      },
+    });
+    expect(await ai.sahayakReply({})).toEqual({ ok: false, reason: "failed" });
+    expect(n).toBe(1);
+  });
+
+  it("gives up when the service doesn't wake within the budget", async () => {
+    const ai = createAiClient({
+      env,
+      sahayakTimeoutMs: 20,
+      wakeBudgetMs: 80,
+      wakePollMs: 5,
+      fetchImpl: async () => {
+        throw new TypeError("fetch failed");
+      },
+    });
+    const t0 = Date.now();
+    expect(await ai.sahayakReply({})).toEqual({ ok: false, reason: "failed" });
+    expect(Date.now() - t0).toBeLessThan(1000);
   });
 
   it("only accepts complete letters", () => {
