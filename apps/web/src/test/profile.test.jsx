@@ -161,7 +161,9 @@ describe("S-27 profile", () => {
     await userEvent.click(await screen.findByRole("button", { name: "लॉग आउट" }));
     await waitFor(() => expect(router.state.location.pathname).toBe("/"));
     expect(await screen.findByText("लॉग आउट हो गए")).toBeInTheDocument();
-    expect(await screen.findByRole("link", { name: "रजिस्टर करें" })).toBeInTheDocument();
+    expect((await screen.findAllByRole("link", { name: "रजिस्टर करें" })).length).toBeGreaterThan(
+      0,
+    );
   });
 
   it("logs out from the account menu in the header, from any page", async () => {

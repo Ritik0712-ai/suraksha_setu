@@ -1,4 +1,4 @@
-import { Box, Button, Container, Link, Paper, Typography } from "@mui/material";
+import { Box, Button, Container, Link, Paper, Stack, Typography } from "@mui/material";
 import {
   CallRounded,
   HomeRounded,
@@ -94,8 +94,12 @@ const DESKTOP_NAV = [
   { to: "/sahayak", key: "nav.sahayak" },
 ];
 
-function Header({ authed }) {
+function Header({ authed, guest }) {
   const { t } = useTranslation();
+  const { pathname } = useLocation();
+  // Guests get Log in (and Register on wider screens) at the top of every page, except on the
+  // login and register pages themselves.
+  const showAuth = guest && !["/login", "/register"].includes(pathname);
   return (
     <Box
       component="header"
@@ -166,6 +170,32 @@ function Header({ authed }) {
         <TextSizeControl />
         {authed && <NotificationBell />}
         {authed && <AccountMenu />}
+        {showAuth && (
+          <Stack direction="row" spacing={1} sx={{ ml: 0.5, flexShrink: 0 }}>
+            <Button
+              variant="outlined"
+              size="small"
+              component={RouterLink}
+              to="/login"
+              sx={{ minHeight: 40, whiteSpace: "nowrap" }}
+            >
+              {t("actions.logIn")}
+            </Button>
+            <Button
+              variant="contained"
+              size="small"
+              component={RouterLink}
+              to="/register"
+              sx={{
+                minHeight: 40,
+                whiteSpace: "nowrap",
+                display: { xs: "none", sm: "inline-flex" },
+              }}
+            >
+              {t("actions.register")}
+            </Button>
+          </Stack>
+        )}
       </Container>
     </Box>
   );
@@ -278,7 +308,7 @@ export function CitizenShell() {
     <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <SkipLink />
       <TricolourStrip />
-      <Header authed={authed} />
+      <Header authed={authed} guest={!authed && status !== "loading"} />
       {!handle.noEmergencyBar && <EmergencyBar />}
       <OfflineBanner />
       <Box

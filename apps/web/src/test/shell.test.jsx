@@ -52,13 +52,20 @@ describe("citizen shell (docs/03 §2.1)", () => {
 });
 
 describe("home (S-02)", () => {
-  it("guests see the SOS card, the tiles and the register card", async () => {
+  it("guests see Register / Log in at the top, the SOS card and the tiles", async () => {
     renderApp("/");
     expect(await screen.findByRole("link", { name: /SOS — मदद चाहिए\?/ })).toHaveAttribute(
       "href",
       "/sos",
     );
-    expect(await screen.findByRole("link", { name: "रजिस्टर करें" })).toBeInTheDocument();
+    // In the header on every page, and next to the greeting on Home — never below the tiles.
+    const header = within(screen.getByRole("banner"));
+    expect(header.getByRole("link", { name: "लॉग इन" })).toHaveAttribute("href", "/login");
+    expect(header.getByRole("link", { name: "रजिस्टर करें" })).toHaveAttribute("href", "/register");
+    const main = within(screen.getByRole("main"));
+    const register = main.getByRole("link", { name: "रजिस्टर करें" });
+    const tiles = main.getByRole("button", { name: "शिकायत करें" });
+    expect(register.compareDocumentPosition(tiles) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(screen.getByRole("button", { name: "शिकायत करें" })).toBeInTheDocument(); // login-gated tile
     expect(screen.queryByRole("navigation", { name: "मुख्य मेन्यू" })).toBeInTheDocument(); // desktop nav markup
   });

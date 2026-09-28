@@ -1,4 +1,4 @@
-import { Box, Button, Paper, Stack, Typography } from "@mui/material";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import {
   AssignmentRounded,
   BloodtypeRounded,
@@ -107,12 +107,33 @@ export default function HomePage() {
 
   return (
     <Stack spacing={3}>
-      <Box>
-        <Typography variant="h2" component="h1">
-          {authed ? t("greetingName", { name: firstName }) : t("greeting")}
-        </Typography>
-        <Typography color="text.secondary">{t("tagline", { ns: "common" })}</Typography>
-      </Box>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        spacing={{ xs: 1.5, sm: 2 }}
+        alignItems={{ xs: "stretch", sm: "center" }}
+        justifyContent="space-between"
+      >
+        <Box>
+          <Typography variant="h2" component="h1">
+            {authed ? t("greetingName", { name: firstName }) : t("greeting")}
+          </Typography>
+          <Typography color="text.secondary">{t("tagline", { ns: "common" })}</Typography>
+          {!authed && status !== "loading" && (
+            <Typography sx={{ mt: 0.5 }}>{t("account.text")}</Typography>
+          )}
+        </Box>
+        {/* Guests: Register / Log in at the top of the page, not below the tiles. */}
+        {!authed && status !== "loading" && (
+          <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }}>
+            <Button variant="contained" component={RouterLink} to="/register">
+              {t("actions.register", { ns: "common" })}
+            </Button>
+            <Button variant="outlined" component={RouterLink} to="/login">
+              {t("actions.logIn", { ns: "common" })}
+            </Button>
+          </Stack>
+        )}
+      </Stack>
 
       {authed && user?.emergencyContactCount === 0 && (
         <Notice
@@ -200,20 +221,6 @@ export default function HomePage() {
           ))}
         </Box>
       </Box>
-
-      {!authed && status !== "loading" && (
-        <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
-          <Typography sx={{ mb: 2 }}>{t("account.text")}</Typography>
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
-            <Button variant="contained" component={RouterLink} to="/register">
-              {t("actions.register", { ns: "common" })}
-            </Button>
-            <Button variant="text" component={RouterLink} to="/login">
-              {t("actions.logIn", { ns: "common" })}
-            </Button>
-          </Stack>
-        </Paper>
-      )}
     </Stack>
   );
 }
