@@ -75,6 +75,14 @@ Everything so far — not yet tagged or deployed.
 
 ### Fixed
 
+- **Phones stuck on the old version (4 Oct):** the "Update" bar build made new versions wait for
+  a tap, but the version already on phones had no such button, so they never updated (no 🔊/🎤,
+  old Sahayak). New versions now take over at once (`skipWaiting` + `clientsClaim`); the page
+  reloads by itself if it was opened in the last 15 s, otherwise the bar offers a reload. A
+  missing screen file from an older deploy reloads the page once instead of crashing.
+- **Sahayak no longer depends on the browser to wake the AI service:** the API wakes it through
+  the web app's Vercel rewrite (`PUBLIC_APP_URL/ai-wake`, or `AI_WAKE_URL`), which Render treats
+  as outside traffic; `/api/v1/health?ai=1` wakes it the same way.
 - **Sahayak failing with "Couldn't get a reply" (1 Oct):** Render doesn't wake a sleeping free
   service for requests from another Render service, so the API's wake-up calls never woke the AI
   service. The browser now wakes it through a Vercel rewrite (`/ai-wake`) when Sahayak or the

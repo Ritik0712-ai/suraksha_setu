@@ -22,6 +22,8 @@ const schema = z.object({
         .filter(Boolean),
     ),
   PUBLIC_APP_URL: z.string().default("http://localhost:5173"),
+  // Optional override for waking the AI service from outside Render (lib/aiClient.js).
+  AI_WAKE_URL: z.string().url().optional(),
   // Public URL of this API. Only used for photo URLs when photos are stored on local disk.
   API_PUBLIC_URL: optional,
   // Set by Render itself (the service's public https URL). The API pings it in the daytime to

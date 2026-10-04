@@ -49,7 +49,12 @@ describe("Sahayak emergency pre-check (docs/02 §4.4, 4G.3)", () => {
 });
 
 describe("Sahayak AI client (docs/02 §7.3)", () => {
-  const env = testEnv({ AI_BASE_URL: "http://ai.internal:8000", AI_INTERNAL_KEY: "k1" });
+  // Direct polling (no https web app to wake it through); the Vercel path has its own test.
+  const env = testEnv({
+    AI_BASE_URL: "http://ai.internal:8000",
+    AI_INTERNAL_KEY: "k1",
+    PUBLIC_APP_URL: "http://localhost:5173",
+  });
   const json = (body, status = 200) => new Response(JSON.stringify(body), { status });
   const GOOD = {
     intent: "answer",
@@ -136,6 +141,35 @@ describe("Sahayak AI client (docs/02 §7.3)", () => {
       "/health",
       "/health",
       "/internal/sahayak/reply",
+    ]);
+  });
+
+  it("wakes it through the web app (outside Render) when PUBLIC_APP_URL is https", async () => {
+    const calls = [];
+    let woken = false;
+    const ai = createAiClient({
+      env: testEnv({
+        AI_BASE_URL: "https://suraksha-setu-ai.onrender.com",
+        AI_INTERNAL_KEY: "k1",
+        PUBLIC_APP_URL: "https://app.example.in",
+      }),
+      wakePollMs: 1,
+      sleep: async () => {},
+      fetchImpl: async (url) => {
+        calls.push(url);
+        if (url === "https://app.example.in/ai-wake") {
+          woken = true; // Render holds this request while the instance boots, then answers
+          return new Response('{"status":"ok"}', { status: 200 });
+        }
+        return woken ? json(GOOD) : new Response("<html>502</html>", { status: 502 });
+      },
+    });
+    const out = await ai.sahayakReply({ language: "hi", mode: "general", message: "hi" });
+    expect(out.ok).toBe(true);
+    expect(calls).toEqual([
+      "https://suraksha-setu-ai.onrender.com/internal/sahayak/reply",
+      "https://app.example.in/ai-wake",
+      "https://suraksha-setu-ai.onrender.com/internal/sahayak/reply",
     ]);
   });
 

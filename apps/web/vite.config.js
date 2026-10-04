@@ -39,9 +39,10 @@ export default defineConfig({
     react(),
     // Installable PWA with an offline app shell (docs/01 FR-GEN-06, doc 06 task 3.10).
     VitePWA({
-      // "prompt": a new version waits until the user taps "Update" on the bar (UpdateBar.jsx),
-      // instead of phones silently running the old version until every tab is closed.
-      registerType: "prompt",
+      // A new version takes over at once (skipWaiting + clientsClaim below): a version that
+      // waits for a tap can never be applied by an older page that has no such button (Oct 2026:
+      // phones stayed on the old build). lib/pwa.js registers it and shows "Update" (reload).
+      registerType: "autoUpdate",
       injectRegister: false,
       includeAssets: ["logo.svg", "icons/apple-touch-icon.png"],
       manifest: {
@@ -83,6 +84,8 @@ export default defineConfig({
         navigateFallback: "/index.html",
         navigateFallbackDenylist: [/^\/api\//],
         cleanupOutdatedCaches: true,
+        skipWaiting: true,
+        clientsClaim: true,
       },
       devOptions: { enabled: false },
     }),

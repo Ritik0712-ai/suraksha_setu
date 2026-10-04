@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { dbStatus } from "../db/connect.js";
+import { aiWakeUrl } from "../lib/aiClient.js";
 
 /**
  * GET /api/v1/health → { status, db, ai } (docs/02 §7.2, used by the keep-alive and Render).
@@ -26,8 +27,12 @@ async function checkAi(env, fetchImpl) {
       headers: { "X-Internal-Key": env.AI_INTERNAL_KEY ?? "" },
       signal: AbortSignal.timeout(3000),
     });
-    return r.ok ? "up" : "down";
+    if (r.ok) return "up";
   } catch {
-    return "down";
+    // asleep or down
   }
+  // Asleep: Render only wakes it for outside traffic, so ask through the web app's rewrite.
+  const wakeUrl = aiWakeUrl(env);
+  if (wakeUrl) fetchImpl(wakeUrl, { signal: AbortSignal.timeout(60_000) }).catch(() => {});
+  return "down";
 }

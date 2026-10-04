@@ -6,10 +6,12 @@ export const CLASSIFY_TIMEOUT_MS = 8000; // docs/02 §8.2
 // < 6 s); the AI service gives up on the LLM after 12 s.
 export const SAHAYAK_TIMEOUT_MS = 15000;
 // The AI service runs on Render's free plan and sleeps after 15 idle minutes; waking takes about
-// 45–60 s. Render does NOT wake it for requests from our API (also on Render — they get an
-// instant 502), so the web app wakes it through Vercel (/ai-wake) when Sahayak or the complaint
-// form opens. A Sahayak message then waits up to this long in total for it to come up (the web
-// app allows 85 s) instead of failing.
+// 30–50 s. Render does NOT wake it for requests from our API (also on Render — they get an
+// instant 502). Requests from outside Render do wake it, so the API wakes it through the web
+// app's Vercel rewrite (PUBLIC_APP_URL/ai-wake → the AI service's /health): Render → Vercel →
+// Render counts as outside traffic. The browser also calls /ai-wake when Sahayak or the
+// complaint form opens. A Sahayak message waits up to this long in total for it to come up (the
+// web app allows 85 s) instead of failing.
 export const SAHAYAK_WAKE_BUDGET_MS = 70000;
 const WAKE_POLL_MS = 3000;
 
@@ -28,6 +30,7 @@ export function createAiClient({
   sleep = (ms) => new Promise((r) => setTimeout(r, ms)),
 }) {
   const base = env.AI_BASE_URL?.replace(/\/+$/, "");
+  const wakeUrl = aiWakeUrl(env);
   const headers = { "X-Internal-Key": env.AI_INTERNAL_KEY ?? "" };
   const configured = Boolean(base && env.AI_INTERNAL_KEY);
 
@@ -68,9 +71,16 @@ export function createAiClient({
     return null;
   }
 
+  /** Starts waking the AI service from outside Render; never waits, never throws. */
+  function wake() {
+    if (!wakeUrl) return;
+    fetchImpl(wakeUrl, { signal: AbortSignal.timeout(60_000) }).catch(() => {});
+  }
+
   /** Warm-up ping when the wizard opens (docs/02 §12): wakes a sleeping instance. */
   async function health() {
     if (!configured) return { ok: false, modelVersion: null };
+    wake();
     try {
       const res = await request("/internal/health", {}, Date.now() + timeoutMs);
       if (!res.ok) return { ok: false, modelVersion: null };
@@ -81,12 +91,18 @@ export function createAiClient({
     }
   }
 
-  /** Polls the AI service's public /health until it answers (it is waking) or the deadline. */
+  /**
+   * Waits until the AI service answers its public /health, or the deadline. Goes through the
+   * wake URL when there is one (Render holds that request while the instance boots, then
+   * answers), else polls the service directly.
+   */
   async function waitUntilAwake(deadline) {
+    const url = wakeUrl ?? `${base}/health`;
+    const perTry = wakeUrl ? 50_000 : 10_000;
     while (Date.now() < deadline) {
       try {
-        const res = await fetchImpl(`${base}/health`, {
-          signal: AbortSignal.timeout(Math.max(1, Math.min(10_000, deadline - Date.now()))),
+        const res = await fetchImpl(url, {
+          signal: AbortSignal.timeout(Math.max(1, Math.min(perTry, deadline - Date.now()))),
         });
         if (res.ok) return true;
       } catch {
@@ -155,7 +171,14 @@ export function createAiClient({
     return strip(await askSahayak(payload, Math.max(Date.now() + 1000, end)));
   }
 
-  return { configured, classify, health, sahayakReply };
+  return { configured, classify, health, wake, sahayakReply };
+}
+
+/** PUBLIC_APP_URL/ai-wake when the web app is on https (Vercel), else AI_WAKE_URL or none. */
+export function aiWakeUrl(env) {
+  if (env.AI_WAKE_URL) return env.AI_WAKE_URL;
+  const app = env.PUBLIC_APP_URL?.replace(/\/+$/, "");
+  return app?.startsWith("https://") ? `${app}/ai-wake` : null;
 }
 
 function strip({ waking: _waking, ...result }) {
