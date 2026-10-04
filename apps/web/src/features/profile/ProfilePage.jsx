@@ -59,6 +59,7 @@ import { useLogout } from "../auth/useLogout.js";
 import { SosHistoryDialog } from "../sos/SosHistoryDialog.jsx";
 import { useVillages } from "../auth/useVillages.js";
 import { VillageAutocomplete } from "../auth/VillageAutocomplete.jsx";
+import { forgetAccount } from "../../lib/knownAccounts.js";
 
 const APP_VERSION = "0.3.0";
 
@@ -351,6 +352,7 @@ function DeleteAccountDialog({ open, onClose }) {
     setError(null);
     try {
       await usersApi.remove({ password });
+      forgetAccount(useSession.getState().user?.phone);
       clearClientSession({ endedByUser: true });
       navigate("/", { replace: true });
       toast(t("deleted"));

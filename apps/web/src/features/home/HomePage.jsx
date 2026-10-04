@@ -1,9 +1,11 @@
+import { lazy, Suspense } from "react";
 import { Box, Button, Stack, Typography } from "@mui/material";
 import {
   AssignmentRounded,
   BloodtypeRounded,
   CallRounded,
   FactCheckRounded,
+  HelpOutlineRounded,
   LocalHospitalRounded,
   PhotoCameraRounded,
   VolunteerActivismRounded,
@@ -15,6 +17,10 @@ import { sosApi } from "../../api/endpoints.js";
 import { isSignedIn, useSession } from "../../stores/session.js";
 import { SahayakIcon } from "../../components/icons/index.jsx";
 import { ModuleTile } from "../../components/ui/ModuleTile.jsx";
+// Only signed-in citizens with saved schemes see it, so it loads separately.
+const SchemeReminders = lazy(() =>
+  import("./SchemeReminders.jsx").then((m) => ({ default: m.SchemeReminders })),
+);
 import { Notice } from "../../components/ui/Notice.jsx";
 
 // Tiles in docs/03 S-02 order. `login: true` tiles send guests to /login?next=.
@@ -221,6 +227,22 @@ export default function HomePage() {
           ))}
         </Box>
       </Box>
+
+      {isCitizen && (
+        <Suspense fallback={null}>
+          <SchemeReminders />
+        </Suspense>
+      )}
+
+      <Button
+        component={RouterLink}
+        to="/tour"
+        state={{ from: "/" }}
+        startIcon={<HelpOutlineRounded />}
+        sx={{ alignSelf: "center", minHeight: 48 }}
+      >
+        {t("howToUse")}
+      </Button>
     </Stack>
   );
 }

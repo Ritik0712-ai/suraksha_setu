@@ -110,3 +110,14 @@ export const categoryBody = z.object({ category: z.enum(C.complaintCategories) }
 export const noteBody = z.object({ visibility: z.enum(C.timelineVisibility), text: note });
 
 export const revealBody = z.object({ target: z.enum(["citizen", "onBehalf"]) });
+
+export const nearbyQuery = z
+  .object({
+    category: z.enum(C.complaintCategories),
+    lat: z.coerce.number().min(-90).max(90).optional(),
+    lng: z.coerce.number().min(-180).max(180).optional(),
+  })
+  .refine((v) => (v.lat === undefined) === (v.lng === undefined), {
+    path: ["lat"],
+    message: "required",
+  });

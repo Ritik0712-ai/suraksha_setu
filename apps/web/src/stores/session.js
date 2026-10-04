@@ -1,7 +1,8 @@
 import { create } from "zustand";
 import { readJSON, writeJSON } from "../lib/storage.js";
+import { rememberAccount } from "../lib/knownAccounts.js";
 
-// Name + role only, cached so an SOS still works (SMS from the phone) when the server can't be
+// Id, name + role only, cached so an SOS still works (SMS from the phone) when the server can't be
 // reached at app start (docs/02 §1 principle 4). Cleared on logout. No tokens are stored here.
 const PROFILE_KEY = "ss_profile";
 export const cachedProfile = () => readJSON(PROFILE_KEY, null);
@@ -19,7 +20,8 @@ export const useSession = create((set) => ({
   // instead of to /login (docs/03 §2.7 "go to /").
   endedByUser: false,
   setSession({ accessToken, user }) {
-    writeJSON(PROFILE_KEY, { name: user.name, role: user.role });
+    writeJSON(PROFILE_KEY, { id: user.id, name: user.name, role: user.role });
+    rememberAccount(user); // "Who is using the phone?" on the login screen
     set({ status: "authed", accessToken, user, endedByUser: false });
   },
   setOffline(profile) {

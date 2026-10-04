@@ -50,6 +50,29 @@ Everything so far — not yet tagged or deployed.
 - The citizen app's first download is ~13 KB smaller (socket.io loads after login), and the
   Schemes list is requested alongside the page's code (Schemes LCP 4.18 s → 3.77 s, slow 4G).
 
+### Added (Oct 2026 — easier for villagers)
+
+- **🔊 Listen** on schemes, Sahayak replies, letters, complaint status and the tour: read aloud
+  in Hindi with the browser's own voice (free); stops with a second tap.
+- **🎤 Speak to type** on Sahayak and the complaint description (browser speech recognition;
+  `Permissions-Policy` now allows the microphone for our own pages).
+- **"New version available — Update" bar:** the service worker now waits for one tap instead of
+  phones running an old build until every tab closes; it also checks for updates every 30 min.
+- **WhatsApp share** on schemes and complaint status (letters already had it).
+- **3-picture tour** after the first language choice (SOS, complaints, Sahayak), read aloud;
+  reopen from "How to use the app" on the home screen.
+- **"Was this helpful? 👍👎"** on Sahayak replies and scheme pages — new `feedback` collection
+  (one vote per person per item, no free text); totals for admins in Analytics.
+- **Complaints saved offline:** with no internet the photo and complaint are kept on the phone
+  (IndexedDB) and sent automatically when it's back; "Waiting to send" on My complaints.
+- **"Me too"** on nearby complaints: before filing, open complaints of the same kind within
+  500 m are shown (no description, photo or filer details) and a citizen can join one instead
+  of filing a duplicate; officials see 👥 +n in the portal.
+- **"Who is using the phone?"** on the login screen: names (and numbers) of people who logged in
+  on this phone, citizens only, max 5, removable; never a password or token.
+- **Scheme document reminders** on the home screen: saved schemes with documents still missing,
+  with the list of what to collect; "Later" snoozes for a week.
+
 ### Fixed
 
 - **Sahayak failing with "Couldn't get a reply" (1 Oct):** Render doesn't wake a sleeping free

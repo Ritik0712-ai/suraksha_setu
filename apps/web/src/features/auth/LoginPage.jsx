@@ -14,6 +14,7 @@ import { PasswordField, PhoneField, SubmitButton } from "../../components/ui/fie
 import { useFieldError } from "../../components/ui/useFieldError.js";
 import { AuthCard } from "./AuthCard.jsx";
 import { loginSchema } from "./schemas.js";
+import { WhoIsUsing } from "./WhoIsUsing.jsx";
 
 /** S-03 Login (docs/03). */
 export default function LoginPage() {
@@ -29,12 +30,20 @@ export default function LoginPage() {
     control,
     register,
     handleSubmit,
+    setValue,
+    setFocus,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: { phone: "", password: "" },
     shouldFocusError: true,
   });
+
+  const pickAccount = (phone) => {
+    setValue("phone", phone ?? "", { shouldValidate: false });
+    if (phone) setTimeout(() => setFocus("password"), 0);
+  };
 
   const onSubmit = async (values) => {
     setFormError(null);
@@ -58,6 +67,7 @@ export default function LoginPage() {
           <Notice kind="info">{t("login.pleaseLogIn")}</Notice>
         )}
         {location.state?.message && <Notice kind="success">{location.state.message}</Notice>}
+        <WhoIsUsing selected={watch("phone")} onPick={pickAccount} />
         <Controller
           name="phone"
           control={control}

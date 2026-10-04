@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { act, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderApp } from "./utils.jsx";
-import { citizen, loggedInAs } from "./server.js";
+import { HttpResponse, citizen, http, loggedInAs, server } from "./server.js";
 import { usePrefs } from "../stores/prefs.js";
 import { useNetwork } from "../stores/network.js";
 import { useAppUpdate } from "../lib/pwa.js";
@@ -38,8 +38,29 @@ describe("citizen shell (docs/03 §2.1)", () => {
     usePrefs.setState({ languageChosen: false });
     renderApp("/");
     await userEvent.click(await screen.findByRole("button", { name: "English" }));
+    // Then the three-picture tour, which can be skipped.
+    expect(
+      await screen.findByRole("heading", { name: "In danger? Press the red SOS" }),
+    ).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Skip" }));
     expect(await screen.findByRole("heading", { name: "Namaste 🙏" })).toBeInTheDocument();
     expect(localStorage.getItem("ss_lang")).toBe("en");
+  });
+
+  it("walks through the tour (SOS → complaints → Sahayak) and can reopen it from home", async () => {
+    usePrefs.setState({ languageChosen: false });
+    renderApp("/");
+    await userEvent.click(await screen.findByRole("button", { name: "हिन्दी" }));
+    expect(await screen.findByText("1 / 3")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "आगे" }));
+    expect(
+      screen.getByRole("heading", { name: "समस्या दिखे? फ़ोटो खींचें, शिकायत करें" }),
+    ).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "आगे" }));
+    expect(screen.getByRole("heading", { name: "सहायक से पूछें" })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "शुरू करें" }));
+    await userEvent.click(await screen.findByRole("link", { name: "ऐप कैसे चलाएँ" }));
+    expect(await screen.findByText("1 / 3")).toBeInTheDocument();
   });
 
   it("shows the offline banner when the browser goes offline (X-03)", async () => {
@@ -105,5 +126,50 @@ describe("home (S-02)", () => {
     await userEvent.click(await screen.findByRole("button", { name: "अपडेट करें" }));
     expect(apply).toHaveBeenCalledTimes(1);
     act(() => useAppUpdate.setState({ ready: false, apply: null }));
+  });
+
+  it("reminds a citizen which documents their saved scheme still needs, and snoozes it", async () => {
+    loggedInAs(citizen());
+    server.use(
+      http.get("*/api/v1/users/me/saved-schemes", () =>
+        HttpResponse.json({
+          data: [
+            {
+              id: "s1",
+              slug: "laadli-behna-yojana",
+              name: { hi: "लाड़ली बहना योजना", en: "Laadli Behna" },
+              documentsTotal: 3,
+              documentsReady: 1,
+              missingDocuments: [
+                { key: "samagra_id", label: { hi: "समग्र आईडी", en: "Samagra ID" } },
+                { key: "bank_passbook", label: { hi: "बैंक पासबुक", en: "Bank passbook" } },
+              ],
+            },
+            {
+              id: "s2",
+              slug: "pm-kisan",
+              name: { hi: "पीएम किसान", en: "PM-KISAN" },
+              documentsTotal: 2,
+              documentsReady: 2,
+              missingDocuments: [],
+            },
+          ],
+        }),
+      ),
+    );
+    renderApp("/");
+    expect(await screen.findByText("लाड़ली बहना योजना")).toBeInTheDocument();
+    expect(screen.getByText("3 में से 1 दस्तावेज़ तैयार")).toBeInTheDocument();
+    expect(screen.getByText("अभी चाहिए: समग्र आईडी, बैंक पासबुक")).toBeInTheDocument();
+    expect(screen.queryByText("पीएम किसान")).not.toBeInTheDocument(); // all ready
+    expect(screen.getByRole("link", { name: "दस्तावेज़ पर निशान लगाएँ" })).toHaveAttribute(
+      "href",
+      "/schemes/laadli-behna-yojana",
+    );
+    await userEvent.click(screen.getByRole("button", { name: "बाद में" }));
+    expect(screen.queryByText("लाड़ली बहना योजना")).not.toBeInTheDocument();
+    expect(JSON.parse(localStorage.getItem("ss_scheme_reminders_snooze")).s1).toBeGreaterThan(
+      Date.now(),
+    );
   });
 });

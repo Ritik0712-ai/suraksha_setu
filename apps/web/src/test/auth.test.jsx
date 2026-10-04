@@ -42,6 +42,42 @@ describe("S-03 login", () => {
     await waitFor(() => expect(router.state.location.pathname).toBe("/profile"));
   });
 
+  it("on a shared phone, remembers who logged in and lets them pick their name", async () => {
+    let body;
+    server.use(
+      http.post("*/api/v1/auth/login", async ({ request }) => {
+        body = await request.json();
+        return HttpResponse.json(tokens(citizen()));
+      }),
+    );
+    localStorage.setItem(
+      "ss_known_accounts",
+      JSON.stringify([
+        { phone: "9876500001", name: "Ramesh Kumar", lastUsed: 1 },
+        { phone: "9876543210", name: "Sunita Devi", lastUsed: 2 },
+      ]),
+    );
+    const { router } = renderApp("/login");
+    expect(await screen.findByText("कौन फ़ोन चला रहा है?")).toBeInTheDocument();
+    expect(screen.getByText("+91 98XXX XX210")).toBeInTheDocument();
+    // Remove one name from this phone.
+    await userEvent.click(
+      screen.getByRole("button", { name: "Ramesh Kumar को इस फ़ोन की सूची से हटाएँ" }),
+    );
+    expect(screen.queryByText("Ramesh Kumar")).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("button", { name: /^Sunita Devi\s*\+91/ }));
+    expect(screen.getByLabelText("मोबाइल नंबर")).toHaveValue("9876543210");
+    await waitFor(() => expect(screen.getByLabelText("पासवर्ड")).toHaveFocus());
+    await userEvent.keyboard("safe-pass-1");
+    await userEvent.click(screen.getByRole("button", { name: "लॉग इन करें" }));
+    await waitFor(() => expect(router.state.location.pathname).toBe("/"));
+    expect(body).toEqual({ phone: "9876543210", password: "safe-pass-1" });
+    const saved = JSON.parse(localStorage.getItem("ss_known_accounts"));
+    expect(saved.map((a) => a.name)).toEqual(["Sunita Devi"]);
+    expect(JSON.stringify(saved)).not.toMatch(/pass|token/i);
+  });
+
   it("sends authorities to the portal, whatever ?next says", async () => {
     server.use(http.post("*/api/v1/auth/login", () => HttpResponse.json(tokens(officer()))));
     const { router } = renderApp("/login?next=%2Fprofile");

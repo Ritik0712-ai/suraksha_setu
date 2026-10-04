@@ -13,5 +13,33 @@
   "account": {
     "text": "Create an account to save your complaints and contacts"
   },
-  "services": "Services"
+  "services": "Services",
+  "tour": {
+    "label": "How to use the app",
+    "step": "{{n}} / {{total}}",
+    "next": "Next",
+    "skip": "Skip",
+    "start": "Get started",
+    "sos": {
+      "title": "In danger? Press the red SOS",
+      "body": "SOS sends your family a message with your location. For the police, call 112."
+    },
+    "complaint": {
+      "title": "See a problem? Take a photo, file a complaint",
+      "body": "Broken handpump, damaged road or garbage — take a photo and send it. You can follow every step here."
+    },
+    "sahayak": {
+      "title": "Ask Sahayak",
+      "body": "Ask about government schemes or get a letter written for the Panchayat. You can speak instead of typing."
+    },
+    "listenHint": "Tap 🔊 to listen"
+  },
+  "howToUse": "How to use the app",
+  "reminders": {
+    "title": "Scheme documents — reminder",
+    "ready": "{{ready}} of {{total}} documents ready",
+    "need": "Still needed: {{list}}",
+    "tick": "Tick documents",
+    "later": "Later"
+  }
 }

@@ -13,6 +13,7 @@ import {
   categoryBody,
   createBody,
   mineQuery,
+  nearbyQuery,
   noteBody,
   reopenBody,
   revealBody,
@@ -20,6 +21,7 @@ import {
   staffListQuery,
   statusBody,
 } from "./schemas.js";
+import { createSupportService } from "./support.js";
 
 const wrap = (fn) => (req, res, next) => fn(req, res, next).catch(next);
 const idParam = { params: z.object({ id: objectId }) };
@@ -51,6 +53,7 @@ function imageUpload() {
 /** /api/v1/complaints — citizen side (docs/02 §7.2 "Complaints (M2)"). */
 export function complaintsRouter({ env, complaints, manager, ai }) {
   const router = Router();
+  const support = createSupportService();
   router.use(requireAuth(env));
 
   // --- authority / admin: list + export (before /:id) -------------------------------------
@@ -114,6 +117,16 @@ export function complaintsRouter({ env, complaints, manager, ai }) {
     validate({ body: createBody }),
     wrap(async (req, res) => {
       res.status(201).json({ data: await complaints.create(req.user, req.body) });
+    }),
+  );
+
+  // "Me too": open complaints of the same kind near the citizen, before they file a new one.
+  router.get(
+    "/nearby",
+    citizen,
+    validate({ query: nearbyQuery }),
+    wrap(async (req, res) => {
+      res.json({ data: await support.nearby(req.user, req.validatedQuery) });
     }),
   );
 
@@ -231,6 +244,23 @@ export function complaintsRouter({ env, complaints, manager, ai }) {
     validate({ ...idParam, body: reopenBody }),
     wrap(async (req, res) => {
       res.json({ data: await complaints.reopen(req.user, req.params.id, req.body) });
+    }),
+  );
+
+  router.post(
+    "/:id/support",
+    citizen,
+    validate(idParam),
+    wrap(async (req, res) => {
+      res.json({ data: await support.setSupport(req.user, req.params.id, true) });
+    }),
+  );
+  router.delete(
+    "/:id/support",
+    citizen,
+    validate(idParam),
+    wrap(async (req, res) => {
+      res.json({ data: await support.setSupport(req.user, req.params.id, false) });
     }),
   );
 

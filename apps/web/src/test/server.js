@@ -45,6 +45,8 @@ export const apiErr = (status, code, message, details) =>
 export const handlers = [
   http.get("*/ai-wake", () => HttpResponse.json({ status: "ok" })),
   http.get("*/api/v1/feedback/mine", () => HttpResponse.json({ data: {} })),
+  http.get("*/api/v1/complaints/nearby", () => HttpResponse.json({ data: [] })),
+  http.get("*/api/v1/users/me/saved-schemes", () => HttpResponse.json({ data: [] })),
   http.post("*/api/v1/feedback", async ({ request }) =>
     HttpResponse.json({ data: await request.json() }),
   ),

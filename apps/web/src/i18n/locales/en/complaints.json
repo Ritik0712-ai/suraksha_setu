@@ -134,7 +134,9 @@
     },
     "listenText": "Complaint number {{no}}. {{category}}. Current status: {{status}}.",
     "listenDept": "Department: {{dept}}.",
-    "listen": "Listen to status"
+    "listen": "Listen to status",
+    "supporters_one": "{{count}} more person says they have the same problem",
+    "supporters_other": "{{count}} more people say they have the same problem"
   },
   "rejection": {
     "duplicate": "Already reported",
@@ -142,5 +144,35 @@
     "outside_area": "Outside this area",
     "inappropriate": "Inappropriate content",
     "other": "Other"
+  },
+  "outbox": {
+    "offlineNote": "No internet. The complaint will be saved on your phone and sent automatically when the internet is back.",
+    "savedTitle": "Complaint saved on your phone",
+    "savedBody": "There is no internet right now. Open the app when it is back — the complaint will be sent automatically and you will get a complaint number.",
+    "seeWaiting": "See waiting complaints",
+    "title": "Waiting to send ({{count}})",
+    "hint": "These are saved on this phone and will go out automatically when the internet is back.",
+    "savedAt": "Saved: {{time}}",
+    "failed": "Could not be sent: {{reason}}",
+    "sendNow": "Send now",
+    "sending": "Sending…",
+    "discard": "Delete",
+    "discardTitle": "Delete this complaint?",
+    "discardBody": "It has not been sent yet. Once deleted it cannot be recovered.",
+    "sentOne": "Your saved complaint was sent: {{no}}",
+    "sentMany": "{{count}} saved complaints were sent"
+  },
+  "nearby": {
+    "title": "Already reported near you?",
+    "hint": "If it is the same problem, tap “Me too” — no need to file it again.",
+    "distance": "About {{m}} m away",
+    "reported": "Reported {{date}}",
+    "count_one": "{{count}} more person has this problem",
+    "count_other": "{{count}} more people have this problem",
+    "meToo": "Me too — same problem",
+    "supported": "You are added ✓",
+    "added": "You were added. Officials will see how many people are affected.",
+    "noNeed": "You are counted — there is no need to send a new complaint.",
+    "done": "Done"
   }
 }

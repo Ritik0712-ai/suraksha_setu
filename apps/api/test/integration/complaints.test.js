@@ -503,3 +503,86 @@ describe("istDayStart", () => {
     );
   });
 });
+
+describe("me too: nearby open complaints and support", () => {
+  let neighbour;
+  let asNeighbour;
+  beforeEach(async () => {
+    neighbour = await createUser({ phone: "+919876500001", jurisdictionId: j.village._id });
+    asNeighbour = await loginAs(ctx.api, "9876500001");
+  });
+
+  it("shows neighbours open complaints of the same kind within 500 m, without private details", async () => {
+    const mine = await file({
+      category: "water_supply",
+      location: HERE,
+      landmark: "स्कूल के पास",
+      description: "मेरा नाम और फ़ोन 98765…",
+    });
+    expect(mine.status).toBe(201);
+    await file({ category: "garbage", location: HERE }); // other kind
+    const far = { lat: HERE.lat + 0.02, lng: HERE.lng }; // ~2 km away
+    await file({ category: "water_supply", location: far });
+
+    const res = await asNeighbour(
+      "get",
+      `/complaints/nearby?category=water_supply&lat=${HERE.lat}&lng=${HERE.lng + 0.001}`,
+    );
+    expect(res.status).toBe(200);
+    expect(res.body.data).toHaveLength(1);
+    const item = res.body.data[0];
+    expect(item).toMatchObject({
+      id: mine.body.data.id,
+      complaintNo: mine.body.data.complaintNo,
+      landmark: "स्कूल के पास",
+      supporterCount: 0,
+      supportedByMe: false,
+    });
+    expect(item.distanceM).toBeGreaterThan(90);
+    expect(item.distanceM).toBeLessThan(120);
+    expect(JSON.stringify(item)).not.toMatch(/description|98765|imageUrl|citizen/);
+
+    // The filer doesn't see their own complaint as a "me too" candidate.
+    const own = await as(
+      "get",
+      `/complaints/nearby?category=water_supply&lat=${HERE.lat}&lng=${HERE.lng}`,
+    );
+    expect(own.body.data).toEqual([]);
+  });
+
+  it("counts each supporter once, can be undone, and shows the count to the filer and officials", async () => {
+    const mine = await file({ category: "water_supply", location: HERE });
+    const id = mine.body.data.id;
+    const add = await asNeighbour("post", `/complaints/${id}/support`);
+    expect(add.body.data).toEqual({ id, supporterCount: 1, supportedByMe: true });
+    expect((await asNeighbour("post", `/complaints/${id}/support`)).body.data.supporterCount).toBe(
+      1,
+    );
+
+    const near = await asNeighbour(
+      "get",
+      `/complaints/nearby?category=water_supply&lat=${HERE.lat}&lng=${HERE.lng}`,
+    );
+    expect(near.body.data[0]).toMatchObject({ supporterCount: 1, supportedByMe: true });
+
+    const detail = await as("get", `/complaints/${id}`);
+    expect(detail.body.data.supporterCount).toBe(1);
+    expect(JSON.stringify(detail.body.data)).not.toContain(String(neighbour._id));
+
+    // Can't support your own complaint.
+    expect((await as("post", `/complaints/${id}/support`)).status).toBe(400);
+
+    const undo = await asNeighbour("delete", `/complaints/${id}/support`);
+    expect(undo.body.data).toEqual({ id, supporterCount: 0, supportedByMe: false });
+    expect(
+      (await asNeighbour("delete", `/complaints/${id}/support`)).body.data.supporterCount,
+    ).toBe(0);
+  });
+
+  it("refuses support for a closed complaint", async () => {
+    const mine = await file({ category: "garbage", location: HERE });
+    await Complaint.updateOne({ _id: mine.body.data.id }, { status: "RESOLVED" });
+    const res = await asNeighbour("post", `/complaints/${mine.body.data.id}/support`);
+    expect(res.status).toBe(409);
+  });
+});

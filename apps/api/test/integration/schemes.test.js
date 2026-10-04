@@ -191,6 +191,10 @@ describe("saved schemes (docs/03 S-18)", () => {
         updated: false,
       }),
     ]);
+    // The two documents still to collect, for the home-screen reminder.
+    expect(list.body.data[0].missingDocuments.map((d) => d.key)).toHaveLength(2);
+    expect(list.body.data[0].missingDocuments.map((d) => d.key)).not.toContain("aadhaar");
+    expect(list.body.data[0].missingDocuments[0].label).toHaveProperty("hi");
 
     const detail = await asCitizen("get", "/schemes/laadli-behna-yojana");
     expect(detail.body.data.saved).toEqual({ checkedDocuments: ["aadhaar"] });

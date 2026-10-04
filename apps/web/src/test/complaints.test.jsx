@@ -252,6 +252,104 @@ describe("S-10 new complaint wizard", () => {
     expect(await screen.findByRole("radiogroup")).toBeInTheDocument();
   });
 
+  it("saves the complaint on the phone without internet and sends it when the internet is back", async () => {
+    loggedInAs(citizen());
+    const backend = wizardBackend();
+    let offline = true;
+    server.use(
+      http.post("*/api/v1/complaints/classify", () => {
+        if (offline) return HttpResponse.error();
+        backend.classified += 1;
+        return HttpResponse.json(
+          { data: { uploadId: "up9", imageUrl: "https://x/up9.jpg", suggestion: null } },
+          { status: 201 },
+        );
+      }),
+      http.post("*/api/v1/complaints", async ({ request }) => {
+        if (offline) return HttpResponse.error();
+        backend.created.push(await request.json());
+        return HttpResponse.json({ data: detail({ category: "garbage" }) }, { status: 201 });
+      }),
+      http.get("*/api/v1/complaints/mine", () =>
+        HttpResponse.json({ data: { items: [], nextPage: null } }),
+      ),
+    );
+    renderApp("/complaints/new");
+    await userEvent.upload(await screen.findByTestId("camera-input"), photo());
+    await next();
+    // No internet: the photo stays on the phone and the citizen picks the category.
+    await userEvent.click(await screen.findByRole("radio", { name: /कचरा/ }));
+    await next();
+    await next();
+    expect(
+      await screen.findByText(/इंटरनेट नहीं है। शिकायत आपके फ़ोन में सेव होगी/),
+    ).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "शिकायत भेजें" }));
+    expect(await screen.findByText("शिकायत फ़ोन में सेव हो गई")).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("link", { name: "भेजी जाने वाली शिकायतें देखें" }));
+    expect(await screen.findByText("भेजी जानी हैं (1)")).toBeInTheDocument();
+    const send = await screen.findByRole("button", { name: "अभी भेजें" });
+    await waitFor(() => expect(send).toBeEnabled());
+
+    offline = false;
+    await userEvent.click(send);
+    expect(
+      await screen.findByText("सेव की गई शिकायत भेज दी गई: SS-2026-000123"),
+    ).toBeInTheDocument();
+    expect(backend.created).toHaveLength(1);
+    expect(backend.created[0]).toMatchObject({ category: "garbage", uploadId: "up9" });
+    await waitFor(() => expect(screen.queryByText("भेजी जानी हैं (1)")).not.toBeInTheDocument());
+  });
+
+  it("offers 'me too' on the same problem nearby instead of a duplicate complaint", async () => {
+    loggedInAs(citizen());
+    const backend = wizardBackend();
+    const supported = [];
+    server.use(
+      http.get("*/api/v1/complaints/nearby", ({ request }) => {
+        const p = new URL(request.url).searchParams;
+        expect(p.get("category")).toBe("garbage");
+        return HttpResponse.json({
+          data: [
+            {
+              id: "c7",
+              complaintNo: "SS-2026-000077",
+              category: "garbage",
+              status: "VERIFIED",
+              landmark: "हनुमान मंदिर के पास",
+              distanceM: 120,
+              supporterCount: 2,
+              supportedByMe: false,
+              createdAt: "2026-10-01T09:00:00Z",
+            },
+          ],
+        });
+      }),
+      http.post("*/api/v1/complaints/c7/support", () => {
+        supported.push("c7");
+        return HttpResponse.json({ data: { id: "c7", supporterCount: 3, supportedByMe: true } });
+      }),
+      http.get("*/api/v1/complaints/mine", () =>
+        HttpResponse.json({ data: { items: [], nextPage: null } }),
+      ),
+    );
+    renderApp("/complaints/new");
+    await userEvent.click(await screen.findByRole("button", { name: "बिना फ़ोटो के शिकायत करें" }));
+    await userEvent.click(await screen.findByRole("radio", { name: /कचरा/ }));
+    await next();
+    await next();
+    expect(await screen.findByText("यह समस्या पास में पहले से दर्ज है?")).toBeInTheDocument();
+    expect(screen.getByText("हनुमान मंदिर के पास")).toBeInTheDocument();
+    expect(screen.getByText("2 और लोगों की यही समस्या है")).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "मेरी भी यही समस्या है" }));
+    expect(await screen.findByText("3 और लोगों की यही समस्या है")).toBeInTheDocument();
+    expect(supported).toEqual(["c7"]);
+    await userEvent.click(screen.getByRole("button", { name: "ठीक है, हो गया" }));
+    expect(await screen.findByRole("heading", { name: "मेरी शिकायतें" })).toBeInTheDocument();
+    expect(backend.created).toEqual([]);
+  });
+
   it("refuses a file that isn't an image", async () => {
     loggedInAs(citizen());
     wizardBackend();

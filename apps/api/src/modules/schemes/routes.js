@@ -137,6 +137,10 @@ export function savedSchemesRouter({ env }) {
             documentsTotal: keys.size,
             documentsReady: x.checkedDocuments.filter((k) => keys.has(k)).length,
             checkedDocuments: x.checkedDocuments,
+            // For the home-screen reminder: what is still to be collected.
+            missingDocuments: s.documents
+              .filter((d) => !x.checkedDocuments.includes(d.key))
+              .map((d) => ({ key: d.key, label: d.label })),
             updated: s.version > x.seenVersion,
           };
         });

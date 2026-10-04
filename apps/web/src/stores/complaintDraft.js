@@ -5,7 +5,8 @@ import { create } from "zustand";
 
 const EMPTY = {
   photo: null, // { file, previewUrl }
-  upload: null, // { uploadId, imageUrl } from POST /complaints/classify
+  upload: null, // { uploadId, imageUrl, at } from POST /complaints/classify
+  offlinePhoto: null, // compressed photo kept on the phone when there was no internet to upload
   suggestion: null, // { category, confidence, top3, modelVersion } | null
   aiChecked: false, // classify finished (with or without a suggestion)
   category: null,
@@ -27,6 +28,7 @@ export const useComplaintDraft = create((set, get) => ({
     set({
       photo: file ? { file, previewUrl: URL.createObjectURL?.(file) ?? "" } : null,
       upload: null,
+      offlinePhoto: null,
       suggestion: null,
       aiChecked: false,
     });

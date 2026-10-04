@@ -11,6 +11,7 @@ import { useSession } from "../stores/session.js";
 import { useToast } from "../stores/toast.js";
 import { useComplaintDraft } from "../stores/complaintDraft.js";
 import { useEligibility } from "../stores/eligibility.js";
+import { clearOutbox } from "../lib/outbox.js";
 
 export function resetStores() {
   try {
@@ -24,6 +25,7 @@ export function resetStores() {
   usePrefs.setState({ language: "hi", languageChosen: true, textSize: "md" });
   useToast.setState({ toast: null });
   useComplaintDraft.getState().reset();
+  clearOutbox();
   useEligibility.getState().reset();
   useNetwork.setState({ browserOnline: true, failures: 0 });
   document.documentElement.setAttribute("data-text-size", "md");

@@ -1,4 +1,6 @@
-import { Box, Paper, Stack, Typography } from "@mui/material";
+import { Box, Chip, Paper, Stack, Tooltip, Typography } from "@mui/material";
+import { GroupsRounded } from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
 
 /** KPI card (docs/04 §7.2): big number, label, optional hint; red when `alert`. */
 export function KpiCard({ label, value, hint, alert = false, icon: Icon, onClick }) {
@@ -59,5 +61,24 @@ export function Section({ title, action, children, sx }) {
       )}
       {children}
     </Paper>
+  );
+}
+
+/** 👥 n — other citizens who said "me too" on this complaint (shown when n > 0). */
+export function MeTooBadge({ count, long = false }) {
+  const { t } = useTranslation("portal");
+  if (!count) return null;
+  const text = t("complaints.meToo", { count });
+  return (
+    <Tooltip title={text}>
+      <Chip
+        size="small"
+        color="secondary"
+        icon={<GroupsRounded />}
+        label={long ? text : `+${count}`}
+        aria-label={text}
+        sx={{ ml: 1, verticalAlign: "middle" }}
+      />
+    </Tooltip>
   );
 }

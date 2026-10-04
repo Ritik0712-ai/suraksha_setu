@@ -23,6 +23,8 @@ import { getPosition } from "../../lib/geo.js";
 import { compressPhoto, isImageFile } from "../../lib/photo.js";
 import { toTenDigits } from "../../lib/phone.js";
 import { isDraftDirty, useComplaintDraft } from "../../stores/complaintDraft.js";
+import { queueComplaint } from "../../lib/outbox.js";
+import { useSession } from "../../stores/session.js";
 import { HighlightCard, Notice } from "../../components/ui/Notice.jsx";
 import { ConfirmDialog } from "../../components/ui/ResponsiveDialog.jsx";
 import { WizardFrame } from "../../components/ui/WizardFrame.jsx";
@@ -30,6 +32,7 @@ import { PhoneField, SubmitButton } from "../../components/ui/fields.jsx";
 import { CategoryIcon } from "./categories.jsx";
 import { CATEGORIES, buildComplaintBody, confidenceLabel, useLocalized } from "./complaintUtils.js";
 import { LocationPicker } from "./LocationPicker.jsx";
+import { NearbyMatches } from "./NearbyMatches.jsx";
 import { MicButton } from "../../components/ui/Speech.jsx";
 import { appendSpoken } from "../../lib/speech.js";
 
@@ -40,7 +43,7 @@ const SHOW_AI_FROM = 0.6; // docs/03 S-10 step 2
 
 function PhotoStep({ onDone }) {
   const { t } = useTranslation("complaints");
-  const { photo, upload, setPhoto, update } = useComplaintDraft();
+  const { photo, upload, offlinePhoto, setPhoto, update } = useComplaintDraft();
   const camera = useRef(null);
   const gallery = useRef(null);
   const [error, setError] = useState(null); // "notImage" | "uploadFailed" | server message
@@ -56,20 +59,29 @@ function PhotoStep({ onDone }) {
   };
 
   const next = async () => {
-    if (!photo || upload) return onDone();
+    if (!photo || upload || offlinePhoto) return onDone();
     setBusy(true);
     setError(null);
+    let file = null;
     try {
-      const file = await compressPhoto(photo.file);
+      file = await compressPhoto(photo.file);
+      if (typeof navigator !== "undefined" && navigator.onLine === false)
+        throw new Error("offline");
       const res = await complaintsApi.classify(file);
       update({
-        upload: { uploadId: res.uploadId, imageUrl: res.imageUrl },
+        upload: { uploadId: res.uploadId, imageUrl: res.imageUrl, at: Date.now() },
         suggestion: res.suggestion,
         aiChecked: true,
       });
       onDone();
     } catch (err) {
       const e = apiError(err);
+      if (e.network && file) {
+        // No internet: keep the photo on the phone; it goes with the complaint later.
+        update({ offlinePhoto: file, suggestion: null, aiChecked: true });
+        onDone();
+        return;
+      }
       setError(
         e.code === "VALIDATION_ERROR" || e.code === "RATE_LIMITED" ? e.message : "uploadFailed",
       );
@@ -439,7 +451,7 @@ function ReviewRow({ label, onEdit, children }) {
   );
 }
 
-function ReviewStep({ goTo, onSubmitted }) {
+function ReviewStep({ goTo, onSubmitted, onQueued, onMeToo }) {
   const { t } = useTranslation("complaints");
   const localized = useLocalized();
   const draft = useComplaintDraft();
@@ -459,14 +471,39 @@ function ReviewStep({ goTo, onSubmitted }) {
   });
   const dept = localized(preview.data?.department?.name) || t("review.defaultDept");
 
+  const userId = useSession((x) => x.user?.id ?? null);
+
+  // No internet: save the complaint (and photo) on this phone; OutboxRunner sends it later.
+  const saveForLater = async () => {
+    let photo = draft.offlinePhoto;
+    if (!photo && draft.photo) photo = await compressPhoto(draft.photo.file).catch(() => null);
+    await queueComplaint({
+      userId,
+      body: buildComplaintBody(draft),
+      photo,
+      uploadedAt: draft.upload?.at ?? null,
+    });
+    onQueued();
+  };
+
   const submit = async () => {
     setBusy(true);
     setError(null);
     try {
+      if (draft.offlinePhoto || (typeof navigator !== "undefined" && navigator.onLine === false))
+        throw Object.assign(new Error("offline"), { offline: true });
       const created = await complaintsApi.create(buildComplaintBody(draft));
       onSubmitted(created);
     } catch (err) {
       const e = apiError(err);
+      if (e.network && userId) {
+        try {
+          await saveForLater();
+          return;
+        } catch {
+          // fall through to the error below
+        }
+      }
       setError(e.network ? t("states.networkError", { ns: "common" }) : e.message);
       setBusy(false);
     }
@@ -475,6 +512,9 @@ function ReviewStep({ goTo, onSubmitted }) {
   return (
     <Stack spacing={2}>
       <Typography variant="h2">{t("review.heading")}</Typography>
+      {!draft.offlinePhoto && (
+        <NearbyMatches category={draft.category} location={draft.location} onDone={onMeToo} />
+      )}
       <Paper variant="outlined" sx={{ px: 2 }}>
         <ReviewRow label={t("review.photo")} onEdit={() => goTo(1)}>
           {draft.photo ? (
@@ -516,6 +556,7 @@ function ReviewStep({ goTo, onSubmitted }) {
       <Typography>
         {t("review.goesTo")} <strong>{dept}</strong>
       </Typography>
+      {draft.offlinePhoto && <Notice kind="info" title={t("outbox.offlineNote")} />}
       {error && <Notice kind="error" title={error} />}
       <SubmitButton type="button" busy={busy} onClick={submit}>
         {t("review.submit")}
@@ -561,6 +602,19 @@ export default function NewComplaintPage() {
     });
   };
 
+  // Joined a neighbour's complaint ("me too") instead of filing a new one.
+  const onMeToo = () => {
+    submitted.current = true;
+    reset();
+    navigate("/complaints", { replace: true });
+  };
+
+  const onQueued = () => {
+    submitted.current = true;
+    reset();
+    navigate("/complaints/new/success", { replace: true, state: { queued: true } });
+  };
+
   const goNext = () => {
     setStep((s) => Math.min(TOTAL, s + 1));
     window.scrollTo?.(0, 0);
@@ -572,7 +626,14 @@ export default function NewComplaintPage() {
         {step === 1 && <PhotoStep onDone={goNext} />}
         {step === 2 && <CategoryStep onDone={goNext} />}
         {step === 3 && <DetailsStep onDone={goNext} />}
-        {step === 4 && <ReviewStep goTo={setStep} onSubmitted={onSubmitted} />}
+        {step === 4 && (
+          <ReviewStep
+            goTo={setStep}
+            onSubmitted={onSubmitted}
+            onQueued={onQueued}
+            onMeToo={onMeToo}
+          />
+        )}
       </WizardFrame>
       <ConfirmDialog
         open={blocker.state === "blocked"}

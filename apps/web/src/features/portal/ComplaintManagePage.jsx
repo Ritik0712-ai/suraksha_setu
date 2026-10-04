@@ -38,7 +38,7 @@ import { ConfirmDialog, ResponsiveDialog } from "../../components/ui/ResponsiveD
 import { EmptyState, ErrorCard, ListSkeleton } from "../../components/ui/States.jsx";
 import { StatusChip } from "../../components/ui/StatusChip.jsx";
 import { SubmitButton } from "../../components/ui/fields.jsx";
-import { Section } from "./ui.jsx";
+import { MeTooBadge, Section } from "./ui.jsx";
 
 /** Runs a write; on 409 (someone else changed it) reloads and says so (docs/03 A-03). */
 function useAction(id) {
@@ -438,6 +438,7 @@ export default function ComplaintManagePage() {
           {c.complaintNo}
         </Typography>
         <StatusChip status={c.status} />
+        <MeTooBadge count={c.supporterCount} long />
         <Typography color="text.secondary">
           {t(`categories.${c.category}`, { ns: "complaints" })}
         </Typography>

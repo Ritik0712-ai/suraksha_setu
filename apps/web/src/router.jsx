@@ -27,6 +27,11 @@ const page =
 export const routes = [
   { path: "/welcome", element: <WelcomePage />, errorElement: <CrashPage /> },
   {
+    path: "/tour",
+    errorElement: <CrashPage />,
+    lazy: page(() => import("./features/welcome/Tour.jsx")),
+  },
+  {
     element: <LanguageGate />,
     errorElement: <CrashPage />,
     HydrateFallback: RouteSkeleton,

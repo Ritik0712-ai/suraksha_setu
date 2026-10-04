@@ -68,6 +68,9 @@ export const complaintsApi = {
     return data(api.get("/complaints/classify/warmup"));
   },
   routePreview: (params) => data(api.get("/complaints/route-preview", { params })),
+  nearby: (params) => data(api.get("/complaints/nearby", { params })),
+  support: (id) => data(api.post(`/complaints/${id}/support`)),
+  unsupport: (id) => data(api.delete(`/complaints/${id}/support`)),
   create: (body) => data(api.post("/complaints", body)),
   mine: (params) => data(api.get("/complaints/mine", { params })),
   get: (id) => data(api.get(`/complaints/${id}`)),

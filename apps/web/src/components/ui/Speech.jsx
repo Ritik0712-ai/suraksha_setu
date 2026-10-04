@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from "react";
-import { Box, Button, IconButton, Tooltip } from "@mui/material";
+import { Button, IconButton } from "@mui/material";
 import { MicRounded, StopRounded, VolumeUpRounded } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 import {
@@ -48,19 +48,19 @@ export function ListenButton({ text, variant = "icon", size = "medium", label, s
         {name}
       </Button>
     );
+  // Native title instead of MUI Tooltip: keeps Popper out of the first download.
   return (
-    <Tooltip title={name}>
-      <IconButton
-        aria-label={name}
-        aria-pressed={active}
-        onClick={toggle}
-        size={size}
-        color="primary"
-        sx={{ ...(active && { bgcolor: "primary.main", color: "#fff" }), ...sx }}
-      >
-        {icon}
-      </IconButton>
-    </Tooltip>
+    <IconButton
+      aria-label={name}
+      title={name}
+      aria-pressed={active}
+      onClick={toggle}
+      size={size}
+      color="primary"
+      sx={{ ...(active && { bgcolor: "primary.main", color: "#fff" }), ...sx }}
+    >
+      {icon}
+    </IconButton>
   );
 }
 
@@ -114,33 +114,30 @@ export function MicButton({ onText, disabled, size = 56 }) {
 
   const name = listening ? t("speech.stopListening") : t("speech.speak");
   return (
-    <Tooltip title={name}>
-      <Box component="span">
-        <IconButton
-          aria-label={name}
-          aria-pressed={listening}
-          onClick={start}
-          disabled={disabled}
-          sx={{
-            width: size,
-            height: size,
-            border: 2,
-            borderColor: listening ? "error.main" : "primary.main",
-            color: listening ? "#fff" : "primary.main",
-            bgcolor: listening ? "error.main" : "background.paper",
-            "&:hover": { bgcolor: listening ? "error.dark" : "action.hover" },
-            ...(listening && {
-              animation: "ss-pulse 1.2s ease-in-out infinite",
-              "@keyframes ss-pulse": {
-                "0%, 100%": { boxShadow: "0 0 0 0 rgba(200,30,30,.5)" },
-                "50%": { boxShadow: "0 0 0 8px rgba(200,30,30,0)" },
-              },
-            }),
-          }}
-        >
-          {listening ? <StopRounded /> : <MicRounded />}
-        </IconButton>
-      </Box>
-    </Tooltip>
+    <IconButton
+      aria-label={name}
+      title={name}
+      aria-pressed={listening}
+      onClick={start}
+      disabled={disabled}
+      sx={{
+        width: size,
+        height: size,
+        border: 2,
+        borderColor: listening ? "error.main" : "primary.main",
+        color: listening ? "#fff" : "primary.main",
+        bgcolor: listening ? "error.main" : "background.paper",
+        "&:hover": { bgcolor: listening ? "error.dark" : "action.hover" },
+        ...(listening && {
+          animation: "ss-pulse 1.2s ease-in-out infinite",
+          "@keyframes ss-pulse": {
+            "0%, 100%": { boxShadow: "0 0 0 0 rgba(200,30,30,.5)" },
+            "50%": { boxShadow: "0 0 0 8px rgba(200,30,30,0)" },
+          },
+        }),
+      }}
+    >
+      {listening ? <StopRounded /> : <MicRounded />}
+    </IconButton>
   );
 }

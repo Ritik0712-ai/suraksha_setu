@@ -20,6 +20,7 @@ import {
   TextSizeControl,
 } from "./HeaderControls.jsx";
 import { OfflineBanner } from "./OfflineBanner.jsx";
+import { OutboxRunner } from "./OutboxRunner.jsx";
 
 export function SkipLink() {
   const { t } = useTranslation();
@@ -311,6 +312,7 @@ export function CitizenShell() {
       <Header authed={authed} guest={!authed && status !== "loading"} />
       {!handle.noEmergencyBar && <EmergencyBar />}
       <OfflineBanner />
+      <OutboxRunner />
       <Box
         component="main"
         id="main"

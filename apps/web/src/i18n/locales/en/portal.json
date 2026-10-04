@@ -111,7 +111,9 @@
     "empty": "No complaints match these filters.",
     "none": "No complaints yet in your area.",
     "total": "{{count}} complaints",
-    "exporting": "Preparing CSV…"
+    "exporting": "Preparing CSV…",
+    "meToo_one": "{{count}} more citizen has this problem",
+    "meToo_other": "{{count}} more citizens have this problem"
   },
   "manage": {
     "back": "All complaints",

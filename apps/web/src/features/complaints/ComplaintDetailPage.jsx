@@ -279,6 +279,11 @@ export default function ComplaintDetailPage() {
           <Typography sx={{ fontWeight: 500 }}>{category}</Typography>
           <StatusChip status={c.status} />
         </Stack>
+        {c.supporterCount > 0 && (
+          <Typography sx={{ fontWeight: 500, color: "secondary.dark" }}>
+            👥 {t("detail.supporters", { count: c.supporterCount })}
+          </Typography>
+        )}
         <ListenButton
           variant="button"
           text={listenText}

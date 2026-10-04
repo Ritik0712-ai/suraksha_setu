@@ -60,6 +60,9 @@ const ComplaintSchema = new Schema(
     aiSuggestion: { type: AiSuggestion, default: null },
     description: { type: String, maxlength: 500, trim: true },
     landmark: { type: String, maxlength: 100, trim: true },
+    // "Me too": other citizens who have the same problem here. Ids are never sent to anyone.
+    supporters: { type: [{ type: Types.ObjectId, ref: "User" }], default: [], select: false },
+    supporterCount: { type: Number, default: 0, min: 0 },
     location: { type: GeoPoint, required: true },
     locationAccuracyM: Number,
     jurisdictionId: { type: Types.ObjectId, ref: "Jurisdiction", required: true },

@@ -1,14 +1,40 @@
 import { Button, IconButton, Stack, Typography } from "@mui/material";
-import { CheckCircleRounded, ContentCopyRounded } from "@mui/icons-material";
+import { CheckCircleRounded, ContentCopyRounded, CloudUploadRounded } from "@mui/icons-material";
 import { Link as RouterLink, Navigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { copyText } from "../../lib/device.js";
 import { toast } from "../../stores/toast.js";
 
+/** Saved on the phone without internet; it is sent automatically later (lib/outbox.js). */
+function QueuedPage() {
+  const { t } = useTranslation("complaints");
+  return (
+    <Stack
+      spacing={3}
+      alignItems="center"
+      textAlign="center"
+      sx={{ py: 4, maxWidth: 520, mx: "auto" }}
+    >
+      <CloudUploadRounded color="primary" sx={{ fontSize: 96 }} />
+      <Typography variant="h1">{t("outbox.savedTitle")}</Typography>
+      <Typography sx={{ fontSize: "1.125rem" }}>{t("outbox.savedBody")}</Typography>
+      <Stack spacing={1.5} sx={{ width: "100%" }}>
+        <Button variant="contained" component={RouterLink} to="/complaints" replace>
+          {t("outbox.seeWaiting")}
+        </Button>
+        <Button component={RouterLink} to="/">
+          {t("actions.goHome", { ns: "common" })}
+        </Button>
+      </Stack>
+    </Stack>
+  );
+}
+
 /** S-11 Complaint submitted (docs/03). Direct visits without state go to the list. */
 export default function ComplaintSuccessPage() {
   const { t } = useTranslation("complaints");
   const { state } = useLocation();
+  if (state?.queued) return <QueuedPage />;
   if (!state?.complaintNo) return <Navigate to="/complaints" replace />;
 
   const copy = async () => {

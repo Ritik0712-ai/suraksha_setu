@@ -12,6 +12,7 @@ import { PageTitle } from "../../components/ui/PageTitle.jsx";
 import { EmptyState, ErrorCard, ListSkeleton } from "../../components/ui/States.jsx";
 import { StatusChip } from "../../components/ui/StatusChip.jsx";
 import { CategoryIcon } from "./categories.jsx";
+import { WaitingComplaints } from "./WaitingComplaints.jsx";
 import { useLocalized } from "./complaintUtils.js";
 
 const FILTERS = ["all", "open", "resolved", "rejected"];
@@ -115,6 +116,7 @@ export default function MyComplaintsPage() {
   return (
     <Box sx={{ pb: 10 }}>
       <PageTitle>{t("list.title")}</PageTitle>
+      <WaitingComplaints />
       <Box sx={{ mb: 2 }}>
         <FilterChips
           scroll

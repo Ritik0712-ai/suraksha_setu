@@ -1,3 +1,4 @@
+import { lazy, Suspense, useState } from "react";
 import { Box, Button, Container, Stack, Typography } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -5,19 +6,39 @@ import { safeNext } from "../../lib/nextPath.js";
 import { usePrefs } from "../../stores/prefs.js";
 import { LogoMark } from "../../components/icons/index.jsx";
 import { EmergencyBar, TricolourStrip } from "../../components/layout/CitizenShell.jsx";
+// Only first-time visitors see the tour, so it loads separately.
+const Tour = lazy(() => import("./Tour.jsx").then((m) => ({ default: m.Tour })));
 
-/** S-01 Language select — first launch only. Static, works offline (docs/03 S-01). */
+/**
+ * S-01 Language select — first launch only. Static, works offline (docs/03 S-01). Then a
+ * three-picture tour (SOS, complaints, Sahayak) that can be skipped.
+ */
 export default function WelcomePage() {
   const { i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const setLanguage = usePrefs((s) => s.setLanguage);
+  const [touring, setTouring] = useState(false);
+  const done = () => navigate(safeNext(location.state?.from), { replace: true });
 
   const choose = (lng) => {
     i18n.changeLanguage(lng);
     setLanguage(lng);
-    navigate(safeNext(location.state?.from), { replace: true });
+    setTouring(true);
   };
+
+  if (touring)
+    return (
+      <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+        <TricolourStrip />
+        <EmergencyBar />
+        <Container maxWidth="sm" component="main" sx={{ flex: 1, py: 4 }}>
+          <Suspense fallback={null}>
+            <Tour onDone={done} />
+          </Suspense>
+        </Container>
+      </Box>
+    );
 
   return (
     <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>

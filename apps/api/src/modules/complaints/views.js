@@ -44,6 +44,7 @@ export function listItem(c, { depts, jurs }) {
     landmark: c.landmark ?? null,
     village: jurs.get(String(c.jurisdictionId))?.name ?? null,
     department: depts.get(String(c.departmentId))?.name ?? null,
+    supporterCount: c.supporterCount ?? 0,
     createdAt: c.createdAt,
     updatedAt: c.updatedAt,
   };

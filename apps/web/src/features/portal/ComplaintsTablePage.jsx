@@ -36,6 +36,7 @@ import { ErrorCard, ListSkeleton } from "../../components/ui/States.jsx";
 import { StatusChip } from "../../components/ui/StatusChip.jsx";
 import { PageTitle } from "../../components/ui/PageTitle.jsx";
 import { CategoryIcon } from "../complaints/categories.jsx";
+import { MeTooBadge } from "./ui.jsx";
 
 const LIMITS = [20, 50, 100];
 const SORTABLE = { created: "created", age: "age", updated: "updated" };
@@ -312,6 +313,7 @@ export default function ComplaintsTablePage() {
                 >
                   <TableCell sx={{ whiteSpace: "nowrap", fontWeight: 500 }}>
                     {c.complaintNo}
+                    <MeTooBadge count={c.supporterCount} />
                   </TableCell>
                   <TableCell>
                     {c.imageUrl ? (
@@ -381,7 +383,10 @@ export default function ComplaintsTablePage() {
               }}
             >
               <Stack direction="row" justifyContent="space-between" spacing={1}>
-                <Typography sx={{ fontWeight: 700 }}>{c.complaintNo}</Typography>
+                <Typography sx={{ fontWeight: 700 }}>
+                  {c.complaintNo}
+                  <MeTooBadge count={c.supporterCount} />
+                </Typography>
                 <StatusChip status={c.status} size="small" />
               </Stack>
               <Typography>{t(`categories.${c.category}`, { ns: "complaints" })}</Typography>

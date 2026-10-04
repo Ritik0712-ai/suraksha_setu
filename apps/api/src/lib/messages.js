@@ -89,6 +89,14 @@ export const MESSAGES = {
     en: "Complaint not found.",
     hi: "शिकायत नहीं मिली।",
   },
+  own_complaint: {
+    en: "This is your own complaint.",
+    hi: "यह आपकी अपनी शिकायत है।",
+  },
+  complaint_closed: {
+    en: "This complaint is already closed.",
+    hi: "यह शिकायत पहले ही बंद हो चुकी है।",
+  },
   complaint_daily_limit: {
     en: "You've reached today's limit of 10 complaints. Try tomorrow.",
     hi: "आज की 10 शिकायतों की सीमा पूरी हो गई। कल फिर कोशिश करें।",
