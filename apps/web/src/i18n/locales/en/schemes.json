@@ -54,7 +54,10 @@
     "shareCopied": "Link copied",
     "docsHint": "Save this scheme to tick the documents you have.",
     "docsReady": "Documents ready: {{ready}} of {{total}}",
-    "callHelpline": "Call {{number}}"
+    "callHelpline": "Call {{number}}",
+    "listenAll": "Listen to this scheme",
+    "whatsappText": "{{name}}: {{benefit}}\nFull details (Suraksha Setu): {{url}}",
+    "helpful": "Was this information helpful?"
   },
   "check": {
     "title": "Check eligibility",

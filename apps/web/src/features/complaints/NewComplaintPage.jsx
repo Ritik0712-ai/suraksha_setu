@@ -30,6 +30,8 @@ import { PhoneField, SubmitButton } from "../../components/ui/fields.jsx";
 import { CategoryIcon } from "./categories.jsx";
 import { CATEGORIES, buildComplaintBody, confidenceLabel, useLocalized } from "./complaintUtils.js";
 import { LocationPicker } from "./LocationPicker.jsx";
+import { MicButton } from "../../components/ui/Speech.jsx";
+import { appendSpoken } from "../../lib/speech.js";
 
 const TOTAL = 4;
 const SHOW_AI_FROM = 0.6; // docs/03 S-10 step 2
@@ -363,17 +365,22 @@ function DetailsStep({ onDone }) {
         inputProps={{ maxLength: 100 }}
         fullWidth
       />
-      <TextField
-        id="complaint-description"
-        label={t("details.description")}
-        value={draft.description}
-        onChange={(e) => update({ description: e.target.value })}
-        inputProps={{ maxLength: 500 }}
-        helperText={`${t("details.descriptionHint")} · ${draft.description.length}/500`}
-        multiline
-        minRows={3}
-        fullWidth
-      />
+      <Stack direction="row" spacing={1} alignItems="flex-start">
+        <TextField
+          id="complaint-description"
+          label={t("details.description")}
+          value={draft.description}
+          onChange={(e) => update({ description: e.target.value })}
+          inputProps={{ maxLength: 500 }}
+          helperText={`${t("details.descriptionHint")} · ${draft.description.length}/500`}
+          multiline
+          minRows={3}
+          fullWidth
+        />
+        <MicButton
+          onText={(said) => update({ description: appendSpoken(draft.description, said, 500) })}
+        />
+      </Stack>
       <FormControlLabel
         control={
           <Switch

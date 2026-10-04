@@ -10,6 +10,8 @@ import { Jurisdiction } from "../../models/Jurisdiction.js";
 import { SosAlert } from "../../models/SosAlert.js";
 import { UsageEvent } from "../../models/UsageEvent.js";
 import { ChatMessage } from "../../models/ChatMessage.js";
+import { Feedback } from "../../models/Feedback.js";
+import { Scheme } from "../../models/Scheme.js";
 import { User } from "../../models/User.js";
 
 const wrap = (fn) => (req, res, next) => fn(req, res, next).catch(next);
@@ -247,7 +249,10 @@ async function analytics(user, { from, to }) {
       ]),
     ]);
 
-  const sahayak = user.role === "admin" ? await sahayakUsage(range) : null;
+  const [sahayak, feedback] =
+    user.role === "admin"
+      ? await Promise.all([sahayakUsage(range), feedbackSummary(range)])
+      : [null, null];
   const count = (list, key) => list.find((x) => x._id === key)?.count ?? 0;
   const pct = (a, b) => (b ? Math.round((a / b) * 1000) / 10 : null);
   const a = ai[0] ?? { withSuggestion: 0, accepted: 0, corrected: 0 };
@@ -277,6 +282,7 @@ async function analytics(user, { from, to }) {
       correctedPct: pct(a.corrected, a.withSuggestion),
     },
     sahayak,
+    feedback,
   };
 }
 
@@ -312,6 +318,44 @@ async function sahayakUsage(range) {
     tokensInPer100: per100(r.tokensIn ?? 0),
     tokensOutPer100: per100(r.tokensOut ?? 0),
     avgLatencyMs: r.latencyMs ? Math.round(r.latencyMs) : null,
+  };
+}
+
+/**
+ * "Was this helpful?" votes (admin only, pilot data for the usability report). Votes changed
+ * inside the range count with their latest answer.
+ */
+async function feedbackSummary(range) {
+  const rows = await Feedback.aggregate([
+    { $match: { updatedAt: range } },
+    {
+      $group: {
+        _id: {
+          target: "$target",
+          targetId: { $cond: [{ $eq: ["$target", "scheme"] }, "$targetId", null] },
+        },
+        helpful: { $sum: { $cond: ["$helpful", 1, 0] } },
+        notHelpful: { $sum: { $cond: ["$helpful", 0, 1] } },
+      },
+    },
+  ]);
+  const sahayakRow = rows.find((r) => r._id.target === "sahayak_reply");
+  const schemeRows = rows
+    .filter((r) => r._id.target === "scheme")
+    .sort((a, b) => b.helpful + b.notHelpful - (a.helpful + a.notHelpful))
+    .slice(0, 10);
+  const schemeNames = await names(
+    Scheme,
+    schemeRows.map((r) => r._id.targetId),
+  );
+  return {
+    sahayak: { helpful: sahayakRow?.helpful ?? 0, notHelpful: sahayakRow?.notHelpful ?? 0 },
+    schemes: schemeRows.map((r) => ({
+      id: String(r._id.targetId),
+      name: schemeNames.get(String(r._id.targetId)) ?? null,
+      helpful: r.helpful,
+      notHelpful: r.notHelpful,
+    })),
   };
 }
 

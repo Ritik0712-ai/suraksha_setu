@@ -31,7 +31,7 @@ beforeEach(async () => {
 });
 
 describe("collections (docs/05 §3)", () => {
-  it("registers all 19 collections under their documented names", () => {
+  it("registers all 20 collections under their documented names", () => {
     const names = Object.values(models)
       .map((m) => m.collection.collectionName)
       .sort();
@@ -46,6 +46,7 @@ describe("collections (docs/05 §3)", () => {
         "departments",
         "donor_contact_requests",
         "emergency_services",
+        "feedback",
         "jurisdictions",
         "notifications",
         "password_resets",

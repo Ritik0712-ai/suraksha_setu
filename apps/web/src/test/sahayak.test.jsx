@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { screen, waitFor, within } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { act, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderApp } from "./utils.jsx";
 import { HttpResponse, apiErr, citizen, http, loggedInAs, server } from "./server.js";
@@ -419,5 +419,106 @@ describe("helpers", () => {
     });
     expect(text.split("\n")[0]).toBe("To,");
     expect(text).toContain("Mobile: 9876543210");
+  });
+});
+
+describe("voice: 🔊 listen and 🎤 speak-to-type", () => {
+  let spoken;
+  let recognizers;
+  beforeEach(() => {
+    spoken = [];
+    recognizers = [];
+    window.SpeechSynthesisUtterance = class {
+      constructor(text) {
+        this.text = text;
+      }
+    };
+    window.speechSynthesis = {
+      speak: (u) => spoken.push(u),
+      cancel: vi.fn(),
+      getVoices: () => [{ lang: "hi-IN", name: "Hindi" }],
+    };
+    window.SpeechRecognition = class {
+      constructor() {
+        recognizers.push(this);
+      }
+      start() {
+        this.started = true;
+      }
+      stop() {
+        this.onend?.();
+      }
+      abort() {}
+    };
+  });
+  afterEach(() => {
+    delete window.speechSynthesis;
+    delete window.SpeechSynthesisUtterance;
+    delete window.SpeechRecognition;
+  });
+
+  const session = () => ({
+    id: "s1",
+    mode: "general",
+    title: "नई बातचीत",
+    remainingToday: 30,
+    messages: [
+      msg({ text: "लाड़ली बहना योजना **महिलाओं** के लिए है। [वेबसाइट](https://x.in) देखें।" }),
+    ],
+  });
+
+  it("reads a Sahayak reply aloud in Hindi, without Markdown or links, and stops on a second tap", async () => {
+    backend({ sessions: [session()] });
+    renderApp("/sahayak/s1");
+    const listen = await screen.findByRole("button", { name: "सुनें" });
+    await userEvent.click(listen);
+    expect(spoken.map((u) => u.text)).toEqual([
+      "लाड़ली बहना योजना महिलाओं के लिए है।",
+      "वेबसाइट देखें।",
+    ]);
+    expect(spoken[0].lang).toBe("hi-IN");
+    await userEvent.click(screen.getByRole("button", { name: "रोकें" }));
+    expect(window.speechSynthesis.cancel).toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: "सुनें" })).toBeInTheDocument();
+  });
+
+  it("types what the user says into the message box", async () => {
+    backend({ sessions: [session()] });
+    renderApp("/sahayak/s1");
+    await userEvent.click(await screen.findByRole("button", { name: "बोलकर लिखें" }));
+    const r = recognizers[0];
+    expect(r.started).toBe(true);
+    expect(r.lang).toBe("hi-IN");
+    act(() => {
+      r.onresult({ results: [[{ transcript: "पीएम किसान का पैसा कब आएगा" }]] });
+      r.onend();
+    });
+    expect(screen.getByLabelText("अपना सवाल लिखें…")).toHaveValue("पीएम किसान का पैसा कब आएगा");
+  });
+});
+
+describe("👍👎 on Sahayak replies", () => {
+  it("records a vote, shows it as chosen and thanks the user", async () => {
+    const reply = msg({ id: "a1", text: "जवाब" });
+    backend({
+      sessions: [{ id: "s1", mode: "general", title: "x", remainingToday: 30, messages: [reply] }],
+    });
+    const votes = [];
+    server.use(
+      http.post("*/api/v1/feedback", async ({ request }) => {
+        votes.push(await request.json());
+        return HttpResponse.json({ data: votes.at(-1) });
+      }),
+    );
+    renderApp("/sahayak/s1");
+    await userEvent.click(await screen.findByRole("button", { name: "हाँ, काम का था" }));
+    await waitFor(() =>
+      expect(votes).toEqual([{ target: "sahayak_reply", targetId: "a1", helpful: true }]),
+    );
+    expect(screen.getByRole("button", { name: "हाँ, काम का था" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    expect(await screen.findByText(/धन्यवाद! आपकी राय/)).toBeInTheDocument();
   });
 });

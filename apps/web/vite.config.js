@@ -39,8 +39,10 @@ export default defineConfig({
     react(),
     // Installable PWA with an offline app shell (docs/01 FR-GEN-06, doc 06 task 3.10).
     VitePWA({
-      registerType: "autoUpdate",
-      injectRegister: "auto",
+      // "prompt": a new version waits until the user taps "Update" on the bar (UpdateBar.jsx),
+      // instead of phones silently running the old version until every tab is closed.
+      registerType: "prompt",
+      injectRegister: false,
       includeAssets: ["logo.svg", "icons/apple-touch-icon.png"],
       manifest: {
         name: "सुरक्षा सेतु · Suraksha Setu",

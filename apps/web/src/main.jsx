@@ -11,9 +11,11 @@ import "./theme/tokens.css";
 import "./i18n/index.js";
 import App from "./App.jsx";
 import { bootstrapSession } from "./features/auth/session.js";
+import { registerPwa } from "./lib/pwa.js";
 
 // Restore the session from the refresh cookie while the shell renders (no splash screen).
 bootstrapSession();
+if (import.meta.env.PROD) registerPwa();
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

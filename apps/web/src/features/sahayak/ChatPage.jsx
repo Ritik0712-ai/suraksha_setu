@@ -26,8 +26,11 @@ import { chatApi } from "../../api/endpoints.js";
 import { toast } from "../../stores/toast.js";
 import { ConfirmDialog } from "../../components/ui/ResponsiveDialog.jsx";
 import { EmptyState, ErrorCard, ListSkeleton } from "../../components/ui/States.jsx";
+import { HelpfulVote } from "../../components/ui/HelpfulVote.jsx";
+import { useMyFeedback } from "../../lib/feedback.js";
 import {
   AssistantText,
+  AssistantFooter,
   Bubble,
   ChatInput,
   EmergencyCard,
@@ -116,6 +119,11 @@ export default function ChatPage() {
   }, []);
 
   const messages = q.data?.messages ?? [];
+  // 👍👎 under each real Sahayak answer (not the emergency card).
+  const ratable = messages
+    .filter((m) => m.role === "assistant" && m.intent !== "emergency")
+    .map((m) => m.id);
+  const votes = useMyFeedback("sahayak_reply", ratable);
   // The local bubble (and its instant emergency card) stays until the server's messages are in
   // the list; from that render on it is hidden, whichever state update React applies first.
   const waiting = pending && messages.length <= pending.base ? pending : null;
@@ -227,7 +235,15 @@ export default function ChatPage() {
                   {t("chat.outOfScope")}
                 </Typography>
               )}
-              <MessageTime at={m.createdAt} />
+              <AssistantFooter message={m}>
+                <HelpfulVote
+                  target="sahayak_reply"
+                  targetId={m.id}
+                  ids={ratable}
+                  value={votes.data?.[m.id]}
+                  size="small"
+                />
+              </AssistantFooter>
             </Bubble>
           );
         })}

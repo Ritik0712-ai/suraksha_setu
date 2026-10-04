@@ -54,7 +54,10 @@
     "shareCopied": "लिंक कॉपी हो गया",
     "docsHint": "आपके पास मौजूद दस्तावेज़ों पर निशान लगाने के लिए योजना सेव करें।",
     "docsReady": "दस्तावेज़ तैयार: {{total}} में से {{ready}}",
-    "callHelpline": "{{number}} पर कॉल करें"
+    "callHelpline": "{{number}} पर कॉल करें",
+    "listenAll": "पूरी योजना सुनें",
+    "whatsappText": "{{name}}: {{benefit}}\nपूरी जानकारी (सुरक्षा सेतु): {{url}}",
+    "helpful": "क्या यह जानकारी काम की थी?"
   },
   "check": {
     "title": "पात्रता जाँचें",

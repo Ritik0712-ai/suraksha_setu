@@ -29,6 +29,8 @@ import { useTranslation } from "react-i18next";
 import { apiError } from "../../api/client.js";
 import { complaintsApi } from "../../api/endpoints.js";
 import { copyText } from "../../lib/device.js";
+import { ListenButton } from "../../components/ui/Speech.jsx";
+import { WhatsAppShare } from "../../components/ui/WhatsAppShare.jsx";
 import { mapsLink } from "../../lib/geo.js";
 import { useSocketEvent } from "../../lib/socket.js";
 import { formatDateTime } from "../../lib/time.js";
@@ -218,6 +220,11 @@ export default function ComplaintDetailPage() {
     if (await copyText(text)) toast(t("detail.shareCopied"));
   };
 
+  const listenText = [
+    t("detail.listenText", { no: c.complaintNo, category, status }),
+    c.department ? t("detail.listenDept", { dept: localized(c.department.name) }) : "",
+  ].join(" ");
+
   const copyNo = async () => {
     if (await copyText(c.complaintNo)) toast(t("success.copied"));
   };
@@ -272,6 +279,12 @@ export default function ComplaintDetailPage() {
           <Typography sx={{ fontWeight: 500 }}>{category}</Typography>
           <StatusChip status={c.status} />
         </Stack>
+        <ListenButton
+          variant="button"
+          text={listenText}
+          label={t("detail.listen")}
+          sx={{ alignSelf: { sm: "flex-start" }, minHeight: 48 }}
+        />
       </Stack>
 
       <Paper variant="outlined" sx={{ p: 2 }}>
@@ -335,9 +348,15 @@ export default function ComplaintDetailPage() {
           }
         />
       )}
-      <Button variant="outlined" startIcon={<ShareRounded />} onClick={share}>
-        {t("detail.share")}
-      </Button>
+      <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
+        <WhatsAppShare
+          fullWidth
+          text={t("detail.shareText", { no: c.complaintNo, category, status })}
+        />
+        <Button fullWidth variant="outlined" startIcon={<ShareRounded />} onClick={share}>
+          {t("detail.share")}
+        </Button>
+      </Stack>
 
       <ReopenDialog open={reopening} complaintId={id} onClose={() => setReopening(false)} />
       <Dialog fullScreen open={Boolean(viewer)} onClose={() => setViewer(null)}>

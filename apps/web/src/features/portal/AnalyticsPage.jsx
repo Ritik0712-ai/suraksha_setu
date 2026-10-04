@@ -19,7 +19,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { apiError } from "../../api/client.js";
 import { adminApi } from "../../api/endpoints.js";
-import { downloadBlob, toCsv } from "../../lib/localized.js";
+import { downloadBlob, toCsv, useLocalized } from "../../lib/localized.js";
 import { FilterChips } from "../../components/ui/FilterChips.jsx";
 import { PageTitle } from "../../components/ui/PageTitle.jsx";
 import { ErrorCard, ListSkeleton } from "../../components/ui/States.jsx";
@@ -70,6 +70,51 @@ const SAHAYAK_ROWS = [
   "tokensOutPer100",
   "avgLatencyMs",
 ];
+
+/** "Was this helpful?" votes from citizens (admin only; counts, never who voted). */
+function FeedbackChart({ feedback, suffix }) {
+  const { t } = useTranslation("portal");
+  const localized = useLocalized();
+  const rows = [
+    [t("analytics.feedback.sahayak"), feedback.sahayak.helpful, feedback.sahayak.notHelpful],
+    ...feedback.schemes.map((s) => [localized(s.name) || s.id, s.helpful, s.notHelpful]),
+  ];
+  const header = [
+    t("analytics.feedback.item"),
+    t("analytics.feedback.helpful"),
+    t("analytics.feedback.notHelpful"),
+  ];
+  return (
+    <Chart
+      title={t("analytics.charts.feedback")}
+      header={header}
+      rows={rows}
+      filename={`helpful_votes_${suffix}.csv`}
+      empty={rows.every((r) => r[1] + r[2] === 0)}
+    >
+      <Table size="small">
+        <TableHead>
+          <TableRow>
+            {header.map((h, i) => (
+              <TableCell key={h} align={i ? "right" : "left"}>
+                {h}
+              </TableCell>
+            ))}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {rows.map((r) => (
+            <TableRow key={r[0]}>
+              <TableCell>{r[0]}</TableCell>
+              <TableCell align="right">{r[1]}</TableCell>
+              <TableCell align="right">{r[2]}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </Chart>
+  );
+}
 
 export default function AnalyticsPage() {
   const { t } = useTranslation("portal");
@@ -287,6 +332,7 @@ export default function AnalyticsPage() {
               </Typography>
             </Chart>
           )}
+          {d.feedback && <FeedbackChart feedback={d.feedback} suffix={suffix} />}
         </Box>
       )}
     </Stack>

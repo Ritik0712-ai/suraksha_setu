@@ -24,6 +24,7 @@ import { createComplaintManager } from "./modules/complaints/manage.js";
 import { notificationsRouter } from "./modules/notifications/routes.js";
 import { eventsRouter } from "./modules/events/routes.js";
 import { chatRouter } from "./modules/chat/routes.js";
+import { feedbackRouter } from "./modules/feedback/routes.js";
 import { createAiClient } from "./lib/aiClient.js";
 import { noopRealtime } from "./lib/realtime.js";
 import { createStorage } from "./lib/storage.js";
@@ -84,6 +85,7 @@ export function createApp({
   v1.use("/complaints", complaintsRouter({ env, complaints, manager, ai }));
   v1.use("/notifications", notificationsRouter({ env }));
   v1.use("/chat", chatRouter({ env, ai }));
+  v1.use("/feedback", feedbackRouter({ env }));
   v1.use(eventsRouter({ env, limiter: limiters.events }));
   v1.use("/files", filesRouter({ storage }));
   app.use("/api/v1", v1);

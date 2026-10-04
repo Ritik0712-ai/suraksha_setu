@@ -23,6 +23,7 @@ import { useTranslation } from "react-i18next";
 import { apiError } from "../../api/client.js";
 import { chatApi } from "../../api/endpoints.js";
 import { copyText, whatsappHref } from "../../lib/device.js";
+import { ListenButton } from "../../components/ui/Speech.jsx";
 import { toast } from "../../stores/toast.js";
 import { EmptyState, ErrorCard, ListSkeleton } from "../../components/ui/States.jsx";
 import { SubmitButton } from "../../components/ui/fields.jsx";
@@ -206,9 +207,10 @@ export default function LetterPage() {
       {printCss}
       <Stack direction="row" spacing={1} alignItems="center">
         {back}
-        <Typography variant="h1" sx={{ fontSize: "1.375rem" }}>
+        <Typography variant="h1" sx={{ fontSize: "1.375rem", flex: 1 }}>
           {t("letter.title")}
         </Typography>
+        {!editing && <ListenButton text={text} />}
       </Stack>
 
       {editing ? (

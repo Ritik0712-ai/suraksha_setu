@@ -241,6 +241,7 @@
     "donor_search",
     "app_install"
   ],
+  "feedbackTargets": ["sahayak_reply", "scheme"],
   "helplines": [
     {
       "number": "112",

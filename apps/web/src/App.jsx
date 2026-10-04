@@ -5,6 +5,7 @@ import { RouterProvider } from "react-router-dom";
 import { queryClient } from "./lib/queryClient.js";
 import { createRouter } from "./router.jsx";
 import { theme } from "./theme/theme.js";
+import { UpdateBar } from "./components/layout/UpdateBar.jsx";
 
 export default function App({ router: injected }) {
   const [router] = useState(() => injected ?? createRouter());
@@ -13,6 +14,7 @@ export default function App({ router: injected }) {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <RouterProvider router={router} />
+        <UpdateBar />
       </ThemeProvider>
     </QueryClientProvider>
   );

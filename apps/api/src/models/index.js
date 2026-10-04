@@ -1,4 +1,4 @@
-// Registers every model — all 19 collections from docs/05 §3.
+// Registers every model — the 19 collections from docs/05 §3, plus feedback (👍👎, Oct 2026).
 export { User } from "./User.js";
 export { Session } from "./Session.js";
 export { PasswordReset } from "./PasswordReset.js";
@@ -18,3 +18,4 @@ export { Notification } from "./Notification.js";
 export { AuditLog } from "./AuditLog.js";
 export { UsageEvent } from "./UsageEvent.js";
 export { Counter } from "./Counter.js";
+export { Feedback } from "./Feedback.js";

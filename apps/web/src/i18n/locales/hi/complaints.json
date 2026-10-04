@@ -131,7 +131,10 @@
       "status_change": "स्थिति बदली",
       "category_changed": "श्रेणी सुधारी गई",
       "resolution_photo": "फ़ोटो जोड़ी गई"
-    }
+    },
+    "listenText": "शिकायत नंबर {{no}}। {{category}}। अभी की स्थिति: {{status}}।",
+    "listenDept": "विभाग: {{dept}}।",
+    "listen": "स्थिति सुनें"
   },
   "rejection": {
     "duplicate": "पहले ही दर्ज है",

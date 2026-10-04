@@ -1,10 +1,11 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { act, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { renderApp } from "./utils.jsx";
 import { citizen, loggedInAs } from "./server.js";
 import { usePrefs } from "../stores/prefs.js";
 import { useNetwork } from "../stores/network.js";
+import { useAppUpdate } from "../lib/pwa.js";
 
 describe("citizen shell (docs/03 §2.1)", () => {
   it("renders in Hindi by default with the emergency bar and the disclaimer", async () => {
@@ -94,5 +95,15 @@ describe("home (S-02)", () => {
     await waitFor(() => expect(router.state.location.pathname).toBe("/login"));
     expect(router.state.location.search).toBe("?next=%2Fblood");
     expect(await screen.findByText("आगे बढ़ने के लिए लॉग इन करें")).toBeInTheDocument();
+  });
+
+  it("offers a one-tap update when a new version has been downloaded", async () => {
+    const apply = vi.fn();
+    renderApp("/");
+    expect(screen.queryByText("ऐप का नया वर्ज़न आ गया है।")).not.toBeInTheDocument();
+    act(() => useAppUpdate.setState({ ready: true, apply }));
+    await userEvent.click(await screen.findByRole("button", { name: "अपडेट करें" }));
+    expect(apply).toHaveBeenCalledTimes(1);
+    act(() => useAppUpdate.setState({ ready: false, apply: null }));
   });
 });

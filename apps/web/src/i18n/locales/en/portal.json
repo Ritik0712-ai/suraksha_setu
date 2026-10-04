@@ -252,7 +252,8 @@
       "aiWith": "Complaints with an AI suggestion",
       "aiAccepted": "Citizen accepted the AI category",
       "aiCorrected": "Corrected by the authority",
-      "sahayak": "Sahayak usage (admins only)"
+      "sahayak": "Sahayak usage (admins only)",
+      "feedback": "Was it helpful? (👍/👎)"
     },
     "count": "Count",
     "day": "Day",
@@ -270,6 +271,12 @@
       "tokensOutPer100": "Output tokens per 100 replies",
       "avgLatencyMs": "Average reply time (ms)",
       "costHint": "Cost per 100 replies = tokens per 100 × the provider's price per token (see the provider's billing page)."
+    },
+    "feedback": {
+      "item": "Item",
+      "sahayak": "Sahayak replies",
+      "helpful": "👍 Helpful",
+      "notHelpful": "👎 Not helpful"
     }
   },
   "users": {

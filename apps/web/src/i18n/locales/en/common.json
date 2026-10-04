@@ -143,5 +143,27 @@
     "zoomOut": "Zoom out",
     "pin": "Selected place",
     "you": "You are here"
+  },
+  "speech": {
+    "listen": "Listen",
+    "stop": "Stop",
+    "speak": "Speak to type",
+    "stopListening": "Stop listening",
+    "micDenied": "Microphone access is blocked. Turn it on in your browser settings.",
+    "micOffline": "Voice typing needs the internet.",
+    "noSpeech": "Didn't hear anything. Please try again."
+  },
+  "share": {
+    "whatsapp": "Send on WhatsApp"
+  },
+  "update": {
+    "message": "A new version of the app is ready.",
+    "button": "Update"
+  },
+  "feedback": {
+    "question": "Was this helpful?",
+    "yes": "Yes, helpful",
+    "no": "No, not helpful",
+    "thanks": "Thank you! Your answer helps us improve."
   }
 }

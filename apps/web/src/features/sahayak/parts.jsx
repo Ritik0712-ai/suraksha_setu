@@ -24,6 +24,8 @@ import C from "../../config/constants.js";
 import { useLocalized } from "../../lib/localized.js";
 import { SahayakIcon } from "../../components/icons/index.jsx";
 import { Markdown } from "./Markdown.jsx";
+import { ListenButton, MicButton } from "../../components/ui/Speech.jsx";
+import { appendSpoken } from "../../lib/speech.js";
 
 const MAX = C.sahayak.maxMessageChars;
 
@@ -249,6 +251,19 @@ export function AssistantText({ text }) {
   return <Markdown text={text} />;
 }
 
+/** Under each Sahayak reply: time on the left; 🔊 listen (and other actions) on the right. */
+export function AssistantFooter({ message, children }) {
+  return (
+    <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mt: 0.5 }}>
+      <Box sx={{ flex: 1 }}>
+        <MessageTime at={message.createdAt} />
+      </Box>
+      {children}
+      <ListenButton text={message.text} size="small" />
+    </Stack>
+  );
+}
+
 /** Input bar: multiline field + send button; Enter sends, Shift+Enter adds a line. */
 export function ChatInput({ onSend, disabled, remaining, initial = "", autoFocus = false }) {
   const { t } = useTranslation("sahayak");
@@ -283,6 +298,10 @@ export function ChatInput({ onSend, disabled, remaining, initial = "", autoFocus
             }
           }}
           inputProps={{ maxLength: MAX }}
+        />
+        <MicButton
+          disabled={disabled}
+          onText={(said) => setValue((v) => appendSpoken(v, said, MAX))}
         />
         <IconButton
           aria-label={t("input.send")}

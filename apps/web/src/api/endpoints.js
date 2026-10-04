@@ -135,6 +135,13 @@ export const chatApi = {
   remove: (id) => data(api.delete(`/chat/sessions/${id}`)),
 };
 
+// "Was this helpful? 👍👎" (Sahayak replies, scheme pages).
+export const feedbackApi = {
+  vote: (body) => data(api.post("/feedback", body)),
+  mine: (target, ids) =>
+    data(api.get("/feedback/mine", { params: { target, ids: ids.join(",") } })),
+};
+
 export const notificationsApi = {
   list: (params) => data(api.get("/notifications", { params })),
   read: (body) => data(api.post("/notifications/read", body)),

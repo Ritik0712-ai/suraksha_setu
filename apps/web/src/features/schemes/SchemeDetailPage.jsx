@@ -41,6 +41,10 @@ import { formatDate } from "../../lib/time.js";
 import { toast } from "../../stores/toast.js";
 import { Notice } from "../../components/ui/Notice.jsx";
 import { EmptyState, ErrorCard, ListSkeleton } from "../../components/ui/States.jsx";
+import { ListenButton } from "../../components/ui/Speech.jsx";
+import { WhatsAppShare } from "../../components/ui/WhatsAppShare.jsx";
+import { HelpfulVote } from "../../components/ui/HelpfulVote.jsx";
+import { useMyFeedback } from "../../lib/feedback.js";
 import { cachedScheme, cacheScheme, isNetworkError } from "./cache.js";
 import { CATEGORY_ICONS } from "./icons.js";
 import { LevelBadge } from "./SchemeCard.jsx";
@@ -159,6 +163,8 @@ export default function SchemeDetailPage() {
     },
     retry: (n, err) => apiError(err).status !== 404 && n < 2,
   });
+  const schemeId = q.data && !q.data.offline ? q.data.id : null;
+  const votes = useMyFeedback("scheme", [schemeId]);
 
   if (q.isLoading) return <ListSkeleton rows={5} />;
   if (q.isError) {
@@ -202,6 +208,24 @@ export default function SchemeDetailPage() {
   const stale =
     !s.lastVerifiedAt || Date.now() - new Date(s.lastVerifiedAt) > STALE_DAYS * 86400_000;
 
+  // The whole page as one text for 🔊 (headings + items), in the reading order of the screen.
+  const listenText = [
+    name,
+    localized(s.summary),
+    ...[
+      ["detail.benefits", s.benefits],
+      ["detail.eligibility", s.eligibilityText],
+      ["detail.documents", s.documents.map((d) => d.label)],
+      ["detail.how", s.howToApply],
+      ["detail.where", s.whereToApply],
+    ].flatMap(([key, items]) => [`${t(key)}.`, ...(items ?? []).map((x) => `${localized(x)}.`)]),
+  ].join("\n");
+  const whatsappText = t("detail.whatsappText", {
+    name,
+    benefit: localized(s.benefitShort),
+    url: `${window.location.origin}/schemes/${s.slug}`,
+  });
+
   const share = async () => {
     const text = t("detail.shareText", { name, benefit: localized(s.benefitShort) });
     const url = window.location.href;
@@ -237,7 +261,13 @@ export default function SchemeDetailPage() {
           })}
         </Stack>
         <Typography sx={{ fontSize: "1.125rem" }}>{localized(s.summary)}</Typography>
-        <Stack direction="row" spacing={1}>
+        <ListenButton
+          variant="button"
+          text={listenText}
+          label={t("detail.listenAll")}
+          sx={{ alignSelf: { sm: "flex-start" }, minHeight: 48 }}
+        />
+        <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
           <Button
             variant={saved ? "contained" : "outlined"}
             startIcon={saved ? <BookmarkRounded /> : <BookmarkBorderRounded />}
@@ -250,6 +280,7 @@ export default function SchemeDetailPage() {
           <Button variant="outlined" startIcon={<ShareRounded />} onClick={share}>
             {t("detail.share")}
           </Button>
+          <WhatsAppShare text={whatsappText} />
         </Stack>
       </Stack>
 
@@ -324,6 +355,17 @@ export default function SchemeDetailPage() {
           {t("detail.official")}
         </Button>
       </Stack>
+      {schemeId && citizen && (
+        <Paper variant="outlined" sx={{ px: 2, py: 1 }}>
+          <HelpfulVote
+            target="scheme"
+            targetId={schemeId}
+            ids={[schemeId]}
+            value={votes.data?.[schemeId]}
+            label={t("detail.helpful")}
+          />
+        </Paper>
+      )}
       <Notice kind="info" title={t("detail.disclaimer")} />
     </Stack>
   );
