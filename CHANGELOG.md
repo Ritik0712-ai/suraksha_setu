@@ -52,6 +52,11 @@ Everything so far — not yet tagged or deployed.
 
 ### Fixed
 
+- **Sahayak failing with "Couldn't get a reply" (1 Oct):** Render doesn't wake a sleeping free
+  service for requests from another Render service, so the API's wake-up calls never woke the AI
+  service. The browser now wakes it through a Vercel rewrite (`/ai-wake`) when Sahayak or the
+  complaint form opens and on every Sahayak message; the API waits up to 70 s for it.
+
 - Sahayak could show the emergency card twice for a moment.
 - Lists on S-24, S-27 and the portal sidebar broke the WCAG "list" rule.
 - Letters could repeat the salutation.

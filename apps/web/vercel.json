@@ -7,6 +7,10 @@
       "destination": "https://suraksha-setu-api-jrcl.onrender.com/api/:path*"
     },
     {
+      "source": "/ai-wake",
+      "destination": "https://suraksha-setu-ai.onrender.com/health"
+    },
+    {
       "source": "/((?!api/).*)",
       "destination": "/index.html"
     }

@@ -97,9 +97,13 @@ Render's free services sleep after 15 minutes without traffic; waking takes abou
   and is the uptime monitor (a failed run emails the repository owner). GitHub runs quiet
   repositories' schedules late or skips them (on 27–28 Sep it ran 4 times in 20 hours), so it is
   only a backup morning wake-up — never rely on it alone.
-- **The AI service wakes on demand:** opening Sahayak or the complaint wizard sends a warm-up
-  request, and a Sahayak message that finds it asleep waits for it (up to about a minute, with a
-  "Sahayak is waking up" note) and then asks again. `/api/v1/health` does **not** touch the AI
+- **The AI service wakes on demand — from the browser:** Render only starts a sleeping free
+  service for traffic from outside Render. A call from our API (also on Render) gets an instant
+  502 and the AI service stays asleep (this broke Sahayak on 1 Oct). So opening Sahayak or the
+  complaint wizard, and sending a Sahayak message, makes the browser call `/ai-wake`, a Vercel
+  rewrite to the AI service's public `/health` (`apps/web/vercel.json`). A message that finds it
+  still asleep waits for it (up to about 70 s, with a "Sahayak is waking up" note) and then asks
+  again. `/api/v1/health` does **not** touch the AI
   service (that would keep it awake all day); use `/api/v1/health?ai=1` to check it.
 - **Free hours budget:** Render gives 750 free instance hours per workspace per month. The API's
   daytime window uses ≈ 520; the AI service uses the rest while it's awake. Don't make the window

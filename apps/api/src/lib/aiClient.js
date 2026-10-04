@@ -6,9 +6,11 @@ export const CLASSIFY_TIMEOUT_MS = 8000; // docs/02 §8.2
 // < 6 s); the AI service gives up on the LLM after 12 s.
 export const SAHAYAK_TIMEOUT_MS = 15000;
 // The AI service runs on Render's free plan and sleeps after 15 idle minutes; waking takes about
-// 30–50 s, during which Render answers 502 or holds the request. A Sahayak message then waits up
-// to this long in total (the web app allows 75 s) instead of failing.
-export const SAHAYAK_WAKE_BUDGET_MS = 60000;
+// 45–60 s. Render does NOT wake it for requests from our API (also on Render — they get an
+// instant 502), so the web app wakes it through Vercel (/ai-wake) when Sahayak or the complaint
+// form opens. A Sahayak message then waits up to this long in total for it to come up (the web
+// app allows 85 s) instead of failing.
+export const SAHAYAK_WAKE_BUDGET_MS = 70000;
 const WAKE_POLL_MS = 3000;
 
 /**

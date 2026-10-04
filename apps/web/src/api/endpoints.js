@@ -1,5 +1,16 @@
 import { api } from "./client.js";
 
+/**
+ * Wakes the sleeping AI service (Render free plan). Render only starts a sleeping service for
+ * traffic from outside Render: a call from our API (also on Render) gets an instant 502 and the
+ * service stays asleep. So the browser pings it through Vercel's rewrite (/ai-wake → the AI
+ * service's public /health, vercel.json); nothing secret is sent and the answer is ignored.
+ */
+export function wakeAiService() {
+  if (typeof fetch !== "function") return;
+  fetch("/ai-wake", { cache: "no-store", credentials: "omit" }).catch(() => {});
+}
+
 const data = (p) => p.then((r) => r.data.data);
 
 // docs/02 §7.2 — only the endpoints the Phase 3 screens use.
@@ -52,7 +63,10 @@ export const complaintsApi = {
     form.append("image", file, file.name || "photo.jpg");
     return data(api.post("/complaints/classify", form, { timeout: 45000 }));
   },
-  warmup: () => data(api.get("/complaints/classify/warmup")),
+  warmup: () => {
+    wakeAiService();
+    return data(api.get("/complaints/classify/warmup"));
+  },
   routePreview: (params) => data(api.get("/complaints/route-preview", { params })),
   create: (body) => data(api.post("/complaints", body)),
   mine: (params) => data(api.get("/complaints/mine", { params })),
@@ -106,10 +120,16 @@ export const chatApi = {
   sessions: () => data(api.get("/chat/sessions")),
   start: (body) => data(api.post("/chat/sessions", body)),
   get: (id) => data(api.get(`/chat/sessions/${id}`)),
-  // Up to ~60 s when the free AI service has to wake up first (API waits and retries).
-  send: (id, body) => data(api.post(`/chat/sessions/${id}/messages`, body, { timeout: 75000 })),
+  // Up to ~70 s when the free AI service has to wake up first (API waits and retries).
+  send: (id, body) => {
+    wakeAiService();
+    return data(api.post(`/chat/sessions/${id}/messages`, body, { timeout: 85000 }));
+  },
   // Wakes the AI service in the background when Sahayak opens; errors don't matter.
-  warmup: () => api.get("/chat/warmup").catch(() => {}),
+  warmup: () => {
+    wakeAiService();
+    return api.get("/chat/warmup").catch(() => {});
+  },
   saveLetter: (id, messageId, body) =>
     data(api.put(`/chat/sessions/${id}/messages/${messageId}/letter`, body)),
   remove: (id) => data(api.delete(`/chat/sessions/${id}`)),

@@ -122,14 +122,21 @@ describe("S-24 Sahayak home", () => {
   it("wakes the (free, sleeping) AI service as soon as Sahayak opens", async () => {
     backend({ sessions: [] });
     let warmups = 0;
+    let wakes = 0;
     server.use(
       http.get("*/api/v1/chat/warmup", () => {
         warmups += 1;
         return HttpResponse.json({ data: { ok: true } });
       }),
+      // Render only wakes it for traffic from outside Render, so the browser pings it via Vercel.
+      http.get("*/ai-wake", () => {
+        wakes += 1;
+        return HttpResponse.json({ status: "ok" });
+      }),
     );
     renderApp("/sahayak");
     await waitFor(() => expect(warmups).toBe(1));
+    expect(wakes).toBe(1);
   });
 
   it("a letter chip starts a letter session with Sahayak's first question", async () => {
