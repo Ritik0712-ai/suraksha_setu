@@ -3,8 +3,8 @@
 // Playwright starts this file (playwright.config.js → webServer) and stops it after the run.
 import { spawn } from "node:child_process";
 import { readFile } from "node:fs/promises";
-import mongoose from "mongoose";
-import { MongoMemoryReplSet } from "mongodb-memory-server";
+import { createRequire } from "node:module";
+import { fileURLToPath } from "node:url";
 import C from "../apps/api/src/config/constants.js";
 import { hashPassword } from "../apps/api/src/lib/password.js";
 import "../apps/api/src/models/index.js";
@@ -15,6 +15,11 @@ import { seedDepartments } from "../apps/api/src/scripts/seedDepartments.js";
 import { seedJurisdictionTree } from "../apps/api/src/scripts/seedJurisdictions.js";
 import { seedSchemes } from "../apps/api/src/scripts/seedSchemes.js";
 import { ACCOUNTS, API_PORT, AI_PORT, INTERNAL_KEY, PASSWORD } from "./accounts.js";
+
+// Resolve through the API workspace so the stack uses the server's Mongoose instance.
+const fromApi = createRequire(new URL("../apps/api/package.json", import.meta.url));
+const mongoose = fromApi("mongoose");
+const { MongoMemoryReplSet } = fromApi("mongodb-memory-server");
 
 const seed = async (name) =>
   JSON.parse(await readFile(new URL(`../apps/api/seed/${name}`, import.meta.url), "utf8"));
@@ -69,7 +74,7 @@ await Scheme.updateMany(
 await mongoose.disconnect();
 
 const api = spawn(process.execPath, ["apps/api/src/server.js"], {
-  cwd: new URL("..", import.meta.url).pathname,
+  cwd: fileURLToPath(new URL("..", import.meta.url)),
   stdio: "inherit",
   env: {
     ...process.env,
@@ -92,7 +97,7 @@ const api = spawn(process.execPath, ["apps/api/src/server.js"], {
 // grounded on the same database. If Python/Django isn't installed, the app's AI fallbacks run.
 const python = process.env.E2E_PYTHON || "python3";
 const ai = spawn(python, ["manage.py", "runserver", String(AI_PORT), "--noreload"], {
-  cwd: new URL("../apps/ai", import.meta.url).pathname,
+  cwd: fileURLToPath(new URL("../apps/ai", import.meta.url)),
   stdio: "inherit",
   env: {
     ...process.env,
@@ -100,8 +105,9 @@ const ai = spawn(python, ["manage.py", "runserver", String(AI_PORT), "--noreload
     AI_INTERNAL_KEY: INTERNAL_KEY,
     LLM_PROVIDER: "fake",
     MONGODB_URI_READONLY: uri,
-    MODEL_PATH: new URL("../apps/ai/core/tests/fixtures/test_model.tflite", import.meta.url)
-      .pathname,
+    MODEL_PATH: fileURLToPath(
+      new URL("../apps/ai/core/tests/fixtures/test_model.tflite", import.meta.url),
+    ),
     AI_ALLOWED_IMAGE_HOSTS: "localhost,127.0.0.1",
   },
 });

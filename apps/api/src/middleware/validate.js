@@ -2,8 +2,9 @@ import { AppError } from "../lib/errors.js";
 
 // Zod issue → the { field, issue } shape of docs/02 §7.1. Custom refinements put their issue
 // code in `message` (e.g. "invalid_phone", "only_digits").
-function toIssue(i) {
-  if (i.code === "invalid_type" && i.received === "undefined") return "required";
+function toIssue(i, input) {
+  const value = i.path.reduce((current, key) => current?.[key], input);
+  if (i.code === "invalid_type" && value === undefined) return "required";
   if (i.code === "too_small") return "too_short";
   if (i.code === "too_big") return "too_long";
   if (i.code === "custom") return i.message;
@@ -16,13 +17,14 @@ export function validate(schemas) {
     const details = [];
     for (const part of ["params", "query", "body"]) {
       if (!schemas[part]) continue;
-      const result = schemas[part].safeParse(req[part] ?? {});
+      const input = req[part] ?? {};
+      const result = schemas[part].safeParse(input);
       if (result.success) {
         if (part === "query") req.validatedQuery = result.data;
         else req[part] = result.data;
       } else {
         for (const i of result.error.issues)
-          details.push({ field: i.path.join(".") || part, issue: toIssue(i) });
+          details.push({ field: i.path.join(".") || part, issue: toIssue(i, input) });
       }
     }
     if (details.length) return next(new AppError("VALIDATION_ERROR", "validation", details));

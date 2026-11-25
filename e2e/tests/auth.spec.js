@@ -29,6 +29,9 @@ test.describe("login and session", () => {
   }) => {
     await login(page, "authority");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await page.goto("/profile");
+    await expect(page).toHaveURL(/\/portal$/);
+    await expect(page.getByText("यह पेज नागरिकों के लिए है।")).toBeVisible();
     for (const path of ["/portal", "/portal/complaints", "/portal/sos", "/portal/analytics"]) {
       await page.goto(path);
       await page.waitForLoadState("networkidle");

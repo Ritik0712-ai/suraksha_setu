@@ -14,7 +14,7 @@ const schema = z.object({
   REFRESH_TOKEN_PEPPER: optional,
   CORS_ORIGINS: z
     .string()
-    .default("http://localhost:5173")
+    .prefault("http://localhost:5173")
     .transform((v) =>
       v
         .split(",")
@@ -29,6 +29,10 @@ const schema = z.object({
   // Set by Render itself (the service's public https URL). The API pings it in the daytime to
   // stay awake on the free plan (src/jobs/keepAwake.js); unset locally, so nothing is pinged.
   RENDER_EXTERNAL_URL: optional,
+  DATA_RETENTION_ENABLED: z
+    .enum(["0", "1"])
+    .default("0")
+    .transform((value) => value === "1"),
   CLOUDINARY_URL: optional,
   SMTP_HOST: optional,
   SMTP_PORT: z.coerce.number().int().positive().default(587),

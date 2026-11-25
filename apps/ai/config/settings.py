@@ -49,7 +49,9 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "core.middleware.InternalKeyMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
     "django.middleware.common.CommonMiddleware",
 ]
 
@@ -72,6 +74,17 @@ REST_FRAMEWORK = {
 }
 
 SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_SSL_REDIRECT = not DEBUG
+# Render terminates TLS before Gunicorn. Its own liveness probe can use HTTP.
+SECURE_REDIRECT_EXEMPT = [r"^health$"]
+if _env_bool("RENDER"):
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SECURE_HSTS_SECONDS = 31_536_000 if not DEBUG else 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+X_FRAME_OPTIONS = "DENY"
+CSRF_COOKIE_SECURE = not DEBUG
+# The shared Render domain is not ours to submit to the browser preload list.
+SILENCED_SYSTEM_CHECKS = ["security.W021"]
 DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024  # JSON bodies only; images are fetched by URL
 
 LOGGING = {

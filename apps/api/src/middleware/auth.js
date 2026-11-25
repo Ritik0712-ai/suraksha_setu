@@ -22,14 +22,16 @@ export async function loadUser(id) {
   return user;
 }
 
+export function readAccessToken(req, env) {
+  const [scheme, token] = (req.headers.authorization || "").split(" ");
+  if (scheme !== "Bearer" || !token) throw new AppError("UNAUTHENTICATED");
+  return verifyAccessToken(token, env.JWT_ACCESS_SECRET);
+}
+
 export function requireAuth(env) {
   return async (req, _res, next) => {
     try {
-      const header = req.headers.authorization || "";
-      const [scheme, token] = header.split(" ");
-      if (scheme !== "Bearer" || !token) throw new AppError("UNAUTHENTICATED");
-
-      const payload = verifyAccessToken(token, env.JWT_ACCESS_SECRET);
+      const payload = readAccessToken(req, env);
       const user = await loadUser(payload.sub);
       if (!user || user.status !== "active" || user.tokenVersion !== payload.ver)
         throw new AppError("UNAUTHENTICATED");

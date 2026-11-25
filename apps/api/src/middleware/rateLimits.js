@@ -1,6 +1,7 @@
 import { ipKeyGenerator, rateLimit } from "express-rate-limit";
 import { AppError } from "../lib/errors.js";
 import { normalizePhone } from "../lib/phone.js";
+import { readAccessToken } from "./auth.js";
 
 // Auth rate limits from docs/02 SEC-06. SOS is never rate-limited (and never goes through here).
 const MIN = 60 * 1000;
@@ -20,9 +21,10 @@ function limiter({ windowMs, limit, key, skipSuccessfulRequests = false }) {
 const passthrough = (_req, _res, next) => next();
 
 /** @param enabled  false turns every limiter into a no-op (used by tests of other behaviour). */
-export function createAuthLimiters(enabled = true) {
+export function createAuthLimiters(enabled, env) {
   if (!enabled)
     return {
+      general: passthrough,
       login: passthrough,
       register: passthrough,
       passwordReset: passthrough,
@@ -31,6 +33,20 @@ export function createAuthLimiters(enabled = true) {
       events: passthrough,
     };
   return {
+    general: limiter({
+      windowMs: MIN,
+      limit: 120,
+      key: (req) => {
+        if (req.headers.authorization) {
+          try {
+            return `user:${readAccessToken(req, env).sub}`;
+          } catch {
+            // Invalid and expired tokens use the anonymous IP bucket.
+          }
+        }
+        return `ip:${ipKeyGenerator(req.ip)}`;
+      },
+    }),
     // 5 failed logins per 15 min per phone + IP
     login: limiter({
       windowMs: 15 * MIN,

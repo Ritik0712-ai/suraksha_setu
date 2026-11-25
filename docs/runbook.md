@@ -154,6 +154,7 @@ Content-Security-Policy), `.github/workflows/keep-alive.yml` and this file.
 3. Generated for you: `JWT_ACCESS_SECRET`, `REFRESH_TOKEN_PEPPER`, `AI_INTERNAL_KEY` (copied to the AI service automatically) and `DJANGO_SECRET_KEY`.
 4. **Model:** until CNN v1 is published as a GitHub Release (`ml/README.md`), leave `MODEL_URL` / `MODEL_CARD_URL` empty — the build skips the download and complaints use manual categories. After the release, set both and **Manual Deploy → Clear build cache & deploy**.
 5. Checks: `https://suraksha-setu-api-jrcl.onrender.com/api/v1/health?ai=1` → `{"status":"ok","db":"up","ai":"up"}` (without `?ai=1`, `ai` is `unchecked`); `https://suraksha-setu-ai.onrender.com/health` → `{"status":"ok"}`; `…/internal/health` without the key → **401**.
+   With the internal key, verify `modelReady` for image classification, and `llmConfigured` and `groundingConfigured` for Sahayak setup. Run the classifier and Sahayak smoke tests on staging to confirm inference, provider access and MongoDB permissions.
 
 Notes: the API has no build step (plain Node ESM), so it starts with `npm run start -w apps/api` rather than `node dist/server.js` (docs/02 §9.2). Both services build from the repo root because they read `shared/constants.json`.
 
@@ -247,9 +248,10 @@ If a key was committed to git, rotating it is the fix — rewriting history does
 
 ### 2.9 Backups and the restore drill (task 7.7)
 
-- **Turn backups on:** add the GitHub secrets `MONGODB_URI_BACKUP` (the `backup-ro` user) and `BACKUP_PASSPHRASE`. Until both exist the nightly job only prints a warning and skips (it shows as a green run). Then Actions → "Nightly DB backup" → **Run workflow** once and check the artifact exists.
+- **Turn backups on:** add the GitHub secrets `MONGODB_URI_BACKUP` (the `backup-ro` user) and `BACKUP_PASSPHRASE`. The nightly job fails if either is missing. Then Actions → "Nightly DB backup" → **Run workflow** once and check the encrypted artifact exists.
 - M0 has no snapshots of its own, so this nightly dump (GitHub Actions, free for public repositories) is the backup. Artifacts are kept for 30 days.
 - **Drill (once before the pilot):** create a scratch database on the dev cluster → restore last night's dump into it (commands in README "Backups") → point a local API at it → log in as an admin and open a complaint → drop the scratch database. Record the date and the time it took in the Phase II report.
+- **Enable retention after a successful restore drill.** Apply the indexes with `npm run db:indexes -w apps/api` against the intended database, then set `DATA_RETENTION_ENABLED=1` on the API. The daily job removes data past the documented SOS and complaint cutoffs, including complaint images. The audit log cleanup runs during the first week of each month. Check the job logs after enabling.
 
 ### 2.10 Pilot and demo weeks (task 7.6) — still free
 

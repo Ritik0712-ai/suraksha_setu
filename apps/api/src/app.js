@@ -4,7 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import mongoSanitize from "express-mongo-sanitize";
 import { pinoHttp } from "pino-http";
-import { logger } from "./lib/logger.js";
+import { logger, serializeRequest } from "./lib/logger.js";
 import { createMailer } from "./lib/mailer.js";
 import { createAuthLimiters } from "./middleware/rateLimits.js";
 import { errorHandler, notFound } from "./middleware/errorHandler.js";
@@ -54,7 +54,7 @@ export function createApp({
   const sos = createSosService({ env, mailer: mail, realtime });
   const complaints = createComplaintService({ realtime, storage, ai });
   const manager = createComplaintManager({ realtime, storage, mailer: mail });
-  const limiters = createAuthLimiters(rateLimits);
+  const limiters = createAuthLimiters(rateLimits, env);
 
   app.disable("x-powered-by");
   app.set("trust proxy", 1); // Render / Vercel sit in front of us
@@ -68,10 +68,13 @@ export function createApp({
   app.use(express.json({ limit: "100kb" }));
   app.use(cookieParser());
   app.use(mongoSanitize());
-  app.use(pinoHttp({ logger }));
+  app.use(pinoHttp({ logger, serializers: { req: serializeRequest } }));
 
   const v1 = express.Router();
   v1.use("/health", healthRouter({ env, fetchImpl }));
+  // Emergency actions must remain available even when other API calls exhaust the budget.
+  v1.use("/sos", sosRouter({ env, sos }));
+  v1.use(limiters.general);
   v1.use("/auth", authRouter({ env, auth, limiters }));
   v1.use("/users/me/saved-schemes", savedSchemesRouter({ env }));
   v1.use("/users", usersRouter({ env, auth }));
@@ -80,7 +83,6 @@ export function createApp({
   v1.use("/donors", donorsRouter({ env }));
   v1.use("/emergency", emergencyRouter({ env, fetchImpl, limiter: limiters.nearby }));
   v1.use("/jurisdictions", jurisdictionsRouter());
-  v1.use("/sos", sosRouter({ env, sos }));
   v1.use("/track", trackRouter({ sos, limiter: limiters.track }));
   v1.use("/complaints", complaintsRouter({ env, complaints, manager, ai }));
   v1.use("/notifications", notificationsRouter({ env }));

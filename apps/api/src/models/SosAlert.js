@@ -58,6 +58,7 @@ const SosAlertSchema = new Schema(
     closeOutcome: { type: String, enum: [...C.sosCloseOutcomes, null], default: null },
     closeNote: { type: String, trim: true, maxlength: 500 },
     resolvedAt: Date,
+    locationTrimmedAt: Date,
     triggeredAt: { type: Date, required: true },
     lastUpdateAt: { type: Date, required: true },
     flaggedForReview: { type: Boolean, default: false },
@@ -70,6 +71,7 @@ SosAlertSchema.index({ userId: 1, status: 1 });
 SosAlertSchema.index({ jurisdictionAncestors: 1, status: 1, triggeredAt: -1 });
 SosAlertSchema.index({ trackTokenHash: 1 }, { unique: true });
 SosAlertSchema.index({ status: 1, lastUpdateAt: 1 });
+SosAlertSchema.index({ resolvedAt: 1 });
 SosAlertSchema.index({ lastLocation: "2dsphere" });
 // Only one open SOS per user (docs/05 §5.10), enforced by the database as the final guard.
 SosAlertSchema.index(

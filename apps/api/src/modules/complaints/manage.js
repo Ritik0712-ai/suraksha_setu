@@ -382,6 +382,9 @@ export function createComplaintManager({ realtime, storage, mailer }) {
     const updated = await write(c, {
       set: { resolutionImageUrl: stored.url, resolutionImagePublicId: stored.publicId },
       events: [event(user, "resolution_photo", {})],
+    }).catch(async (err) => {
+      await storage.destroy(stored.publicId).catch(() => {});
+      throw err;
     });
     if (previous) storage.destroy(previous).catch(() => {});
     await announce(updated, { templateKey: "notif.complaintNote", type: "complaint_note" });

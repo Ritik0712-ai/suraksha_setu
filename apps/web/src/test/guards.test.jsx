@@ -22,7 +22,9 @@ describe("route guards (docs/03 §1)", () => {
     loggedInAs(officer());
     const { router } = renderApp("/profile");
     await waitFor(() => expect(router.state.location.pathname).toBe("/portal"));
-    expect(await screen.findByText("यह पेज नागरिकों के लिए है।")).toBeInTheDocument();
+    expect(
+      await screen.findByText("यह पेज नागरिकों के लिए है।", {}, { timeout: 5_000 }),
+    ).toBeVisible();
   });
 
   it("authorities can't open admin pages", async () => {

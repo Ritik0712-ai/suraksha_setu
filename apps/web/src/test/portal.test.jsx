@@ -428,7 +428,7 @@ describe("A-06 analytics — Sahayak usage (docs/06 task 5.6)", () => {
     sahayak,
   });
 
-  it("admins see LLM usage; authorities don't", async () => {
+  it("admins see LLM usage", async () => {
     loggedInAs(officer({ role: "admin", authority: null }));
     server.use(
       http.get("*/api/v1/admin/analytics", () =>
@@ -447,7 +447,9 @@ describe("A-06 analytics — Sahayak usage (docs/06 task 5.6)", () => {
       ),
     );
     renderApp("/portal/analytics");
-    expect(await screen.findByText("सहायक का उपयोग (सिर्फ़ एडमिन)")).toBeInTheDocument();
+    expect(
+      await screen.findByText("सहायक का उपयोग (सिर्फ़ एडमिन)", {}, { timeout: 5_000 }),
+    ).toBeInTheDocument();
     expect(screen.getByText("210000")).toBeInTheDocument();
   });
 

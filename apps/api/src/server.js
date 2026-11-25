@@ -22,7 +22,14 @@ io = createRealtime(server, env);
 
 if (env.MONGODB_URI) {
   connectDb(env.MONGODB_URI, { production: env.NODE_ENV === "production" })
-    .then(() => startJobs({ realtime, storage, publicUrl: env.RENDER_EXTERNAL_URL }))
+    .then(() =>
+      startJobs({
+        realtime,
+        storage,
+        publicUrl: env.RENDER_EXTERNAL_URL,
+        retentionEnabled: env.DATA_RETENTION_ENABLED,
+      }),
+    )
     .catch((err) => {
       logger.error({ err }, "MongoDB connection failed");
       if (env.NODE_ENV === "production") process.exit(1);
