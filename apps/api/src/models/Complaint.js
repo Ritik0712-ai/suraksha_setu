@@ -104,6 +104,7 @@ const ComplaintSchema = new Schema(
 );
 
 ComplaintSchema.index({ complaintNo: 1 }, { unique: true });
+ComplaintSchema.index({ createdAt: 1 });
 ComplaintSchema.index({ citizenId: 1, createdAt: -1 });
 ComplaintSchema.index({ jurisdictionAncestors: 1, status: 1, createdAt: -1 });
 ComplaintSchema.index({ departmentId: 1, status: 1 });

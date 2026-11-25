@@ -19,29 +19,33 @@ def _error(code: str, message: str, http_status: int) -> Response:
     return Response({"error": {"code": code, "message": message}}, status=http_status)
 
 
-def _model_version() -> str | None:
-    """Version from the loaded model, else from model_card.json if the file is there."""
+def _model_status() -> tuple[bool, str | None]:
+    """Report readiness separately from version metadata on disk."""
     try:
-        return get_classifier().version
+        return True, get_classifier().version
     except ModelUnavailable:
         card = Path(settings.MODEL_PATH).with_name("model_card.json")
         if not Path(settings.MODEL_PATH).exists() or not card.exists():
-            return None
+            return False, None
         try:
-            return json.loads(card.read_text(encoding="utf-8")).get("modelVersion")
+            metadata = json.loads(card.read_text(encoding="utf-8"))
+            return False, metadata.get("modelVersion") if isinstance(metadata, dict) else None
         except (OSError, ValueError):
-            return None
+            return False, None
 
 
 @api_view(["GET"])
 def health(_request):
-    """GET /internal/health → { status, modelVersion, llmProvider } (docs/02 §7.3)."""
+    """Report AI capabilities to authenticated operators without calling the LLM."""
+    model_ready, model_version = _model_status()
     return Response(
         {
             "status": "ok",
-            "modelVersion": _model_version(),
+            "modelReady": model_ready,
+            "modelVersion": model_version,
             "llmProvider": settings.LLM_PROVIDER,
             "llmConfigured": settings.LLM_PROVIDER == "fake" or bool(settings.LLM_API_KEY),
+            "groundingConfigured": bool(settings.MONGODB_URI_READONLY),
         }
     )
 

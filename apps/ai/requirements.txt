@@ -1,9 +1,9 @@
 # Runtime (docs/02 §4.2). Pinned to minor versions; bump deliberately.
 Django>=5.2,<5.3
-djangorestframework>=3.17.2,<3.18
+djangorestframework>=3.18.2,<3.19
 gunicorn>=23,<24
 ai-edge-litert>=1.0  # LiteRT runtime for the .tflite model (docs/02 ADR-07)
-Pillow>=10,<13
+Pillow>=13.0.0,<14
 numpy>=1.26,<3
 google-genai>=1.0,<2  # Sahayak default LLM provider (docs/02 §4.2)
 pymongo>=4.8,<5  # read-only scheme grounding

@@ -390,7 +390,7 @@ Every request must carry `X-Internal-Key: <AI_INTERNAL_KEY>`. The service reject
 |---|---|---|---|
 | POST | `/internal/classify` | `{ imageUrl }` (Cloudinary URL, downloaded server-side, max 5 MB) | `{ category, confidence, top3: [...], modelVersion, inferenceMs }` |
 | POST | `/internal/sahayak/reply` | `{ language, mode, history: [...], message, schemeIds?, letterType?, userContext: { village, district } }` | `{ text, intent: "answer"\|"emergency"\|"letter_ready"\|"need_info"\|"out_of_scope", cards: [{type:"scheme", slug}], letter?: {...} }` |
-| GET | `/internal/health` | — | `{ status, modelVersion, llmProvider }` |
+| GET | `/internal/health` | — | `{ status, modelReady, modelVersion, llmProvider, llmConfigured, groundingConfigured }` |
 
 ### 7.4 Real-time events (Socket.IO)
 

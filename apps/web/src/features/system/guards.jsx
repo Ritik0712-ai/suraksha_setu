@@ -1,9 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { useTranslation } from "react-i18next";
 import { usePrefs } from "../../stores/prefs.js";
 import { isStaff, useSession } from "../../stores/session.js";
-import { toast } from "../../stores/toast.js";
 import { ListSkeleton } from "../../components/ui/States.jsx";
 import { ForbiddenPage } from "./SystemPages.jsx";
 
@@ -19,14 +17,6 @@ export function LanguageGate() {
   return <Outlet />;
 }
 
-function RedirectStaffToPortal() {
-  const { t } = useTranslation("system");
-  useEffect(() => {
-    toast(t("citizensOnly"), "info");
-  }, [t]);
-  return <Navigate to="/portal" replace />;
-}
-
 /** Citizen routes: guests → /login?next=, authorities/admins → /portal with a toast. */
 export function RequireCitizen() {
   const status = useSession((s) => s.status);
@@ -38,7 +28,7 @@ export function RequireCitizen() {
   if (status === "offline") return <Outlet />; // known citizen, server unreachable
   if (status !== "authed")
     return <Navigate to={`/login?next=${encodeURIComponent(here(location))}`} replace />;
-  if (isStaff(user)) return <RedirectStaffToPortal />;
+  if (isStaff(user)) return <Navigate to="/portal" replace state={{ citizensOnly: true }} />;
   return <Outlet />;
 }
 

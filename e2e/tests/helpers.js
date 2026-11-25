@@ -1,4 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
+import { fileURLToPath } from "node:url";
 import { expect, test as base } from "@playwright/test";
 import { ACCOUNTS, CONTEXT, PASSWORD, WEB_PORT, local } from "../accounts.js";
 
@@ -48,7 +49,7 @@ export async function expectAccessible(page, label) {
 }
 
 /** A red photo: the E2E test model classifies mostly-red images as road damage. */
-export const RED_PHOTO = new URL("../fixtures/red-road.jpg", import.meta.url).pathname;
+export const RED_PHOTO = fileURLToPath(new URL("../fixtures/red-road.jpg", import.meta.url));
 
 /** A second person on another phone (e.g. the officer while the citizen stays logged in). */
 export async function newPhone(browser) {

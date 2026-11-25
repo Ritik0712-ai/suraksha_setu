@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   AppBar,
   Badge,
@@ -30,9 +30,10 @@ import {
   PersonRounded,
   VolunteerActivismRounded,
 } from "@mui/icons-material";
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useSession } from "../../stores/session.js";
+import { toast } from "../../stores/toast.js";
 import { useLogout } from "../../features/auth/useLogout.js";
 import { ForceChangePassword } from "../../features/portal/ForceChangePassword.jsx";
 import { SessionExpiredDialog } from "../../features/system/SessionExpiredDialog.jsx";
@@ -194,10 +195,18 @@ function Sidebar({ mini, onNavigate }) {
 export function PortalShell({ title }) {
   const { t } = useTranslation("portal");
   const location = useLocation();
+  const navigate = useNavigate();
   const lg = useMediaQuery((theme) => theme.breakpoints.up("lg"));
   const md = useMediaQuery((theme) => theme.breakpoints.up("md"));
   const [open, setOpen] = useState(false);
   const width = lg ? FULL : md ? MINI : 0;
+
+  useEffect(() => {
+    if (!location.state?.citizensOnly) return;
+    toast(t("citizensOnly", { ns: "system" }), "info");
+    const { pathname, search, hash } = location;
+    navigate({ pathname, search, hash }, { replace: true, state: null });
+  }, [location, navigate, t]);
 
   return (
     <Box sx={{ display: "flex", minHeight: "100vh" }}>

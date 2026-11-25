@@ -23,20 +23,14 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Check secrets
-        id: check
         env:
           URI: ${{ secrets.MONGODB_URI_BACKUP }}
           PASS: ${{ secrets.BACKUP_PASSPHRASE }}
         run: |
-          if [ -z "$URI" ] || [ -z "$PASS" ]; then
-            echo "::warning::MONGODB_URI_BACKUP or BACKUP_PASSPHRASE is not set — skipping backup."
-            echo "ready=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "ready=true" >> "$GITHUB_OUTPUT"
-          fi
+          test -n "$URI" || { echo "::error::Missing MONGODB_URI_BACKUP"; exit 1; }
+          test -n "$PASS" || { echo "::error::Missing BACKUP_PASSPHRASE"; exit 1; }
 
       - name: Dump database
-        if: steps.check.outputs.ready == 'true'
         env:
           URI: ${{ secrets.MONGODB_URI_BACKUP }}
         run: |
@@ -44,10 +38,9 @@ jobs:
           # The official image ships mongodump, so no tool version to pin or download here.
           docker run --rm -e URI -v "$PWD/backup:/backup" mongo:8 \
             sh -c 'mongodump --uri="$URI" --archive=/backup/dump.archive.gz --gzip'
-          ls -lh backup
+          test -s backup/dump.archive.gz
 
       - name: Encrypt archive
-        if: steps.check.outputs.ready == 'true'
         env:
           PASS: ${{ secrets.BACKUP_PASSPHRASE }}
         run: |
@@ -59,7 +52,6 @@ jobs:
           echo "NAME=$name" >> "$GITHUB_ENV"
 
       - name: Upload encrypted backup
-        if: steps.check.outputs.ready == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.NAME }}

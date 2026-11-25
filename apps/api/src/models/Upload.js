@@ -24,5 +24,6 @@ const UploadSchema = new Schema(
 
 UploadSchema.index({ userId: 1, status: 1 });
 UploadSchema.index({ status: 1, createdAt: 1 }); // hourly cleanup of pending > 24 h
+UploadSchema.index({ attachedTo: 1 }, { sparse: true });
 
 export const Upload = mongoose.models.Upload || mongoose.model("Upload", UploadSchema);

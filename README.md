@@ -49,7 +49,7 @@ suraksha-setu/
 
 ### Prerequisites
 
-- Node.js **22** (LTS) and npm 10+
+- Node.js **22.12+** on the 22 LTS line and npm 10+
 - Python **3.11**
 - MongoDB: either a free Atlas **dev** cluster or local Mongo (`docker run -d -p 27017:27017 mongo:7`). The API still starts without one, but `/health` reports `db: "down"`.
 

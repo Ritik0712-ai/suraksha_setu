@@ -476,6 +476,7 @@ Each condition evaluates to **true**, **false** or **unknown** (the answer is mi
 | `closeOutcome` | Enum `sosCloseOutcomes` | | | |
 | `closeNote` | String (≤ 500) | | | |
 | `resolvedAt` | Date | | | |
+| `locationTrimmedAt` | Date | | | Set once the retention job removes detailed location history |
 | `triggeredAt` | Date | ✅ | | Client time if queued offline; the server keeps `createdAt` as well |
 | `lastUpdateAt` | Date | ✅ | | |
 | `flaggedForReview` | Boolean | | `false` | `true` if > 3 SOS in 1 hour from this user |

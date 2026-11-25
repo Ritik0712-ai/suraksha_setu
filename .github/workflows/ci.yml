@@ -56,6 +56,12 @@ jobs:
       - name: Lint the training scripts (ml/)
         run: ruff check ../../ml && black --check ../../ml
       - run: pytest -q
+      - name: Check production Django settings
+        env:
+          RENDER: "true"
+        run: |
+          DJANGO_SECRET_KEY="$(python -c 'import secrets; print(secrets.token_urlsafe(64))')" \
+            python manage.py check --deploy --fail-level WARNING
       # docs/02 SEC-17: known vulnerabilities in the AI service's dependencies
       - name: pip-audit
         run: pip install pip-audit && pip-audit -r requirements.txt
